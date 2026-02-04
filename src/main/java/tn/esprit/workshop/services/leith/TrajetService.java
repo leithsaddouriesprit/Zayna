@@ -74,4 +74,31 @@ public class TrajetService implements CRUD<Trajet> {
         }
         return list;
     }
+
+    public Trajet getTrajetByEnfant(int enfantId) throws SQLException {
+
+        String req =
+                "SELECT t.* FROM trajet t " +
+                        "JOIN enfant e ON e.trajet_id = t.id " +
+                        "WHERE e.id = " + enfantId +
+                        " AND e.actif = true";
+
+        Statement st = connection.createStatement();
+        ResultSet rs = st.executeQuery(req);
+
+        if (rs.next()) {
+            Trajet t = new Trajet();
+            t.setId(rs.getInt("id"));
+            t.setNom(rs.getString("nom"));
+            t.setIdBus(rs.getInt("id_bus"));
+            t.setIdEcole(rs.getInt("id_ecole"));
+            t.setHeureDepart(rs.getTime("heure_depart").toLocalTime());
+            t.setActif(rs.getBoolean("actif"));
+            t.setStatut(rs.getString("statut"));
+            return t;
+        }
+
+        return null;
+    }
+
 }
