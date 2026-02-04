@@ -1,5 +1,5 @@
 package tn.esprit.workshop.services;
-import tn.esprit.workshop.model.User;
+import tn.esprit.workshop.model.tous.User;
 import tn.esprit.workshop.utilis.MyBDConnexion;
 
 import java.sql.Connection;

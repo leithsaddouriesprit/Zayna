@@ -4,7 +4,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshop.controlleurs.AjouterPersonne">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshop.controlleurs.tous.AjouterPersonne">
    <children>
       <Button fx:id="login" layoutX="398.0" layoutY="270.0" mnemonicParsing="false" onAction="#enter" text="login" />
       <Button layoutX="170.0" layoutY="153.0" mnemonicParsing="false" text="Button" />

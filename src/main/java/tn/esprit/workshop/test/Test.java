@@ -1,10 +1,6 @@
 package tn.esprit.workshop.test;
-import tn.esprit.workshop.model.User;
 import tn.esprit.workshop.services.UserService;
 import tn.esprit.workshop.utilis.MyBDConnexion;
-
-import java.sql.SQLException;
-import java.util.List;
 
 
 public class Test {

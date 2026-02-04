@@ -1,15 +1,23 @@
-package tn.esprit.workshop.model;
+package tn.esprit.workshop.model.tous;
 
 import java.util.Objects;
 
-public class Maitresse {
+public class User {
     private int id;
     private String nom;
     private String prenom;
-    private String nomEcoleAttache;
+    private int age;
 
 
-    public Maitresse() {}
+    public User() {
+    }
+
+    public User(int id, String nom, String prenom, int age) {
+        this.id = id;
+        this.nom = nom;
+        this.prenom = prenom;
+        this.age = age;
+    }
 
     public int getId() {
         return id;
@@ -35,32 +43,33 @@ public class Maitresse {
         this.prenom = prenom;
     }
 
-    public String getNomEcoleAttache() {
-        return nomEcoleAttache;
+    public int getAge() {
+        return age;
     }
 
-    public void setNomEcoleAttache(String nomEcoleAttache) {
-        this.nomEcoleAttache = nomEcoleAttache;
+    public void setAge(int age) {
+        this.age = age;
     }
 
     @Override
     public String toString() {
-        return "Maitresse{" +
+        return "User{" +
                 "id=" + id +
                 ", nom='" + nom + '\'' +
                 ", prenom='" + prenom + '\'' +
-                ", nomEcoleAttache='" + nomEcoleAttache + '\'' +
+                ", age=" + age +
                 '}';
     }
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Maitresse maitresse)) return false;
-        return id == maitresse.id && Objects.equals(nom, maitresse.nom) && Objects.equals(prenom, maitresse.prenom) && Objects.equals(nomEcoleAttache, maitresse.nomEcoleAttache);
+        if (!(o instanceof User user)) return false;
+        return id == user.id && age == user.age && Objects.equals(nom, user.nom) && Objects.equals(prenom, user.prenom);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, nom, prenom, nomEcoleAttache);
+        return Objects.hash(id, nom, prenom, age);
     }
 }
+

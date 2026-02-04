@@ -1,4 +1,4 @@
-package tn.esprit.workshop.model;
+package tn.esprit.workshop.model.tous;
 
 import java.util.Objects;
 
