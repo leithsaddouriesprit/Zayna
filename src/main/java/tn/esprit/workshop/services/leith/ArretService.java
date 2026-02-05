@@ -1,6 +1,7 @@
 package tn.esprit.workshop.services.leith;
 
 import tn.esprit.workshop.model.leith.Arret;
+import tn.esprit.workshop.model.leith.Trajet;
 import tn.esprit.workshop.services.CRUD;
 import tn.esprit.workshop.utilis.MyBDConnexion;
 
@@ -73,4 +74,48 @@ public class ArretService implements CRUD<Arret> {
         }
         return list;
     }
+
+    public List<Arret> getArretsByTrajetOrdered(int trajetId) throws SQLException {
+        List<Arret> list = new ArrayList<>();
+        String req = "SELECT * FROM arret WHERE id_trajet=" + trajetId + " ORDER BY ordre_arret ASC";
+        Statement st = connection.createStatement();
+        ResultSet rs = st.executeQuery(req);
+
+        while (rs.next()) {
+            Arret a = new Arret();
+            a.setId(rs.getInt("id"));
+            a.setIdTrajet(rs.getInt("id_trajet"));
+            a.setNom(rs.getString("nom"));
+            a.setLatitude(rs.getDouble("latitude"));
+            a.setLongitude(rs.getDouble("longitude"));
+            a.setOrdre(rs.getInt("ordre_arret"));
+            a.setHeurePrevue(rs.getString("heure_prevue"));
+            list.add(a);
+        }
+        return list;
+    }
+
+    public Trajet getTrajetByEnfant(int enfantId) throws SQLException {
+        String req =
+                "SELECT t.* FROM trajet t " +
+                        "JOIN enfant e ON e.trajet_id = t.id " +
+                        "WHERE e.id=" + enfantId + " AND e.actif=true";
+
+        Statement st = connection.createStatement();
+        ResultSet rs = st.executeQuery(req);
+
+        if (rs.next()) {
+            Trajet t = new Trajet();
+            t.setId(rs.getInt("id"));
+            t.setNom(rs.getString("nom"));
+            t.setIdBus(rs.getInt("id_bus"));
+            t.setIdEcole(rs.getInt("id_ecole"));
+            t.setHeureDepart(rs.getTime("heure_depart").toLocalTime());
+            t.setActif(rs.getBoolean("actif"));
+            t.setStatut(rs.getString("statut"));
+            return t;
+        }
+        return null;
+    }
+
 }

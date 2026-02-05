@@ -6,7 +6,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <style>
-        html, body, #map { height: 100%; margin: 0; }
+        html, body { height: 100%; margin: 0; }
+        #map { height: 100vh; width: 100vw; }
     </style>
 </head>
 <body>
@@ -14,6 +15,7 @@
 
 <script>
     var map = L.map('map').setView([36.8065, 10.1815], 13);
+
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
@@ -28,6 +30,13 @@
 
     function panToBus(lat, lng) {
         map.panTo([lat, lng]);
+    }
+
+    function fixMapSize() {
+        // force recalcul 3 fois (WebView resize glitch)
+        setTimeout(() => map.invalidateSize(true), 100);
+        setTimeout(() => map.invalidateSize(true), 400);
+        setTimeout(() => map.invalidateSize(true), 900);
     }
 </script>
 </body>

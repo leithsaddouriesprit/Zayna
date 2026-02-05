@@ -1,10 +1,13 @@
 package tn.esprit.workshop.utilis;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import tn.esprit.workshop.controlleurs.leith.MapTrackingController;
+import tn.esprit.workshop.controlleurs.leith.TrackingMode;
 
 import java.io.IOException;
 
@@ -14,7 +17,22 @@ public class MainFFX extends Application {
         launch(args);
     }
 
+/*
     @Override
+    public void start(Stage primaryStage) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/leith/MapTracking.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            primaryStage.setScene(scene);
+            primaryStage.show();
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+*/
+  /* @Override
     public void start(Stage primaryStage) {
 
         try {
@@ -28,4 +46,37 @@ public class MainFFX extends Application {
         }
 
     }
+    */
+
+
+  @Override
+  public void start(Stage primaryStage) {
+
+      try {
+          FXMLLoader loader = new FXMLLoader(
+                  getClass().getResource("/leith/MapTracking.fxml")
+          );
+
+          Parent root = loader.load();
+
+          // récupérer le controller pour init
+          MapTrackingController controller = loader.getController();
+
+          // TEST ÉCOLE
+          controller.init(1, TrackingMode.ECOLE, null);
+
+          // (si tu veux tester Parent à la place)
+          // controller.init(1, TrackingMode.PARENT, 1);
+
+          Scene scene = new Scene(root, 1100, 700);
+          primaryStage.setTitle("Zayna – Bus Tracking");
+          primaryStage.setScene(scene);
+          primaryStage.show();
+      } catch (IOException e) {
+          System.out.println(e.getMessage());
+      }
+
+
+  }
+
 }
