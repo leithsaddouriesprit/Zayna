@@ -117,5 +117,29 @@ public class ArretService implements CRUD<Arret> {
         }
         return null;
     }
+    public List<Arret> getByTrajetId(int trajetId) throws SQLException {
+        List<Arret> list = new ArrayList<>();
+        String sql = "SELECT id, id_trajet, nom, latitude, longitude, ordre_arret, heure_prevue " +
+                "FROM arret WHERE id_trajet=? ORDER BY ordre_arret ASC";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, trajetId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Arret a = new Arret();
+                    a.setId(rs.getInt("id"));
+                    a.setIdTrajet(rs.getInt("id_trajet"));
+                    a.setNom(rs.getString("nom"));
+                    a.setLatitude(rs.getDouble("latitude"));
+                    a.setLongitude(rs.getDouble("longitude"));
+                    a.setOrdre(rs.getInt("ordre_arret"));
+                    // heure_prevue optional
+                    list.add(a);
+                }
+            }
+        }
+        return list;
+    }
+
 
 }

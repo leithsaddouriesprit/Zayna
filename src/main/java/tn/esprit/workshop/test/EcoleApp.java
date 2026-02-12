@@ -8,6 +8,6 @@ import tn.esprit.workshop.controlleurs.leith.TrackingMode;
 public class EcoleApp extends Application {
     @Override
     public void start(Stage primaryStage) {
-        SceneNavigator.openMap(1, TrackingMode.ECOLE, null);
+        SceneNavigator.openMap(1, TrackingMode.ECOLE, 1, 2);
     }
 }

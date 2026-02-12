@@ -57,13 +57,15 @@ public class MainFFX extends Application {
                   getClass().getResource("/leith/MapTracking.fxml")
           );
 
+          // if user.role =="parent"
+
           Parent root = loader.load();
 
           // récupérer le controller pour init
           MapTrackingController controller = loader.getController();
 
           // TEST ÉCOLE
-          controller.init(1, TrackingMode.ECOLE, null);
+          controller.init(1, TrackingMode.ECOLE, 1, 1);
 
           // (si tu veux tester Parent à la place)
           // controller.init(1, TrackingMode.PARENT, 1);

@@ -26,6 +26,7 @@ public class MapTrackingController {
 
     @FXML private WebView mapView;
 
+
     @FXML private Label lblTitle;
     @FXML private Label lblSubTitle;
     @FXML private Label lblChauffeur;
@@ -70,6 +71,12 @@ public class MapTrackingController {
             if (n == Worker.State.SUCCEEDED) {
                 System.out.println(engine.executeScript("typeof fixMapSize"));
                 engine.executeScript("fixMapSize()");
+                try {
+                    pushRouteToMap();
+                } catch (Exception e) {
+                    System.out.println("Erreur pushRouteToMap: " + e.getMessage());
+                }
+
 
                 // Si init(...) a déjà été appelé, on démarre
                 if (busId != 0) startAutoRefresh();
@@ -77,15 +84,58 @@ public class MapTrackingController {
         });
     }
 
-    /**
-     * ✅ Méthode clé : on injecte le contexte (busId + mode + enfantId)
-     */
-    public void init(int busId, TrackingMode mode, Integer enfantId) {
+    private void pushRouteToMap() throws SQLException {
+        if (trajetId <= 0) return;
+
+        List<Arret> arrets = arretService.getByTrajetId(trajetId);
+        if (arrets.isEmpty()) return;
+
+        String json = toStopsJson(arrets);
+        engine.executeScript("setRoute(" + json + ")");
+    }
+
+    private String toStopsJson(List<Arret> arrets) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+
+        for (int i = 0; i < arrets.size(); i++) {
+            Arret a = arrets.get(i);
+
+            sb.append("{")
+                    .append("\"lat\":").append(a.getLatitude()).append(",")
+                    .append("\"lng\":").append(a.getLongitude()).append(",")
+                    .append("\"name\":").append("\"").append(escapeJson(a.getNom())).append("\",")
+                    .append("\"order\":").append(a.getOrdre())
+                    .append("}");
+
+            if (i < arrets.size() - 1) sb.append(",");
+        }
+
+        sb.append("]");
+        return sb.toString();
+    }
+
+    private String escapeJson(String s) {
+        if (s == null) return "";
+        return s.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", " ")
+                .replace("\r", " ");
+    }
+
+
+
+    /// on injecte le contexte (busId + mode + enfantId)
+
+    public void init(int busId, TrackingMode mode, Integer enfantId, Integer trajetId) {
         this.busId = busId;
         this.mode = mode;
         this.enfantId = enfantId;
+        this.trajetId = trajetId;
 
-        // Texte UI selon le mode
+
+
+        /// Texte UI selon le mode
         if (mode == TrackingMode.PARENT) {
             lblTitle.setText("Suivi du bus de votre enfant");
             lblEtaTitle.setText("Arrivée estimée :");
@@ -97,7 +147,7 @@ public class MapTrackingController {
         lblBus.setText("Bus ID = " + busId);
         lblChauffeur.setText("—"); // on liera plus tard au chauffeur via bus
 
-        // Si map déjà chargée, on peut démarrer
+        /// Si map déjà chargée, on peut démarrer
         if (engine != null && engine.getLoadWorker().getState() == Worker.State.SUCCEEDED) {
             startAutoRefresh();
         }

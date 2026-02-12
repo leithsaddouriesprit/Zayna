@@ -17,87 +17,74 @@
 <div id="map"></div>
 
 <script>
-    // 1) Map init
-    const map = L.map('map').setView([36.8065, 10.1815], 13);
+    // 1) MAP INIT
+    var map = L.map('map').setView([36.8065, 10.1815], 13);
 
-    // 2) Tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '© OpenStreetMap'
     }).addTo(map);
 
-    // 3) BUS marker (très visible)
-    const busIcon = L.divIcon({
-        className: "",
-        html: "<div style='font-size:28px; transform: translate(-50%,-50%);'>🚌</div>",
-        iconSize: [28, 28]
-    });
+    // 2) BUS MARKER
+    var busMarker = L.marker([36.8065, 10.1815], { title: "Bus" }).addTo(map);
 
-    let busMarker = L.marker([36.8065, 10.1815], { icon: busIcon })
-        .addTo(map)
-        .bindPopup("BUS");
+    function updateBusPosition(lat, lng) { busMarker.setLatLng([lat, lng]); }
+    function panToBus(lat, lng) { map.panTo([lat, lng]); }
 
-    // 4) Stops + route (placeholders)
-    let stopsLayer = L.layerGroup().addTo(map);
-    let routeLine = null;
-
-    // ====== API JS appelée depuis JavaFX (engine.executeScript) ======
-
-    // Update bus marker position
-    function updateBusPosition(lat, lng) {
-        busMarker.setLatLng([lat, lng]);
-    }
-
-    // Pan to bus
-    function panToBus(lat, lng) {
-        map.panTo([lat, lng]);
-    }
-
-    // Draw stops (array: [{name, lat, lng, order}])
-    function setStops(stops) {
-        stopsLayer.clearLayers();
-
-        const latlngs = [];
-
-        stops.forEach(s => {
-            latlngs.push([s.lat, s.lng]);
-
-            L.circleMarker([s.lat, s.lng], {
-                radius: 6,
-                color: "#1f2937",
-                fillColor: "#3b82f6",
-                fillOpacity: 1
-            })
-                .addTo(stopsLayer)
-                .bindPopup((s.order ? ("#" + s.order + " - ") : "") + (s.name || "Stop"));
-        });
-
-        // Auto draw route if we have 2+ points
-        if (latlngs.length >= 2) {
-            drawRoute(latlngs);
-        }
-    }
-
-    // Draw route polyline
-    function drawRoute(latlngs) {
-        if (routeLine) map.removeLayer(routeLine);
-        routeLine = L.polyline(latlngs, { weight: 5 }).addTo(map);
-    }
-
-    // Force size recalculation (WebView resize glitch)
     function fixMapSize() {
         setTimeout(() => map.invalidateSize(true), 100);
         setTimeout(() => map.invalidateSize(true), 400);
         setTimeout(() => map.invalidateSize(true), 900);
     }
 
-    // ====== TEST local (tu peux supprimer après) ======
-    // Exemple: stops dummy
-    // setStops([
-    //   { order: 1, name: "Maison Leith", lat: 36.8065, lng: 10.1815 },
-    //   { order: 2, name: "Stop 2", lat: 36.8100, lng: 10.1700 },
-    //   { order: 3, name: "École", lat: 36.8200, lng: 10.1900 }
-    // ]);
+    // 3) ROUTE (REAL ROADS via OSRM)
+    var routeLayer = null;
+    var stopMarkers = [];
+
+    // stops = [{lat:36.8,lng:10.18,name:"...",order:0}, ...]
+    async function setRoute(stops) {
+        if (!stops || stops.length < 2) return;
+
+        // clear old layers
+        if (routeLayer) { map.removeLayer(routeLayer); routeLayer = null; }
+        stopMarkers.forEach(m => map.removeLayer(m));
+        stopMarkers = [];
+
+        // sort by order
+        stops.sort((a,b) => (a.order ?? 0) - (b.order ?? 0));
+
+        // markers
+        stops.forEach(s => {
+            var p = [s.lat, s.lng];
+            var m = L.circleMarker(p, { radius: 6, weight: 2 }).addTo(map);
+            m.bindPopup("<b>" + (s.name || "Arrêt") + "</b><br>Ordre: " + (s.order ?? "-"));
+            stopMarkers.push(m);
+        });
+
+        // build OSRM coords: lng,lat;lng,lat;...
+        var coords = stops.map(s => `${s.lng},${s.lat}`).join(";");
+
+        // OSRM public demo (OK for dev/tests; for production use your own OSRM)
+        var url = `https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson`;
+
+        try {
+            const res = await fetch(url);
+            const data = await res.json();
+
+            if (!data.routes || data.routes.length === 0) {
+                console.error("OSRM: no route", data);
+                return;
+            }
+
+            var geo = data.routes[0].geometry; // GeoJSON LineString
+            routeLayer = L.geoJSON(geo, { }).addTo(map);
+
+            map.fitBounds(routeLayer.getBounds(), { padding: [20, 20] });
+
+        } catch (e) {
+            console.error("OSRM fetch error:", e);
+        }
+    }
 </script>
 </body>
 </html>

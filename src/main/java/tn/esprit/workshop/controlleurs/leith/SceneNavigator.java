@@ -12,7 +12,7 @@ public class SceneNavigator {
 
     private static final Logger LOGGER =
             Logger.getLogger(SceneNavigator.class.getName());
-    public static void openMap(int busId, TrackingMode mode, Integer enfantId) {
+    public static void openMap(int busId, TrackingMode mode, Integer enfantId, Integer trajetId) {
         try {
             FXMLLoader loader = new FXMLLoader(
                     SceneNavigator.class.getResource("/leith/map/MapTracking.fxml")
@@ -20,7 +20,7 @@ public class SceneNavigator {
             Parent root = loader.load();
 
             MapTrackingController controller = loader.getController();
-            controller.init(busId, mode, enfantId);
+            controller.init(busId, mode, enfantId, trajetId);
 
             Stage stage = new Stage();
             stage.setTitle("Zayna - Tracking");

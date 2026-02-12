@@ -9,7 +9,7 @@ public class ParentApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         // enfantId = 1 (doit exister et avoir trajet_id)
-        SceneNavigator.openMap(1, TrackingMode.PARENT, 1);
+        SceneNavigator.openMap(1, TrackingMode.PARENT, 1, 2);
     }
 }
 
