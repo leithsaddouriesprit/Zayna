@@ -10,6 +10,7 @@ import tn.esprit.workshop.controlleurs.leith.MapTrackingController;
 import tn.esprit.workshop.controlleurs.leith.TrackingMode;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class MainFFX extends Application {
 
@@ -76,6 +77,8 @@ public class MainFFX extends Application {
           primaryStage.show();
       } catch (IOException e) {
           System.out.println(e.getMessage());
+      } catch (SQLException e) {
+          throw new RuntimeException(e);
       }
 
 

@@ -71,4 +71,28 @@ public class BusService implements CRUD<Bus> {
         }
         return list;
     }
+    public Bus getById(int id) throws SQLException {
+
+        String req = "SELECT * FROM bus WHERE id = " + id;
+
+        Statement st = connection.createStatement();
+        ResultSet rs = st.executeQuery(req);
+
+        if (rs.next()) {
+
+            Bus bus = new Bus();
+
+            bus.setId(rs.getInt("id"));
+            bus.setNumeroBus(rs.getString("numero_bus"));
+            bus.setMatricule(rs.getString("matricule"));
+            bus.setCapacite(rs.getInt("capacite"));
+            bus.setIdChauffeur(rs.getInt("id_chauffeur"));
+            bus.setActif(rs.getBoolean("actif"));
+
+            return bus;
+        }
+
+        return null;
+    }
+
 }

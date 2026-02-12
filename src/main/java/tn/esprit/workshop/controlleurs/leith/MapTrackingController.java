@@ -9,11 +9,12 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.util.Duration;
 import tn.esprit.workshop.model.leith.Arret;
+import tn.esprit.workshop.model.leith.Bus;
 import tn.esprit.workshop.model.leith.PositionBus;
 import tn.esprit.workshop.model.leith.Trajet;
-import tn.esprit.workshop.services.leith.ArretService;
-import tn.esprit.workshop.services.leith.PositionBusService;
-import tn.esprit.workshop.services.leith.TrajetService;
+import tn.esprit.workshop.model.tous.Chauffeur;
+import tn.esprit.workshop.services.leith.*;
+
 import java.net.URL;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -39,6 +40,7 @@ public class MapTrackingController {
 
     // paramètres injectés
     private int busId;
+    private int busMatricule;
     private TrackingMode mode;
     private Integer enfantId; // null si ECOLE
     private Integer trajetId; // optionnel (si tu veux éviter de recalculer)
@@ -47,6 +49,8 @@ public class MapTrackingController {
     private final PositionBusService positionBusService = new PositionBusService();
     private final TrajetService trajetService = new TrajetService();
     private final ArretService arretService = new ArretService();
+    private final BusService busService = new BusService();
+    private final ChauffeurService chauffeurService = new ChauffeurService();
     private static final Logger LOG = Logger.getLogger(MapTrackingController.class.getName());
 
     // state
@@ -127,8 +131,8 @@ public class MapTrackingController {
 
     /// on injecte le contexte (busId + mode + enfantId)
 
-    public void init(int busId, TrackingMode mode, Integer enfantId, Integer trajetId) {
-        this.busId = busId;
+    public void init(int busId, TrackingMode mode, Integer enfantId, Integer trajetId) throws SQLException {
+        this.busId = busMatricule;
         this.mode = mode;
         this.enfantId = enfantId;
         this.trajetId = trajetId;
@@ -143,9 +147,53 @@ public class MapTrackingController {
             lblTitle.setText("Suivi du bus (École)");
             lblEtaTitle.setText("Prochain point :");
         }
+        Bus bus = busService.getById(busId);
 
-        lblBus.setText("Bus ID = " + busId);
-        lblChauffeur.setText("—"); // on liera plus tard au chauffeur via bus
+        if (bus != null) {
+
+            lblBus.setText(bus.getMatricule());
+
+            Chauffeur chauffeur = chauffeurService.getById(bus.getIdChauffeur());
+
+            if (chauffeur != null) {
+                lblChauffeur.setText(
+                        chauffeur.getNom() + " " + chauffeur.getPrenom()
+                );
+            } else {
+                lblChauffeur.setText("Non assigné");
+            }
+
+        }
+
+
+
+        //// lblBus.setText("Bus Matricule = " + busMatricule);
+         //// lblChauffeur.setText("—"); // on liera plus tard au chauffeur via bus
+
+      /*  Bus bus = busService.getById(busId);
+
+        if (bus != null) {
+
+            // Affichage matricule
+            lblBus.setText(bus.getMatricule());
+
+            // Affichage chauffeur (si tu as la table chauffeur)
+            if (bus.getIdChauffeur() > 0) {
+                Chauffeur chauffeur = chauffeurService.getById(bus.getIdChauffeur());
+                if (chauffeur != null) {
+                    lblChauffeur.setText(chauffeur.getNom() + " " + chauffeur.getPrenom());
+                } else {
+                    lblChauffeur.setText("Chauffeur inconnu");
+                }
+            } else {
+                lblChauffeur.setText("Non assigné");
+            }
+
+        } else {
+            lblBus.setText("Bus inconnu");
+            lblChauffeur.setText("—");
+        }
+*/
 
         /// Si map déjà chargée, on peut démarrer
         if (engine != null && engine.getLoadWorker().getState() == Worker.State.SUCCEEDED) {
