@@ -31,10 +31,16 @@
 
             <Pane HBox.hgrow="ALWAYS"/>
 
-            <VBox>
-                <Label style="-fx-font-size: 16; -fx-font-weight: bold;" text="Your Son is"/>
-                <Label style="-fx-font-size: 12; -fx-opacity: 0.75;" text="On Board"/>
+            <VBox alignment="TOP_RIGHT" spacing="2">
+                <Label fx:id="lblEnfantNom"
+                       style="-fx-font-size: 16; -fx-font-weight: bold;"
+                       text="—"/>
+
+                <Label fx:id="lblEnfantStatus"
+                       style="-fx-font-size: 12; -fx-font-weight: bold;"
+                       text="—"/>
             </VBox>
+
         </HBox>
 
         <Separator/>

@@ -69,4 +69,56 @@ public class EnfantService implements CRUD<Enfant> {
         }
         return list;
     }
+
+    public Enfant getEnfantById(int id) {
+
+        Enfant enfant = null;
+        String sql = "SELECT * FROM enfant WHERE id = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                enfant = new Enfant();
+
+                enfant.setId(rs.getInt("id"));
+                enfant.setNom(rs.getString("nom"));
+                enfant.setPrenom(rs.getString("prenom"));
+                enfant.setParentId(rs.getInt("parent_id"));
+                enfant.setTrajetId(rs.getInt("trajet_id"));
+                enfant.setActif(rs.getBoolean("actif"));
+                enfant.setOnBoard(rs.getBoolean("on_board"));
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return enfant;
+    }
+    public Enfant getEnfantByTrajetId(int trajetId) throws SQLException {
+        String sql = "SELECT * FROM enfant WHERE trajet_id = ? LIMIT 1";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, trajetId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Enfant e = new Enfant();
+                    e.setId(rs.getInt("id"));
+                    e.setNom(rs.getString("nom"));
+                    e.setPrenom(rs.getString("prenom"));
+                    e.setParentId(rs.getInt("parent_id"));
+                    e.setTrajetId(rs.getInt("trajet_id"));
+                    e.setActif(rs.getBoolean("actif"));
+                    // e.setOnBoard(rs.getBoolean("on_board")); si tu l’as ajoutée
+                    return e;
+                }
+            }
+        }
+        return null;
+    }
+
+
 }

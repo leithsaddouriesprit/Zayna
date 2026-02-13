@@ -8,6 +8,7 @@ public class Enfant {
     private int parentId;
     private int trajetId;
     private boolean actif;
+    private boolean onBoard;
 
     public Enfant() {}
 
@@ -66,6 +67,13 @@ public class Enfant {
 
     public void setActif(boolean actif) {
         this.actif = actif;
+    }
+    public boolean isOnBoard() {
+        return onBoard;
+    }
+
+    public void setOnBoard(boolean onBoard) {
+        this.onBoard = onBoard;
     }
 
     @Override

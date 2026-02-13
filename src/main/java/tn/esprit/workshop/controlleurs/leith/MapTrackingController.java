@@ -8,10 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.util.Duration;
-import tn.esprit.workshop.model.leith.Arret;
-import tn.esprit.workshop.model.leith.Bus;
-import tn.esprit.workshop.model.leith.PositionBus;
-import tn.esprit.workshop.model.leith.Trajet;
+import tn.esprit.workshop.model.leith.*;
 import tn.esprit.workshop.model.tous.Chauffeur;
 import tn.esprit.workshop.services.leith.*;
 
@@ -34,6 +31,9 @@ public class MapTrackingController {
     @FXML private Label lblBus;
     @FXML private Label lblEtaTitle;
     @FXML private Label lblEtaValue;
+    @FXML private Label lblEnfantNom;
+    @FXML private Label lblEnfantStatus;
+
 
     private WebEngine engine;
     private Timeline timeline;
@@ -51,6 +51,7 @@ public class MapTrackingController {
     private final ArretService arretService = new ArretService();
     private final BusService busService = new BusService();
     private final ChauffeurService chauffeurService = new ChauffeurService();
+    private final EnfantService enfantService = new EnfantService();
     private static final Logger LOG = Logger.getLogger(MapTrackingController.class.getName());
 
     // state
@@ -137,7 +138,7 @@ public class MapTrackingController {
         this.enfantId = enfantId;
         this.trajetId = trajetId;
 
-
+loadEnfant();
 
         /// Texte UI selon le mode
         if (mode == TrackingMode.PARENT) {
@@ -199,6 +200,8 @@ public class MapTrackingController {
         if (engine != null && engine.getLoadWorker().getState() == Worker.State.SUCCEEDED) {
             startAutoRefresh();
         }
+
+
     }
 
     private void startAutoRefresh() {
@@ -290,6 +293,52 @@ public class MapTrackingController {
         }
         return best;
     }
+
+    private void loadEnfant() {
+        try {
+            Enfant enfant = enfantService.getEnfantById(enfantId);
+            System.out.println("DEBUG enfant = " + enfant);
+            updateEnfantStatus(enfant);
+        } catch (Exception e) {
+            System.out.println("ERROR enfant");
+        }
+    }
+    private void updateEnfantStatus(Enfant enfant) {
+
+        if (enfant == null) {
+            lblEnfantNom.setText("Aucun enfant");
+            lblEnfantStatus.setText("—");
+            lblEnfantStatus.setStyle("-fx-text-fill: #7f8c8d; -fx-font-weight: bold;");
+            return;
+        }
+
+        lblEnfantNom.setText(enfant.getNom() + " " + enfant.getPrenom());
+
+        if (enfant.isOnBoard()) {
+
+            lblEnfantStatus.setText("ON BOARD");
+            lblEnfantStatus.setStyle(
+                    "-fx-text-fill: #2ecc71; " +
+                            "-fx-font-weight: bold; " +
+                            "-fx-background-color: rgba(46,204,113,0.15); " +
+                            "-fx-padding: 4 8 4 8; " +
+                            "-fx-background-radius: 8;"
+            );
+
+        } else {
+
+            lblEnfantStatus.setText("NOT ON BOARD");
+            lblEnfantStatus.setStyle(
+                    "-fx-text-fill: #e74c3c; " +
+                            "-fx-font-weight: bold; " +
+                            "-fx-background-color: rgba(231,76,60,0.15); " +
+                            "-fx-padding: 4 8 4 8; " +
+                            "-fx-background-radius: 8;"
+            );
+        }
+    }
+
+
 
     // Haversine distance (km)
     private double haversineKm(double lat1, double lon1, double lat2, double lon2) {
