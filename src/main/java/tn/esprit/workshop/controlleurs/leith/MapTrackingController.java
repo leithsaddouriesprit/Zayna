@@ -71,15 +71,37 @@ public class MapTrackingController {
         );
         engine.load(url.toExternalForm());
 
+
         // IMPORTANT : on lance le refresh quand la page est prête
         engine.getLoadWorker().stateProperty().addListener((obs, o, n) -> {
             if (n == Worker.State.SUCCEEDED) {
                 System.out.println(engine.executeScript("typeof fixMapSize"));
                 engine.executeScript("fixMapSize()");
                 try {
+                    PositionBus p = positionBusService.getLastPosition(busId);
+
+                    double lat;
+                    double lng;
+
+                    if (p != null) {
+                        lat = p.getLatitude();
+                        lng = p.getLongitude();
+                    } else {
+                        Arret depart = arretService.getDepart(trajetId);
+                        lat = depart.getLatitude();
+                        lng = depart.getLongitude();
+                    }
+
+                    engine.executeScript("initBus(" + lat + "," + lng + ",14)");
+                } catch (Exception e) {
+                    System.out.println("Erreur initBus: " + e.getMessage());
+                }
+
+                // 👇 TES LIGNES EXISTANTES RESTENT
+                try {
                     pushRouteToMap();
                 } catch (Exception e) {
-                    System.out.println("Erreur pushRouteToMap: " + e.getMessage());
+                    System.out.println("Erreur pushRouteTomap: " + e.getMessage());
                 }
 
 

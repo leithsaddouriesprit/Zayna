@@ -6,6 +6,8 @@
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-rotatedmarker/leaflet.rotatedMarker.js"></script>
+
 
     <style>
         html, body { height: 100%; margin: 0; }
@@ -25,10 +27,34 @@
         attribution: '© OpenStreetMap'
     }).addTo(map);
 
-    // 2) BUS MARKER
-    var busMarker = L.marker([36.8065, 10.1815], { title: "Bus" }).addTo(map);
+    function initBus(lat, lng, zoom) {
+        busMarker.setLatLng([lat, lng]);
+        map.setView([lat, lng], zoom || 14);
+    }
 
-    function updateBusPosition(lat, lng) { busMarker.setLatLng([lat, lng]); }
+    // 2) BUS ICON
+    var busIcon = L.icon({
+        iconUrl: 'bus.png',
+        iconSize: [40, 40],
+        iconAnchor: [20, 20],
+        popupAnchor: [0, -20]
+    });
+
+    // 3) BUS MARKER
+    var busMarker = L.marker([36.8065, 10.1815], {
+        icon: busIcon,
+        title: "Bus"
+    }).addTo(map);
+
+
+    function updateBusPosition(lat, lng, angle) {
+        busMarker.setLatLng([lat, lng]);
+
+        if (angle !== undefined) {
+            busMarker.setRotationAngle(angle);
+        }
+    }
+
     function panToBus(lat, lng) { map.panTo([lat, lng]); }
 
     function fixMapSize() {

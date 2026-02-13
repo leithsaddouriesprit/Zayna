@@ -66,7 +66,7 @@ public class MainFFX extends Application {
           MapTrackingController controller = loader.getController();
 
           // TEST ÉCOLE
-          controller.init(1, TrackingMode.ECOLE, 1, 1);
+          controller.init(1, TrackingMode.PARENT, 1, 1);
 
           // (si tu veux tester Parent à la place)
           // controller.init(1, TrackingMode.PARENT, 1);
