@@ -101,4 +101,32 @@ public class TrajetService implements CRUD<Trajet> {
         return null;
     }
 
+
+    public Trajet getByBusId(int busId) throws SQLException {
+
+        String sql = "SELECT * FROM trajet WHERE id_bus = ? AND actif = 1 LIMIT 1";
+
+       PreparedStatement ps = connection.prepareStatement(sql);
+
+            ps.setInt(1, busId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                Trajet t = new Trajet();
+                t.setId(rs.getInt("id"));
+                t.setNom(rs.getString("nom"));
+                t.setIdBus(rs.getInt("id_bus"));
+                t.setIdEcole(rs.getInt("id_ecole"));
+                t.setHeureDepart(rs.getTime("heure_depart").toLocalTime());
+                t.setActif(rs.getBoolean("actif"));
+                t.setStatut(rs.getString("statut"));
+                return t;
+            }
+
+
+        return null;
+    }
+
+
 }

@@ -63,52 +63,68 @@
         setTimeout(() => map.invalidateSize(true), 900);
     }
 
-    // 3) ROUTE (REAL ROADS via OSRM)
-    var routeLayer = null;
-    var stopMarkers = [];
+    let routeLayer = null;
+    let stopMarkers = [];
 
-    // stops = [{lat:36.8,lng:10.18,name:"...",order:0}, ...]
-    async function setRoute(stops) {
-        if (!stops || stops.length < 2) return;
-
-        // clear old layers
+    function clearRoute() {
         if (routeLayer) { map.removeLayer(routeLayer); routeLayer = null; }
         stopMarkers.forEach(m => map.removeLayer(m));
         stopMarkers = [];
+    }
 
-        // sort by order
+    function dedupeStops(stops) {
+        const out = [];
+        let prev = null;
+        for (const s of stops) {
+            const lat = Number(s.lat), lng = Number(s.lng);
+            if (!isFinite(lat) || !isFinite(lng)) continue;
+
+            // ignore points quasi identiques (évite les loops OSRM)
+            if (prev && Math.abs(prev.lat - lat) < 0.00005 && Math.abs(prev.lng - lng) < 0.00005) {
+                continue;
+            }
+            out.push({ ...s, lat, lng });
+            prev = { lat, lng };
+        }
+        return out;
+    }
+
+    // stops = [{lat, lng, name, order}, ...]
+    async function setRoute(stops) {
+        clearRoute();
+        if (!stops || !stops.length) return;
+
+        // tri + nettoyage
         stops.sort((a,b) => (a.order ?? 0) - (b.order ?? 0));
+        stops = dedupeStops(stops);
+        if (stops.length < 2) return;
 
-        // markers
-        stops.forEach(s => {
-            var p = [s.lat, s.lng];
-            var m = L.circleMarker(p, { radius: 6, weight: 2 }).addTo(map);
-            m.bindPopup("<b>" + (s.name || "Arrêt") + "</b><br>Ordre: " + (s.order ?? "-"));
+        // markers arrêts
+        for (const s of stops) {
+            const p = [s.lat, s.lng];
+            const m = L.circleMarker(p, { radius: 6, weight: 2 }).addTo(map);
+            m.bindPopup("<b>" + (s.name || "Arrêt") + "</b>");
             stopMarkers.push(m);
-        });
+        }
 
-        // build OSRM coords: lng,lat;lng,lat;...
-        var coords = stops.map(s => `${s.lng},${s.lat}`).join(";");
+        // OSRM coordinates: lng,lat ; lng,lat ...
+        const coords = stops.map(s => `${s.lng},${s.lat}`).join(";");
 
-        // OSRM public demo (OK for dev/tests; for production use your own OSRM)
-        var url = `https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson`;
+        // Route réelle
+        const url = `https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson&steps=false`;
 
         try {
             const res = await fetch(url);
             const data = await res.json();
+            if (!data.routes || !data.routes.length) return;
 
-            if (!data.routes || data.routes.length === 0) {
-                console.error("OSRM: no route", data);
-                return;
-            }
+            const geom = data.routes[0].geometry; // GeoJSON LineString
+            const latlngs = geom.coordinates.map(c => [c[1], c[0]]); // обратно lat,lng
 
-            var geo = data.routes[0].geometry; // GeoJSON LineString
-            routeLayer = L.geoJSON(geo, { }).addTo(map);
-
+            routeLayer = L.polyline(latlngs, { weight: 5 }).addTo(map);
             map.fitBounds(routeLayer.getBounds(), { padding: [20, 20] });
-
         } catch (e) {
-            console.error("OSRM fetch error:", e);
+            console.log("OSRM error:", e);
         }
     }
 </script>

@@ -3,7 +3,7 @@ import java.sql.DriverManager;
 
 public class TestConnexion {
     public static void main(String[] args) {
-        String url = "jdbc:mysql://127.0.0.1:3310/test?useSSL=false&serverTimezone=UTC";
+        String url = "jdbc:mysql://127.0.0.1:3306/test?useSSL=false&serverTimezone=UTC";
         String user = "root";
         String password = ""; // vide par défaut XAMPP
 

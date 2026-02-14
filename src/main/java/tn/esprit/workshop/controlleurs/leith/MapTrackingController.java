@@ -20,6 +20,8 @@ import java.util.logging.Logger;
 import java.sql.SQLException;
 import java.util.List;
 
+import static com.sun.javafx.geom.Vec2d.distance;
+
 public class MapTrackingController {
 
     @FXML private WebView mapView;
@@ -33,6 +35,7 @@ public class MapTrackingController {
     @FXML private Label lblEtaValue;
     @FXML private Label lblEnfantNom;
     @FXML private Label lblEnfantStatus;
+    @FXML private Label LblEtaValue;
 
 
     private WebEngine engine;
@@ -127,7 +130,6 @@ public class MapTrackingController {
 
         for (int i = 0; i < arrets.size(); i++) {
             Arret a = arrets.get(i);
-
             sb.append("{")
                     .append("\"lat\":").append(a.getLatitude()).append(",")
                     .append("\"lng\":").append(a.getLongitude()).append(",")
@@ -158,9 +160,41 @@ public class MapTrackingController {
         this.busId = busMatricule;
         this.mode = mode;
         this.enfantId = enfantId;
-        this.trajetId = trajetId;
+       /// this.trajetId = trajetId;
 
-loadEnfant();
+        // ✅ 1) Résoudre trajetId AVANT tout
+        this.trajetId = resolveTrajetId(busId, enfantId, trajetId);
+
+        loadEnfant();
+      /*  // 1) si trajetId fourni
+        if (trajetId != null) {
+            this.trajetId = trajetId;
+            return;
+        }
+
+        // 2) sinon si enfantId fourni => trajetId via enfant
+        if (enfantId != null) {
+            try {
+                Enfant e = enfantService.getEnfantById(enfantId);
+                if (e != null) {
+                    this.trajetId = e.getTrajetId();
+                }
+            } catch (Exception ex) {
+                System.err.println(ex.getMessage());
+            }
+            return;
+        }
+
+        // 3) sinon mode ECOLE => trajet via busId (si tu as la méthode)
+        try {
+            Trajet t = trajetService.getByBusId(busId); // ou getActiveByBusId(busId)
+            if (t != null) this.trajetId = t.getId();
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+        }
+
+*/
+
 
         /// Texte UI selon le mode
         if (mode == TrackingMode.PARENT) {
@@ -234,6 +268,8 @@ loadEnfant();
     }
 
     private void refresh() {
+        System.out.println("DEBUG trajetId=" + trajetId + " busId=" + busId + " speed=" + (lastPos!=null?lastPos.getVitesse():null));
+
         try {
             lastPos = positionBusService.getLastPosition(busId);
             if (lastPos == null) {
@@ -264,50 +300,107 @@ loadEnfant();
      * - on prend "prochain arrêt" = le plus proche (v1)
      * - ETA = distance / 30kmh (vitesse moyenne)
      */
-    private String computeEtaText(double lat, double lng) throws SQLException {
+    private String computeEtaText(double lat, double lng) {
 
-        int tId = resolveTrajetId();
-        if (tId == 0) return "—";
+        try {
 
-        List<Arret> arrets = arretService.getArretsByTrajetOrdered(tId);
-        if (arrets.isEmpty()) return "—";
+            if (trajetId == 0) return "—";
 
-        Arret nearest = findNearestArret(lat, lng, arrets);
-        double distKm = haversineKm(lat, lng, nearest.getLatitude(), nearest.getLongitude());
+            List<Arret> arrets = arretService.getByTrajetId(trajetId);
 
-        double speedKmh = 30.0; // v1 fixe
-        double minutes = (distKm / speedKmh) * 60.0;
+            if (arrets.isEmpty()) return "—";
 
-        if (mode == TrackingMode.PARENT) {
-            return String.format("%.0f min (vers %s)", minutes, nearest.getNom());
-        } else {
-            return String.format("%.0f min (next: %s)", minutes, nearest.getNom());
+            Arret next = findClosest(arrets, lat, lng);
+
+            if (next == null) return "—";
+
+            double distanceKm = distance(lat, lng,
+                    next.getLatitude(),
+                    next.getLongitude());
+
+            // vitesse par défaut si 0
+            double speed = (lastPos.getVitesse() > 5)
+                    ? lastPos.getVitesse()
+                    : 30; // km/h fallback
+
+            double timeHours = distanceKm / speed;
+            int minutes = (int) Math.round(timeHours * 60);
+
+            return minutes + " min (next: " + next.getNom() + ")";
+
+        } catch (Exception e) {
+           System.err.println(e.getMessage());
         }
+        return "---";
     }
 
-    private int resolveTrajetId() throws SQLException {
-        if (trajetId != null) return trajetId;
 
-        // v1 : si parent -> on suppose enfantId fourni et Enfant a trajet_id
-        if (mode == TrackingMode.PARENT && enfantId != null) {
-            Trajet t = trajetService.getTrajetByEnfant(enfantId);
-            if (t != null) {
-                trajetId = t.getId();
-                return trajetId;
+    private double distance (double lat1, double lon1, double lat2, double lon2) {
+        double R = 6371.0;
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
+
+    private Arret findClosest(List<Arret> arrets, double lat, double lng) {
+
+        Arret closest = null;
+        double minDistance = Double.MAX_VALUE;
+
+        for (Arret a : arrets) {
+            double d = distance(lat, lng, a.getLatitude(), a.getLongitude());
+
+            if (d < minDistance) {
+                minDistance = d;
+                closest = a;
             }
         }
 
-        // v1 école : tu peux décider d’envoyer trajetId plus tard
-        // sinon on retourne 0
+        return closest;
+    }
+
+
+
+
+
+
+    private int resolveTrajetId(int busId, Integer enfantId, Integer trajetId) {
+
+        // 1) trajetId fourni
+        if (trajetId != null && trajetId > 0) return trajetId;
+
+        // 2) via enfant
+        if (enfantId != null && enfantId > 0) {
+            try {
+                Enfant e = enfantService.getEnfantById(enfantId);
+                if (e != null && e.getTrajetId() > 0) return e.getTrajetId();
+            } catch (Exception ex) {
+                System.err.println("resolveTrajetId enfant: " + ex.getMessage());
+            }
+        }
+
+        // 3) via bus (trajet actif)
+        try {
+            Trajet t = trajetService.getByBusId(busId);
+            if (t != null) return t.getId();
+        } catch (Exception ex) {
+            System.err.println("resolveTrajetId bus: " + ex.getMessage());
+        }
+
         return 0;
     }
+
 
     private Arret findNearestArret(double lat, double lng, List<Arret> arrets) {
         Arret best = arrets.get(0);
         double bestD = Double.MAX_VALUE;
 
         for (Arret a : arrets) {
-            double d = haversineKm(lat, lng, a.getLatitude(), a.getLongitude());
+            double d = distance(lat, lng, a.getLatitude(), a.getLongitude());
             if (d < bestD) {
                 bestD = d;
                 best = a;
@@ -363,17 +456,7 @@ loadEnfant();
 
 
     // Haversine distance (km)
-    private double haversineKm(double lat1, double lon1, double lat2, double lon2) {
-        double R = 6371.0;
-        double dLat = Math.toRadians(lat2 - lat1);
-        double dLon = Math.toRadians(lon2 - lon1);
-        double a =
-                Math.sin(dLat/2) * Math.sin(dLat/2) +
-                        Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
-                                Math.sin(dLon/2) * Math.sin(dLon/2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        return R * c;
-    }
+
 
     @FXML
     private void recenter() {
