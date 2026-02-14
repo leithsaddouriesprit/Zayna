@@ -7,6 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import tn.esprit.workshop.controlleurs.leith.MapTrackingController;
+import tn.esprit.workshop.controlleurs.leith.PostulerChauffeurController;
 import tn.esprit.workshop.controlleurs.leith.TrackingMode;
 
 import java.io.IOException;
@@ -48,8 +49,8 @@ public class MainFFX extends Application {
 
     }
     */
-
-
+/*
+/// tracking scene
   @Override
   public void start(Stage primaryStage) {
 
@@ -83,5 +84,34 @@ public class MainFFX extends Application {
 
 
   }
+
+ */
+    /// chauffeur scene
+@Override
+public void start(Stage primaryStage) {
+    try {
+        FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/leith/PostulerChauffeur.fxml")
+        );
+
+        Parent root = loader.load();
+
+        // récupérer le controller (comme MapTracking)
+        PostulerChauffeurController controller = loader.getController();
+
+        // Optionnel : init si tu veux passer un truc (ex: idEcole)
+        // controller.init(1);
+
+        Scene scene = new Scene(root, 800, 550);
+        primaryStage.setTitle("Zayna – Candidature Chauffeur");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+
+    } catch (IOException e) {
+        System.out.println("Erreur FXML: " + e.getMessage());
+        System.out.println(e.getMessage());
+    }
+}
+
 
 }
