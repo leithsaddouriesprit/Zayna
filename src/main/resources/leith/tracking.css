@@ -1,0 +1,92 @@
+/* Root (pas la map, juste base UI) */
+.root {
+    -fx-font-family: "Segoe UI", "Inter", "SF Pro Display";
+}
+
+/* Carte overlay (glass) */
+.overlay-card {
+    -fx-background-color: rgba(255, 255, 255, 0.88);
+    -fx-background-radius: 18;
+    -fx-border-radius: 18;
+    -fx-border-width: 1;
+    -fx-border-color: rgba(17, 24, 39, 0.10);
+    -fx-padding: 18 18 14 18;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.22), 35, 0.20, 0, 12);
+}
+
+/* Header */
+.bus-emoji { -fx-font-size: 22px; }
+
+.title {
+    -fx-font-size: 17px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #0F172A;
+}
+
+.subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: rgba(15, 23, 42, 0.70);
+}
+
+/* Right side */
+.child-name {
+    -fx-font-size: 16px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #0F172A;
+}
+
+/* Badge */
+.status-badge {
+    -fx-font-size: 11px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #B91C1C;
+    -fx-background-color: #FEE2E2;
+    -fx-background-radius: 999;
+    -fx-padding: 5 10 5 10;
+}
+
+/* Separator */
+.sep { -fx-opacity: 0.35; }
+
+/* Grid */
+.key {
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+    -fx-text-fill: rgba(15, 23, 42, 0.65);
+}
+
+.value {
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #0F172A;
+}
+
+.eta {
+    -fx-font-size: 12px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #0F172A;
+}
+
+/* Buttons */
+.btn-primary {
+    -fx-background-color: linear-gradient(to right, #2563EB, #4F46E5);
+    -fx-text-fill: white;
+    -fx-font-weight: 900;
+    -fx-background-radius: 14;
+    -fx-padding: 9 16 9 16;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(37,99,235,0.30), 18, 0.18, 0, 6);
+}
+.btn-primary:hover { -fx-opacity: 0.92; }
+.btn-primary:pressed { -fx-translate-y: 1; }
+
+.btn-secondary {
+    -fx-background-color: rgba(15, 23, 42, 0.10);
+    -fx-text-fill: #0F172A;
+    -fx-font-weight: 900;
+    -fx-background-radius: 14;
+    -fx-padding: 9 16 9 16;
+    -fx-cursor: hand;
+}
+.btn-secondary:hover { -fx-background-color: rgba(15, 23, 42, 0.14); }
+.btn-secondary:pressed { -fx-translate-y: 1; }

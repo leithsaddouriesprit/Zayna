@@ -32,9 +32,8 @@ public class MainFFX extends Application {
         catch (Exception e) {
             System.out.println(e.getMessage());
         }
-    }
-*/
-  /* @Override
+    } */
+/* @Override
     public void start(Stage primaryStage) {
 
         try {
@@ -49,7 +48,7 @@ public class MainFFX extends Application {
 
     }
     */
-/*
+
 /// tracking scene
   @Override
   public void start(Stage primaryStage) {
@@ -85,8 +84,8 @@ public class MainFFX extends Application {
 
   }
 
- */
-    /// chauffeur scene
+
+   /* /// chauffeur scene
 @Override
 public void start(Stage primaryStage) {
     try {
@@ -111,7 +110,7 @@ public void start(Stage primaryStage) {
         System.out.println("Erreur FXML: " + e.getMessage());
         System.out.println(e.getMessage());
     }
-}
+}*/
 
 
 }

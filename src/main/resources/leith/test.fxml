@@ -1,70 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.web.WebView?>
 
 <AnchorPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="tn.esprit.workshop.controlleurs.leith.PostulerChauffeurController">
+            fx:controller="tn.esprit.workshop.controlleurs.leith.MapTrackingController">
 
-    <children>
-        <VBox spacing="14.0"
-              AnchorPane.topAnchor="20.0"
-              AnchorPane.bottomAnchor="20.0"
-              AnchorPane.leftAnchor="20.0"
-              AnchorPane.rightAnchor="20.0">
+    <!-- MAP (remplit tout) -->
+    <WebView fx:id="mapView"
+             AnchorPane.topAnchor="0.0"
+             AnchorPane.bottomAnchor="0.0"
+             AnchorPane.leftAnchor="0.0"
+             AnchorPane.rightAnchor="0.0"/>
 
-            <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
-            </padding>
+    <!-- OVERLAY bas -->
+    <VBox maxWidth="420" spacing="8"
+          style="-fx-background-color: rgba(255,255,255,0.92); -fx-background-radius: 14; -fx-padding: 14; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 12, 0, 0, 3);"
+          AnchorPane.leftAnchor="20.0"
+          AnchorPane.rightAnchor="20.0"
+          AnchorPane.bottomAnchor="20.0">
 
-            <Label text="Candidature Chauffeur" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <Label style="-fx-font-size: 22;" text="🚌"/>
+            <VBox>
+                <Label fx:id="lblTitle" style="-fx-font-size: 16; -fx-font-weight: bold;" text="Bus Tracking"/>
+                <Label fx:id="lblSubTitle" style="-fx-font-size: 12; -fx-opacity: 0.75;" text="Informations en temps réel"/>
+            </VBox>
 
-            <GridPane hgap="12" vgap="12">
-                <columnConstraints>
-                    <ColumnConstraints minWidth="140" prefWidth="160"/>
-                    <ColumnConstraints hgrow="ALWAYS"/>
-                </columnConstraints>
+            <Pane HBox.hgrow="ALWAYS"/>
 
-                <!-- Nom -->
-                <Label text="Nom :" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                <TextField fx:id="tfNom" promptText="Entrez votre nom"
-                           GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+            <VBox alignment="TOP_RIGHT" spacing="2">
+                <Label fx:id="lblEnfantNom"
+                       style="-fx-font-size: 16; -fx-font-weight: bold;"
+                       text="—"/>
 
-                <!-- Prénom -->
-                <Label text="Prénom :" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                <TextField fx:id="tfPrenom" promptText="Entrez votre prénom"
-                           GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                <Label fx:id="lblEnfantStatus"
+                       style="-fx-font-size: 12; -fx-font-weight: bold;"
+                       text="—"/>
+            </VBox>
 
-                <!-- Age -->
-                <Label text="Âge :" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                <Spinner fx:id="spAge" editable="true"
-                         GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+        </HBox>
 
-                <!-- Expérience -->
-                <Label text="Années d'expérience :" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                <Spinner fx:id="spExperience" editable="true"
-                         GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+        <Separator/>
 
-                <!-- Maladie (non stockée) -->
-                <Label text="Maladie affectant le travail ?" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-                <ChoiceBox fx:id="cbMaladie"
-                           GridPane.rowIndex="4" GridPane.columnIndex="1"/>
-            </GridPane>
+        <GridPane hgap="12" vgap="6">
+            <columnConstraints>
+                <ColumnConstraints percentWidth="40"/>
+                <ColumnConstraints percentWidth="60"/>
+            </columnConstraints>
 
-            <HBox spacing="10" alignment="CENTER_RIGHT">
-                <Button fx:id="btnEnvoyer"
-                        text="Envoyer candidature"
-                        onAction="#envoyerCandidature"/>
-            </HBox>
+            <Label style="-fx-opacity: 0.75;" text="Chauffeur :" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <Label fx:id="lblChauffeur" text="—" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
+            <Label style="-fx-opacity: 0.75;" text="Bus :" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <Label fx:id="lblBus" text="—" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-            <Label fx:id="lblMessage"
-                   text=""
-                   wrapText="true"
-                   style="-fx-font-size: 13px;"/>
+            <Label fx:id="lblEtaTitle" style="-fx-opacity: 0.75;" text="ETA :" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+            <Label fx:id="lblEtaValue" style="-fx-font-weight: bold;" text="—" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+        </GridPane>
 
-        </VBox>
-    </children>
+        <HBox alignment="CENTER_RIGHT" spacing="10">
+            <Button onAction="#recenter" text="Recentrer"/>
+            <Button onAction="#close" text="Fermer"/>
+        </HBox>
+
+    </VBox>
+
 </AnchorPane>
