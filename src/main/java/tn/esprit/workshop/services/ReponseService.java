@@ -58,6 +58,23 @@ public class ReponseService {
         }
         return null;
     }
+    public String getReponseByReclamationId(int reclamationId) throws SQLException {
+
+        String query = "SELECT message FROM reponse WHERE reclamation_id = ?";
+
+        try (PreparedStatement ps = cnx.prepareStatement(query)) {
+
+            ps.setInt(1, reclamationId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getString("message");
+            }
+        }
+
+        return null; // si aucune réponse trouvée
+    }
 
     // READ BY ID
     public Reponse getById(int id) throws SQLException {
