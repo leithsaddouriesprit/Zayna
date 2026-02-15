@@ -6,6 +6,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import tn.esprit.workshop.model.Reclamation;
+import tn.esprit.workshop.model.Reponse;
 import tn.esprit.workshop.services.ReclamationService;
 import tn.esprit.workshop.services.ReponseService;
 
@@ -13,6 +14,7 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
 public class GestionReclamationController implements Initializable {
@@ -22,6 +24,7 @@ public class GestionReclamationController implements Initializable {
     @FXML private TextArea reponseArea;
     @FXML private TextField searchField;
     @FXML private Label statusLabel;
+    @FXML private Label statutReponseLabel;  // ✅ Maintenant reconnu car dans le FXML
 
     @FXML private TableView<Reclamation> tableReclamation;
     @FXML private TableColumn<Reclamation, Integer> colId;
@@ -33,22 +36,46 @@ public class GestionReclamationController implements Initializable {
     private final ReclamationService service = new ReclamationService();
     private final ReponseService reponseService = new ReponseService();
 
-    private int currentUserId = 1; // plus tard → user connecté
+    // ⚠️ Suggestion : Rendre 'final' ou convertir en variable locale
+    private final int currentUserId = 1;  // ✅ Ajout de 'final' pour suivre la suggestion
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-        // Types
+        // Types de réclamation
         typeChoice.getItems().addAll("Bus", "École", "Chauffeur", "Cantine", "Trajet", "Autre");
 
-        // Colonnes
+        // Configuration des colonnes
+        configurerColonnes();
+
+        // Style conditionnel pour le statut
+        configurerStyleStatut();
+
+        // Listener pour la sélection
+        tableReclamation.getSelectionModel().selectedItemProperty().addListener(
+                (obs, oldSelection, newSelection) -> {
+                    if (newSelection != null) {
+                        typeChoice.setValue(newSelection.getType());
+                        messageField.setText(newSelection.getDescription());
+                        chargerReponse(newSelection.getId());
+                    }
+                }
+        );
+
+        // Charger les réclamations
+        afficherReclamations();
+    }
+
+    // ================= CONFIGURATION =================
+
+    private void configurerColonnes() {
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colType.setCellValueFactory(new PropertyValueFactory<>("type"));
         colDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
         colStatut.setCellValueFactory(new PropertyValueFactory<>("statut"));
         colDate.setCellValueFactory(new PropertyValueFactory<>("dateReclamation"));
 
-        // Format date
+        // Format de la date
         colDate.setCellFactory(column -> new TableCell<>() {
             private final SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
@@ -58,8 +85,9 @@ public class GestionReclamationController implements Initializable {
                 setText(empty || item == null ? null : format.format(item));
             }
         });
+    }
 
-        // Style statut
+    private void configurerStyleStatut() {
         colStatut.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -70,7 +98,6 @@ public class GestionReclamationController implements Initializable {
                     setStyle("");
                 } else {
                     setText(item);
-
                     switch (item) {
                         case "EN_ATTENTE" ->
                                 setStyle("-fx-text-fill: orange; -fx-font-weight: bold;");
@@ -82,26 +109,40 @@ public class GestionReclamationController implements Initializable {
                 }
             }
         });
-
-        // 🔥 Quand on sélectionne une ligne
-        tableReclamation.getSelectionModel().selectedItemProperty().addListener(
-                (obs, oldSelection, newSelection) -> {
-                    if (newSelection != null) {
-                        typeChoice.setValue(newSelection.getType());
-                        messageField.setText(newSelection.getDescription());
-                        chargerReponse(newSelection.getId());
-                    }
-                }
-        );
-
-        afficherReclamations();
     }
 
-    // ================= AJOUT =================
+    // ================= CHARGER REPONSE =================
+
+    private void chargerReponse(int reclamationId) {
+        try {
+            Reponse reponse = reponseService.getReponseByReclamationId(reclamationId);
+
+            if (reponse != null) {
+                // ✅ Afficher uniquement le message
+                reponseArea.setText(reponse.getMessage());
+
+                // ✅ Mettre à jour le label de statut avec la date
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+                statutReponseLabel.setText("Répondu le " + reponse.getDate().format(formatter));
+
+                // Changer la couleur du point (optionnel)
+                // Vous pouvez aussi changer la couleur du point ici si vous avez un autre label
+
+            } else {
+                reponseArea.setText("Aucune réponse pour le moment...");
+                statutReponseLabel.setText("En attente de réponse");
+            }
+        } catch (SQLException e) {
+            reponseArea.setText("Erreur chargement réponse");
+            statutReponseLabel.setText("Indisponible");
+            e.printStackTrace();
+        }
+    }
+
+    // ================= CRUD =================
 
     @FXML
     private void envoyerReclamation() {
-
         String type = typeChoice.getValue();
         String message = messageField.getText();
 
@@ -133,11 +174,8 @@ public class GestionReclamationController implements Initializable {
         }
     }
 
-    // ================= MODIFIER =================
-
     @FXML
     private void modifierReclamation() {
-
         Reclamation selected = tableReclamation.getSelectionModel().getSelectedItem();
 
         if (selected == null) {
@@ -160,26 +198,33 @@ public class GestionReclamationController implements Initializable {
         }
     }
 
-    // ================= SUPPRIMER =================
-
     @FXML
     private void supprimerReclamation() {
-
         Reclamation selected = tableReclamation.getSelectionModel().getSelectedItem();
+
         if (selected == null) {
             statusLabel.setText("❌ Sélectionnez une réclamation");
             return;
         }
 
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setHeaderText("Confirmer suppression");
+        confirm.setTitle("Confirmation");
+        confirm.setHeaderText("Supprimer la réclamation");
+        confirm.setContentText("Êtes-vous sûr de vouloir supprimer cette réclamation ?");
 
         if (confirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
             try {
-                service.deleteOne(selected); // Utiliser l'instance de service
+                // Vérifier s'il y a une réponse associée
+                Reponse reponse = reponseService.getReponseByReclamationId(selected.getId());
+                if (reponse != null) {
+                    reponseService.delete(reponse.getId());
+                }
+
+                service.deleteOne(selected.getId());
                 statusLabel.setText("✅ Réclamation supprimée");
                 afficherReclamations();
                 viderFormulaire();
+
             } catch (SQLException e) {
                 statusLabel.setText("❌ Erreur suppression");
                 e.printStackTrace();
@@ -187,15 +232,13 @@ public class GestionReclamationController implements Initializable {
         }
     }
 
-
     // ================= RECHERCHE =================
 
     @FXML
     private void rechercherReclamation() {
-
         String keyword = searchField.getText();
 
-        if (keyword == null || keyword.isEmpty()) {
+        if (keyword == null || keyword.trim().isEmpty()) {
             afficherReclamations();
             return;
         }
@@ -203,15 +246,17 @@ public class GestionReclamationController implements Initializable {
         try {
             tableReclamation.setItems(
                     FXCollections.observableArrayList(
-                            service.rechercherParMotCle(keyword)
+                            service.rechercherParMotCle(keyword.trim())
                     )
             );
+            statusLabel.setText("🔍 Résultats pour : " + keyword);
         } catch (SQLException e) {
             statusLabel.setText("❌ Erreur recherche");
+            e.printStackTrace();
         }
     }
 
-    // ================= AFFICHER =================
+    // ================= AFFICHAGE =================
 
     private void afficherReclamations() {
         try {
@@ -220,19 +265,7 @@ public class GestionReclamationController implements Initializable {
             );
         } catch (SQLException e) {
             statusLabel.setText("❌ Erreur chargement");
-        }
-    }
-
-    // ================= REPONSE =================
-
-    private void chargerReponse(int reclamationId) {
-        try {
-            String reponse = String.valueOf(reponseService.getReponseByReclamationId(reclamationId));
-            reponseArea.setText(
-                    reponse != null ? reponse : "Aucune réponse pour le moment..."
-            );
-        } catch (SQLException e) {
-            reponseArea.setText("Erreur chargement réponse");
+            e.printStackTrace();
         }
     }
 
@@ -243,6 +276,9 @@ public class GestionReclamationController implements Initializable {
         typeChoice.setValue(null);
         messageField.clear();
         reponseArea.clear();
+        statutReponseLabel.setText("En attente de réponse");
         tableReclamation.getSelectionModel().clearSelection();
+        searchField.clear();
+        statusLabel.setText("Formulaire réinitialisé");
     }
 }

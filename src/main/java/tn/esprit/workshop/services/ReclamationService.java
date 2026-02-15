@@ -78,20 +78,19 @@ public class ReclamationService {
     }
 
     // DELETE
-    public void deleteOne(Reclamation r) throws SQLException {
-        // 1. Supprimer les réponses liées
-        String sqlReponse = "DELETE FROM reponse WHERE reclamation_id = ?";
-        try (PreparedStatement ps = cnx.prepareStatement(sqlReponse)) {
-            ps.setInt(1, r.getId());
-            ps.executeUpdate();
+    // ✅ DELETE BY ID (recommandé)
+    public void deleteOne(int id) throws SQLException {
+        String sql = "DELETE FROM reclamation WHERE id = ?";
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            int rowsAffected = ps.executeUpdate();
+            System.out.println("Réclamation supprimée, lignes affectées : " + rowsAffected);
         }
+    }
 
-        // 2. Supprimer la réclamation
-        String sqlReclamation = "DELETE FROM reclamation WHERE id = ?";
-        try (PreparedStatement ps = cnx.prepareStatement(sqlReclamation)) {
-            ps.setInt(1, r.getId());
-            ps.executeUpdate();
-        }
+    // ✅ DELETE BY OBJECT (optionnel)
+    public void deleteOne(Reclamation r) throws SQLException {
+        deleteOne(r.getId());  // Délègue à la méthode avec int
     }
 
 
