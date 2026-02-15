@@ -57,8 +57,14 @@
             <Label style="-fx-opacity: 0.75;" text="Bus :" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
             <Label fx:id="lblBus" text="—" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-            <Label fx:id="lblEtaTitle" style="-fx-opacity: 0.75;" text="ETA :" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-            <Label fx:id="lblEtaValue" style="-fx-font-weight: bold;" text="—" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+            <Label style="-fx-opacity: 0.75;" text="Vitesse :" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+            <Label fx:id="lblVitesse" style="-fx-font-weight: bold;" text="— km/h" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+            <Label style="-fx-opacity: 0.75;" text="Distance prochain arrêt :" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+            <Label fx:id="lblDistance" style="-fx-font-weight: bold;" text="— km" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+            <Label fx:id="lblEtaTitle" style="-fx-opacity: 0.75;" text="ETA :" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+            <Label fx:id="lblEtaValue" style="-fx-font-weight: bold;" text="—" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
         </GridPane>
 
         <HBox alignment="CENTER_RIGHT" spacing="10">

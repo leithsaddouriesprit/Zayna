@@ -19,8 +19,8 @@ import java.util.logging.Logger;
 
 import java.sql.SQLException;
 import java.util.List;
-
-import static com.sun.javafx.geom.Vec2d.distance;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MapTrackingController {
 
@@ -31,6 +31,8 @@ public class MapTrackingController {
     @FXML private Label lblSubTitle;
     @FXML private Label lblChauffeur;
     @FXML private Label lblBus;
+    @FXML private Label lblVitesse;
+    @FXML private Label lblDistance;
     @FXML private Label lblEtaTitle;
     @FXML private Label lblEtaValue;
     @FXML private Label lblEnfantNom;
@@ -81,18 +83,34 @@ public class MapTrackingController {
                 System.out.println(engine.executeScript("typeof fixMapSize"));
                 engine.executeScript("fixMapSize()");
                 try {
-                    PositionBus p = positionBusService.getLastPosition(busId);
-
                     double lat;
                     double lng;
 
-                    if (p != null) {
-                        lat = p.getLatitude();
-                        lng = p.getLongitude();
-                    } else {
+                    // Toujours démarrer à la position de départ (premier arrêt) pour que le bus soit sur le tracé
+                    if (trajetId > 0) {
                         Arret depart = arretService.getDepart(trajetId);
-                        lat = depart.getLatitude();
-                        lng = depart.getLongitude();
+                        if (depart != null) {
+                            lat = depart.getLatitude();
+                            lng = depart.getLongitude();
+                        } else {
+                            PositionBus p = positionBusService.getLastPosition(busId);
+                            if (p != null) {
+                                lat = p.getLatitude();
+                                lng = p.getLongitude();
+                            } else {
+                                lat = 36.8065;
+                                lng = 10.1815;
+                            }
+                        }
+                    } else {
+                        PositionBus p = positionBusService.getLastPosition(busId);
+                        if (p != null) {
+                            lat = p.getLatitude();
+                            lng = p.getLongitude();
+                        } else {
+                            lat = 36.8065;
+                            lng = 10.1815;
+                        }
                     }
 
                     engine.executeScript("initBus(" + lat + "," + lng + ",14)");
@@ -114,6 +132,8 @@ public class MapTrackingController {
         });
     }
 
+    private static final double DEFAULT_SIMULATION_SPEED_KMH = 40;
+
     private void pushRouteToMap() throws SQLException {
         if (trajetId <= 0) return;
 
@@ -121,7 +141,8 @@ public class MapTrackingController {
         if (arrets.isEmpty()) return;
 
         String json = toStopsJson(arrets);
-        engine.executeScript("setRoute(" + json + ")");
+        double speed = (lastPos != null && lastPos.getVitesse() > 5) ? lastPos.getVitesse() : DEFAULT_SIMULATION_SPEED_KMH;
+        engine.executeScript("setRoute(" + json + ", function(s){ if(s&&s>0) startRouteSimulation(s); }, " + speed + ")");
     }
 
     private String toStopsJson(List<Arret> arrets) {
@@ -157,10 +178,10 @@ public class MapTrackingController {
     /// on injecte le contexte (busId + mode + enfantId)
 
     public void init(int busId, TrackingMode mode, Integer enfantId, Integer trajetId) throws SQLException {
-        this.busId = busMatricule;
+        this.busId = busId;
         this.mode = mode;
         this.enfantId = enfantId;
-       /// this.trajetId = trajetId;
+        /// this.trajetId = trajetId;
 
         // ✅ 1) Résoudre trajetId AVANT tout
         this.trajetId = resolveTrajetId(busId, enfantId, trajetId);
@@ -225,7 +246,7 @@ public class MapTrackingController {
 
 
         //// lblBus.setText("Bus Matricule = " + busMatricule);
-         //// lblChauffeur.setText("—"); // on liera plus tard au chauffeur via bus
+        //// lblChauffeur.setText("—"); // on liera plus tard au chauffeur via bus
 
       /*  Bus bus = busService.getById(busId);
 
@@ -252,8 +273,25 @@ public class MapTrackingController {
         }
 */
 
-        /// Si map déjà chargée, on peut démarrer
+        /// Si map déjà chargée, repositionner le bus au départ puis démarrer
         if (engine != null && engine.getLoadWorker().getState() == Worker.State.SUCCEEDED) {
+            if (trajetId > 0) {
+                try {
+                    lastPos = positionBusService.getLastPosition(busId);
+                    Arret depart = arretService.getDepart(trajetId);
+                    if (depart != null) {
+                        engine.executeScript("initBus(" + depart.getLatitude() + "," + depart.getLongitude() + ",14)");
+                    } else {
+                        PositionBus p = positionBusService.getLastPosition(busId);
+                        if (p != null) {
+                            engine.executeScript("initBus(" + p.getLatitude() + "," + p.getLongitude() + ",14)");
+                        }
+                    }
+                    pushRouteToMap();
+                } catch (Exception e) {
+                    LOG.log(Level.WARNING, "Erreur repositionnement bus au départ", e);
+                }
+            }
             startAutoRefresh();
         }
 
@@ -268,12 +306,21 @@ public class MapTrackingController {
     }
 
     private void refresh() {
-        System.out.println("DEBUG trajetId=" + trajetId + " busId=" + busId + " speed=" + (lastPos!=null?lastPos.getVitesse():null));
-
         try {
+            Boolean simActive = (Boolean) engine.executeScript("typeof isRouteSimulationActive === 'function' && isRouteSimulationActive()");
+            if (Boolean.TRUE.equals(simActive)) {
+                Object status = engine.executeScript("getSimulationStatus()");
+                if (status != null && status instanceof String) {
+                    updateLabelsFromSimulation((String) status);
+                }
+                return;
+            }
+
             lastPos = positionBusService.getLastPosition(busId);
             if (lastPos == null) {
                 lblEtaValue.setText("Aucune position");
+                lblVitesse.setText("—");
+                lblDistance.setText("—");
                 return;
             }
 
@@ -282,15 +329,55 @@ public class MapTrackingController {
 
             engine.executeScript("updateBusPosition(" + lat + "," + lng + ");");
 
+            double speed = lastPos.getVitesse() > 5 ? lastPos.getVitesse() : 30;
+            lblVitesse.setText(String.format("%.0f km/h", speed));
+
             // ETA minimal : calcul vers prochain arrêt (ECOLE) ou arrêt “cible” (PARENT)
             // Pour l’instant, on fait v1 : prochain arrêt du trajet (si on a trajetId)
             String etaText = computeEtaText(lat, lng);
             lblEtaValue.setText(etaText);
 
+            if (trajetId > 0) {
+                List<Arret> arretsList = arretService.getByTrajetId(trajetId);
+                Arret next = findClosest(arretsList, lat, lng);
+                if (next != null) {
+                    double distKm = distance(lat, lng, next.getLatitude(), next.getLongitude());
+                    lblDistance.setText(String.format("%.2f km", distKm));
+                } else {
+                    lblDistance.setText("—");
+                }
+            } else {
+                lblDistance.setText("—");
+            }
+
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Erreur MapTrackingController.refresh()", ex);
-
         }
+    }
+
+    private void updateLabelsFromSimulation(String json) {
+        try {
+            double speed = extractJsonDouble(json, "speed");
+            double distNext = extractJsonDouble(json, "distanceToNextStop");
+            int etaMin = (int) extractJsonDouble(json, "etaMinutes");
+            String nextName = extractJsonString(json, "nextStopName");
+
+            lblVitesse.setText(String.format("%.0f km/h", speed));
+            lblDistance.setText(String.format("%.2f km", distNext));
+            lblEtaValue.setText(etaMin + " min" + (nextName != null && !nextName.isEmpty() ? " (next: " + nextName + ")" : ""));
+        } catch (Exception e) {
+            LOG.log(Level.WARNING, "Erreur parse simulation status", e);
+        }
+    }
+
+    private double extractJsonDouble(String json, String key) {
+        Matcher m = Pattern.compile("\"" + key + "\"\\s*:\\s*([\\d.]+)").matcher(json);
+        return m.find() ? Double.parseDouble(m.group(1)) : 0;
+    }
+
+    private String extractJsonString(String json, String key) {
+        Matcher m = Pattern.compile("\"" + key + "\"\\s*:\\s*\"([^\"]*)\"").matcher(json);
+        return m.find() ? m.group(1) : "";
     }
 
     /**
@@ -329,7 +416,7 @@ public class MapTrackingController {
             return minutes + " min (next: " + next.getNom() + ")";
 
         } catch (Exception e) {
-           System.err.println(e.getMessage());
+            System.err.println(e.getMessage());
         }
         return "---";
     }
@@ -410,6 +497,10 @@ public class MapTrackingController {
     }
 
     private void loadEnfant() {
+        if (enfantId == null) {
+            updateEnfantStatus(null);
+            return;
+        }
         try {
             Enfant enfant = enfantService.getEnfantById(enfantId);
             System.out.println("DEBUG enfant = " + enfant);

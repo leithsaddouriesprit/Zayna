@@ -15,7 +15,7 @@ public class SceneNavigator {
     public static void openMap(int busId, TrackingMode mode, Integer enfantId, Integer trajetId) {
         try {
             FXMLLoader loader = new FXMLLoader(
-                    SceneNavigator.class.getResource("/leith/map/MapTracking.fxml")
+                    SceneNavigator.class.getResource("/leith/MapTracking.fxml")
             );
             Parent root = loader.load();
 

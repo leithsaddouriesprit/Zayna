@@ -4,65 +4,72 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.web.WebView?>
 
-<?import java.lang.String?>
 <AnchorPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="tn.esprit.workshop.controlleurs.leith.MapTrackingController"
-            styleClass="root">
+            fx:controller="tn.esprit.workshop.controlleurs.leith.MapTrackingController">
 
-    <stylesheets>
-        <String fx:value="/leith/tracking.css"/>
-    </stylesheets>
-
+    <!-- MAP (remplit tout) -->
     <WebView fx:id="mapView"
              AnchorPane.topAnchor="0.0"
              AnchorPane.bottomAnchor="0.0"
              AnchorPane.leftAnchor="0.0"
              AnchorPane.rightAnchor="0.0"/>
 
-    <VBox maxWidth="420" spacing="10"
-          styleClass="overlay-card"
+    <!-- OVERLAY bas -->
+    <VBox maxWidth="420" spacing="8"
+          style="-fx-background-color: rgba(255,255,255,0.92); -fx-background-radius: 14; -fx-padding: 14; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 12, 0, 0, 3);"
           AnchorPane.leftAnchor="20.0"
           AnchorPane.rightAnchor="20.0"
           AnchorPane.bottomAnchor="20.0">
 
-        <HBox alignment="CENTER_LEFT" spacing="10" styleClass="header-row">
-            <Label text="🚌" styleClass="bus-emoji"/>
-
-            <VBox spacing="2">
-                <Label fx:id="lblTitle" text="Suivi du bus de votre enfant" styleClass="title"/>
-                <Label fx:id="lblSubTitle" text="Informations en temps réel" styleClass="subtitle"/>
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <Label style="-fx-font-size: 22;" text="🚌"/>
+            <VBox>
+                <Label fx:id="lblTitle" style="-fx-font-size: 16; -fx-font-weight: bold;" text="Bus Tracking"/>
+                <Label fx:id="lblSubTitle" style="-fx-font-size: 12; -fx-opacity: 0.75;" text="Informations en temps réel"/>
             </VBox>
 
             <Pane HBox.hgrow="ALWAYS"/>
 
-            <VBox alignment="TOP_RIGHT" spacing="4" styleClass="right-block">
-                <Label fx:id="lblEnfantNom" text="—" styleClass="child-name"/>
-                <Label fx:id="lblEnfantStatus" text="—" styleClass="status-badge"/>
+            <VBox alignment="TOP_RIGHT" spacing="2">
+                <Label fx:id="lblEnfantNom"
+                       style="-fx-font-size: 16; -fx-font-weight: bold;"
+                       text="—"/>
+
+                <Label fx:id="lblEnfantStatus"
+                       style="-fx-font-size: 12; -fx-font-weight: bold;"
+                       text="—"/>
             </VBox>
+
         </HBox>
 
-        <Separator styleClass="sep"/>
+        <Separator/>
 
-        <GridPane hgap="14" vgap="10" styleClass="info-grid">
+        <GridPane hgap="12" vgap="6">
             <columnConstraints>
-                <ColumnConstraints percentWidth="45"/>
-                <ColumnConstraints percentWidth="55"/>
+                <ColumnConstraints percentWidth="40"/>
+                <ColumnConstraints percentWidth="60"/>
             </columnConstraints>
 
-            <Label text="Chauffeur :" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="key"/>
-            <Label fx:id="lblChauffeur" text="—" GridPane.rowIndex="0" GridPane.columnIndex="1" styleClass="value"/>
+            <Label style="-fx-opacity: 0.75;" text="Chauffeur :" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <Label fx:id="lblChauffeur" text="—" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-            <Label text="Bus :" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="key"/>
-            <Label fx:id="lblBus" text="—" GridPane.rowIndex="1" GridPane.columnIndex="1" styleClass="value"/>
+            <Label style="-fx-opacity: 0.75;" text="Bus :" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <Label fx:id="lblBus" text="—" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-            <Label fx:id="lblEtaTitle" text="Arrivée estimée :" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="key"/>
-            <Label fx:id="lblEtaValue" text="—" GridPane.rowIndex="2" GridPane.columnIndex="1" styleClass="eta"/>
+            <Label style="-fx-opacity: 0.75;" text="Vitesse :" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+            <Label fx:id="lblVitesse" style="-fx-font-weight: bold;" text="— km/h" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+            <Label style="-fx-opacity: 0.75;" text="Distance prochain arrêt :" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+            <Label fx:id="lblDistance" style="-fx-font-weight: bold;" text="— km" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+            <Label fx:id="lblEtaTitle" style="-fx-opacity: 0.75;" text="ETA :" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+            <Label fx:id="lblEtaValue" style="-fx-font-weight: bold;" text="—" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
         </GridPane>
 
-        <HBox alignment="CENTER_RIGHT" spacing="10" styleClass="actions">
-            <Button onAction="#recenter" text="Recentrer" styleClass="btn-primary"/>
-            <Button onAction="#close" text="Fermer" styleClass="btn-secondary"/>
+        <HBox alignment="CENTER_RIGHT" spacing="10">
+            <Button onAction="#recenter" text="Recentrer"/>
+            <Button onAction="#close" text="Fermer"/>
         </HBox>
 
     </VBox>

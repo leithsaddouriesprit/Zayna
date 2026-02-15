@@ -65,11 +65,100 @@
 
     let routeLayer = null;
     let stopMarkers = [];
+    let routePoints = [];
+    let cumulativeDistances = [];
+    let totalRouteDistance = 0;
+    let stopDistancesAtRoute = [];  // distance à laquelle on atteint chaque arrêt
+    let stopsData = [];
+    let simInterval = null;
+    let simStartTime = null;
+    let simSpeedKmh = 30;
+    let simDistanceTraveled = 0;
 
     function clearRoute() {
+        stopRouteSimulation();
         if (routeLayer) { map.removeLayer(routeLayer); routeLayer = null; }
         stopMarkers.forEach(m => map.removeLayer(m));
         stopMarkers = [];
+        routePoints = [];
+        cumulativeDistances = [];
+        totalRouteDistance = 0;
+        stopDistancesAtRoute = [];
+        stopsData = [];
+    }
+
+    function haversineKm(lat1, lng1, lat2, lng2) {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLng = (lng2 - lng1) * Math.PI / 180;
+        const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    }
+
+    function getPositionAtDistance(km) {
+        if (!routePoints.length || !cumulativeDistances.length) return null;
+        if (km <= 0) return { lat: routePoints[0][0], lng: routePoints[0][1], nextStopIndex: 0 };
+        if (km >= totalRouteDistance) {
+            const last = routePoints.length - 1;
+            return { lat: routePoints[last][0], lng: routePoints[last][1], nextStopIndex: stopsData.length - 1, finished: true };
+        }
+        let i = 0;
+        while (i < cumulativeDistances.length - 1 && cumulativeDistances[i + 1] < km) i++;
+        const d0 = cumulativeDistances[i], d1 = cumulativeDistances[i + 1];
+        const frac = (km - d0) / (d1 - d0);
+        const lat = routePoints[i][0] + frac * (routePoints[i + 1][0] - routePoints[i][0]);
+        const lng = routePoints[i][1] + frac * (routePoints[i + 1][1] - routePoints[i][1]);
+        let nextStopIdx = 0;
+        for (let s = 0; s < stopDistancesAtRoute.length; s++) {
+            if (stopDistancesAtRoute[s] > km) { nextStopIdx = s; break; }
+            nextStopIdx = s;
+        }
+        const distToNext = nextStopIdx < stopDistancesAtRoute.length && stopDistancesAtRoute[nextStopIdx] > km
+            ? stopDistancesAtRoute[nextStopIdx] - km : 0;
+        return { lat, lng, nextStopIndex: nextStopIdx, distanceToNextStop: Math.max(0, distToNext) };
+    }
+
+    function getSimulationStatus() {
+        if (!simStartTime) return null;
+        const elapsedHours = (Date.now() - simStartTime) / 3600000;
+        simDistanceTraveled = Math.min(simSpeedKmh * elapsedHours, totalRouteDistance);
+        const pos = getPositionAtDistance(simDistanceTraveled);
+        if (!pos) return null;
+        const distNext = pos.distanceToNextStop != null ? Math.round(pos.distanceToNextStop * 1000) / 1000 : 0;
+        const etaMin = pos.distanceToNextStop != null && simSpeedKmh > 0 ? Math.round((pos.distanceToNextStop / simSpeedKmh) * 60) : 0;
+        const nextName = stopsData[pos.nextStopIndex] ? stopsData[pos.nextStopIndex].name : "";
+        return JSON.stringify({
+            speed: simSpeedKmh,
+            distanceTraveled: Math.round(simDistanceTraveled * 1000) / 1000,
+            distanceToNextStop: distNext,
+            nextStopName: nextName,
+            etaMinutes: etaMin
+        });
+    }
+
+    function startRouteSimulation(speedKmh) {
+        stopRouteSimulation();
+        if (!routePoints.length) return;
+        simSpeedKmh = speedKmh || 30;
+        simStartTime = Date.now();
+        simInterval = setInterval(function() {
+            const elapsedHours = (Date.now() - simStartTime) / 3600000;
+            simDistanceTraveled = Math.min(simSpeedKmh * elapsedHours, totalRouteDistance);
+            const pos = getPositionAtDistance(simDistanceTraveled);
+            if (pos) {
+                updateBusPosition(pos.lat, pos.lng);
+                if (simDistanceTraveled >= totalRouteDistance) stopRouteSimulation();
+            }
+        }, 500);
+    }
+
+    function stopRouteSimulation() {
+        if (simInterval) { clearInterval(simInterval); simInterval = null; }
+    }
+
+    function isRouteSimulationActive() {
+        return simInterval != null;
     }
 
     function dedupeStops(stops) {
@@ -78,28 +167,23 @@
         for (const s of stops) {
             const lat = Number(s.lat), lng = Number(s.lng);
             if (!isFinite(lat) || !isFinite(lng)) continue;
-
-            // ignore points quasi identiques (évite les loops OSRM)
-            if (prev && Math.abs(prev.lat - lat) < 0.00005 && Math.abs(prev.lng - lng) < 0.00005) {
-                continue;
-            }
+            if (prev && Math.abs(prev.lat - lat) < 0.00005 && Math.abs(prev.lng - lng) < 0.00005) continue;
             out.push({ ...s, lat, lng });
             prev = { lat, lng };
         }
         return out;
     }
 
-    // stops = [{lat, lng, name, order}, ...]
-    async function setRoute(stops) {
+    // stops = [{lat, lng, name, order}, ...], onReadyCallback = optional function(speedKmh) to start sim
+    async function setRoute(stops, onReadyCallback, speedKmh) {
         clearRoute();
         if (!stops || !stops.length) return;
 
-        // tri + nettoyage
         stops.sort((a,b) => (a.order ?? 0) - (b.order ?? 0));
         stops = dedupeStops(stops);
+        stopsData = stops;
         if (stops.length < 2) return;
 
-        // markers arrêts
         for (const s of stops) {
             const p = [s.lat, s.lng];
             const m = L.circleMarker(p, { radius: 6, weight: 2 }).addTo(map);
@@ -107,24 +191,52 @@
             stopMarkers.push(m);
         }
 
-        // OSRM coordinates: lng,lat ; lng,lat ...
         const coords = stops.map(s => `${s.lng},${s.lat}`).join(";");
-
-        // Route réelle
         const url = `https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson&steps=false`;
 
         try {
             const res = await fetch(url);
             const data = await res.json();
-            if (!data.routes || !data.routes.length) return;
+            if (!data.routes || !data.routes.length) {
+                if (onReadyCallback) onReadyCallback(speedKmh);
+                return;
+            }
 
-            const geom = data.routes[0].geometry; // GeoJSON LineString
-            const latlngs = geom.coordinates.map(c => [c[1], c[0]]); // обратно lat,lng
+            const geom = data.routes[0].geometry;
+            const latlngs = geom.coordinates.map(c => [c[1], c[0]]);
+            routePoints = latlngs;
+
+            cumulativeDistances = [0];
+            for (let i = 1; i < latlngs.length; i++) {
+                const d = haversineKm(latlngs[i-1][0], latlngs[i-1][1], latlngs[i][0], latlngs[i][1]);
+                cumulativeDistances.push(cumulativeDistances[i-1] + d);
+            }
+            totalRouteDistance = cumulativeDistances[cumulativeDistances.length - 1];
+
+            stopDistancesAtRoute = [];
+            let lastIdx = 0;
+            for (const stop of stops) {
+                let bestIdx = lastIdx, bestD = 1e9;
+                for (let i = lastIdx; i < latlngs.length; i++) {
+                    const d = haversineKm(stop.lat, stop.lng, latlngs[i][0], latlngs[i][1]);
+                    if (d < bestD) { bestD = d; bestIdx = i; }
+                }
+                stopDistancesAtRoute.push(cumulativeDistances[bestIdx]);
+                lastIdx = bestIdx;
+            }
 
             routeLayer = L.polyline(latlngs, { weight: 5 }).addTo(map);
             map.fitBounds(routeLayer.getBounds(), { padding: [20, 20] });
+
+            initBus(latlngs[0][0], latlngs[0][1], 14);
+            if (onReadyCallback && typeof onReadyCallback === 'function') {
+                onReadyCallback(speedKmh);
+            } else if (speedKmh > 0) {
+                startRouteSimulation(speedKmh);
+            }
         } catch (e) {
             console.log("OSRM error:", e);
+            if (onReadyCallback) onReadyCallback(speedKmh);
         }
     }
 </script>
