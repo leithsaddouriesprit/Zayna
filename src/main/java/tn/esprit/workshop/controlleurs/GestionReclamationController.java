@@ -6,6 +6,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import tn.esprit.workshop.model.Reclamation;
+import java.util.List;           // ← Pour List
+import java.util.ArrayList;      // ← Pour ArrayList si nécessaire
+import java.util.Optional;       // ← Pour Optional
 import tn.esprit.workshop.model.Reponse;
 import tn.esprit.workshop.services.ReclamationService;
 import tn.esprit.workshop.services.ReponseService;
@@ -64,6 +67,13 @@ public class GestionReclamationController implements Initializable {
 
         // Charger les réclamations
         afficherReclamations();
+    }
+    private void showAlert(String title, String content, Alert.AlertType type) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
     // ================= CONFIGURATION =================
@@ -146,55 +156,120 @@ public class GestionReclamationController implements Initializable {
         String type = typeChoice.getValue();
         String message = messageField.getText();
 
+        // ✅ Validation du type
         if (type == null || type.isEmpty()) {
-            statusLabel.setText("❌ Sélectionnez un type !");
+            showAlert("Erreur de saisie", "❌ Veuillez sélectionner un type de réclamation !", Alert.AlertType.WARNING);
             return;
         }
 
+        // ✅ Validation du message vide
         if (message == null || message.trim().isEmpty()) {
-            statusLabel.setText("❌ Message vide !");
+            showAlert("Erreur de saisie", "❌ Le message ne peut pas être vide !", Alert.AlertType.WARNING);
+            messageField.requestFocus();
             return;
         }
 
-        try {
-            service.ajouterReclamationEtRetournerId(
-                    currentUserId,
-                    type,
-                    message.trim(),
-                    "EN_ATTENTE"
-            );
+        // ✅ Validation de la longueur minimale
+        if (message.trim().length() < 10) {
+            showAlert("Erreur de saisie", "❌ Le message doit contenir au moins 10 caractères !", Alert.AlertType.WARNING);
+            messageField.requestFocus();
+            return;
+        }
 
-            statusLabel.setText("✅ Réclamation envoyée");
-            viderFormulaire();
-            afficherReclamations();
+        // ✅ Validation de la longueur maximale
+        if (message.trim().length() > 500) {
+            showAlert("Erreur de saisie", "❌ Le message ne peut pas dépasser 500 caractères !", Alert.AlertType.WARNING);
+            messageField.requestFocus();
+            return;
+        }
 
-        } catch (SQLException e) {
-            statusLabel.setText("❌ Erreur ajout");
-            e.printStackTrace();
+        // ✅ Validation des caractères spéciaux (optionnel)
+        if (message.matches(".*[<>{}].*")) {
+            showAlert("Erreur de saisie", "❌ Le message contient des caractères non autorisés !", Alert.AlertType.WARNING);
+            return;
+        }
+
+        // ✅ Alerte de confirmation avant envoi
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirmation");
+        confirm.setHeaderText("Envoyer la réclamation");
+        confirm.setContentText("Voulez-vous vraiment envoyer cette réclamation ?");
+
+        if (confirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+            try {
+                service.ajouterReclamationEtRetournerId(
+                        currentUserId,
+                        type,
+                        message.trim(),
+                        "EN_ATTENTE"
+                );
+
+                showAlert("Succès", "✅ Réclamation envoyée avec succès !", Alert.AlertType.INFORMATION);
+                viderFormulaire();
+                afficherReclamations();
+
+            } catch (SQLException e) {
+                showAlert("Erreur", "❌ Erreur lors de l'envoi : " + e.getMessage(), Alert.AlertType.ERROR);
+                e.printStackTrace();
+            }
         }
     }
 
     @FXML
     private void modifierReclamation() {
         Reclamation selected = tableReclamation.getSelectionModel().getSelectedItem();
+        String type = typeChoice.getValue();
+        String message = messageField.getText();
 
+        // ✅ Validation de la sélection
         if (selected == null) {
-            statusLabel.setText("❌ Sélectionnez une réclamation");
+            showAlert("Erreur", "❌ Veuillez sélectionner une réclamation à modifier !", Alert.AlertType.WARNING);
             return;
         }
 
-        try {
-            selected.setType(typeChoice.getValue());
-            selected.setDescription(messageField.getText());
+        // ✅ Validation du type
+        if (type == null || type.isEmpty()) {
+            showAlert("Erreur", "❌ Veuillez sélectionner un type !", Alert.AlertType.WARNING);
+            return;
+        }
 
-            service.updateOne(selected);
+        // ✅ Validation du message
+        if (message == null || message.trim().isEmpty()) {
+            showAlert("Erreur", "❌ Le message ne peut pas être vide !", Alert.AlertType.WARNING);
+            return;
+        }
 
-            statusLabel.setText("✅ Réclamation modifiée");
-            afficherReclamations();
+        // ✅ Validation de la longueur
+        if (message.trim().length() < 10) {
+            showAlert("Erreur", "❌ Le message doit contenir au moins 10 caractères !", Alert.AlertType.WARNING);
+            return;
+        }
 
-        } catch (SQLException e) {
-            statusLabel.setText("❌ Erreur modification");
-            e.printStackTrace();
+        // ✅ Vérifier si des modifications ont été apportées
+        if (selected.getType().equals(type) && selected.getDescription().equals(message.trim())) {
+            showAlert("Information", "ℹ️ Aucune modification détectée", Alert.AlertType.INFORMATION);
+            return;
+        }
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirmation");
+        confirm.setHeaderText("Modifier la réclamation");
+        confirm.setContentText("Voulez-vous vraiment modifier cette réclamation ?");
+
+        if (confirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+            try {
+                selected.setType(type);
+                selected.setDescription(message.trim());
+
+                service.updateOne(selected);
+
+                showAlert("Succès", "✅ Réclamation modifiée avec succès !", Alert.AlertType.INFORMATION);
+                afficherReclamations();
+
+            } catch (SQLException e) {
+                showAlert("Erreur", "❌ Erreur modification : " + e.getMessage(), Alert.AlertType.ERROR);
+                e.printStackTrace();
+            }
         }
     }
 
@@ -203,30 +278,38 @@ public class GestionReclamationController implements Initializable {
         Reclamation selected = tableReclamation.getSelectionModel().getSelectedItem();
 
         if (selected == null) {
-            statusLabel.setText("❌ Sélectionnez une réclamation");
+            showAlert("Erreur", "❌ Veuillez sélectionner une réclamation à supprimer !", Alert.AlertType.WARNING);
             return;
         }
 
+        // ✅ Alerte avec plus de détails
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Confirmation");
-        confirm.setHeaderText("Supprimer la réclamation");
-        confirm.setContentText("Êtes-vous sûr de vouloir supprimer cette réclamation ?");
+        confirm.setTitle("Confirmation de suppression");
+        confirm.setHeaderText("Supprimer la réclamation #" + selected.getId());
+        confirm.setContentText("Êtes-vous sûr de vouloir supprimer cette réclamation ?\nCette action est irréversible.");
 
         if (confirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
             try {
                 // Vérifier s'il y a une réponse associée
                 Reponse reponse = reponseService.getReponseByReclamationId(selected.getId());
                 if (reponse != null) {
+                    Alert info = new Alert(Alert.AlertType.INFORMATION);
+                    info.setTitle("Information");
+                    info.setHeaderText("Réponse associée");
+                    info.setContentText("Cette réclamation a une réponse qui sera également supprimée.");
+                    info.showAndWait();
+
                     reponseService.delete(reponse.getId());
                 }
 
                 service.deleteOne(selected.getId());
-                statusLabel.setText("✅ Réclamation supprimée");
+
+                showAlert("Succès", "✅ Réclamation supprimée avec succès !", Alert.AlertType.INFORMATION);
                 afficherReclamations();
                 viderFormulaire();
 
             } catch (SQLException e) {
-                statusLabel.setText("❌ Erreur suppression");
+                showAlert("Erreur", "❌ Erreur suppression : " + e.getMessage(), Alert.AlertType.ERROR);
                 e.printStackTrace();
             }
         }
@@ -238,24 +321,42 @@ public class GestionReclamationController implements Initializable {
     private void rechercherReclamation() {
         String keyword = searchField.getText();
 
+        // ✅ Validation du mot-clé
         if (keyword == null || keyword.trim().isEmpty()) {
-            afficherReclamations();
+            showAlert("Information", "ℹ️ Veuillez entrer un mot-clé pour la recherche", Alert.AlertType.INFORMATION);
+            afficherReclamations();  // Affiche toutes les réclamations
+            statusLabel.setText("Affichage de toutes les réclamations");
+            return;
+        }
+
+        // ✅ Validation de la longueur du mot-clé
+        if (keyword.trim().length() < 2) {
+            showAlert("Information", "ℹ️ Le mot-clé doit contenir au moins 2 caractères", Alert.AlertType.INFORMATION);
+            searchField.requestFocus();
             return;
         }
 
         try {
-            tableReclamation.setItems(
-                    FXCollections.observableArrayList(
-                            service.rechercherParMotCle(keyword.trim())
-                    )
-            );
-            statusLabel.setText("🔍 Résultats pour : " + keyword);
+            // Récupérer les résultats de la recherche
+            List<Reclamation> resultats = service.rechercherParMotCle(keyword.trim());
+
+            // Mettre à jour le message de statut
+            if (resultats.isEmpty()) {
+                showAlert("Résultat", "ℹ️ Aucune réclamation trouvée pour : " + keyword, Alert.AlertType.INFORMATION);
+                statusLabel.setText("🔍 Aucun résultat pour : " + keyword);
+            } else {
+                statusLabel.setText("🔍 " + resultats.size() + " résultat(s) pour : " + keyword);
+            }
+
+            // Afficher les résultats dans la table
+            tableReclamation.setItems(FXCollections.observableArrayList(resultats));
+
         } catch (SQLException e) {
+            showAlert("Erreur", "❌ Erreur lors de la recherche : " + e.getMessage(), Alert.AlertType.ERROR);
             statusLabel.setText("❌ Erreur recherche");
             e.printStackTrace();
         }
     }
-
     // ================= AFFICHAGE =================
 
     private void afficherReclamations() {
