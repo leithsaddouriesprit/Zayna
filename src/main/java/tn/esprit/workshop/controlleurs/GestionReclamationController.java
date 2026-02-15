@@ -177,7 +177,7 @@ public class GestionReclamationController implements Initializable {
 
         if (confirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
             try {
-                service.deleteOne(selected.getId());
+                ReclamationService.deleteOne(selected.getId());
                 statusLabel.setText("✅ Supprimée");
                 afficherReclamations();
                 viderFormulaire();
@@ -226,7 +226,7 @@ public class GestionReclamationController implements Initializable {
 
     private void chargerReponse(int reclamationId) {
         try {
-            String reponse = reponseService.getReponseByReclamationId(reclamationId);
+            String reponse = String.valueOf(reponseService.getReponseByReclamationId(reclamationId));
             reponseArea.setText(
                     reponse != null ? reponse : "Aucune réponse pour le moment..."
             );

@@ -3,10 +3,164 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import java.lang.String?>
 
 <AnchorPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="tn.esprit.workshop.controlleurs.GestionReponseController">
+
+    <stylesheets>
+        <String fx:value="data:text/css,
+            /* Styles globaux */
+            .root {
+                -fx-background-color: #f5f7fa;
+            }
+
+            /* Styles des boutons */
+            .button-vert {
+                -fx-background-color: #27ae60;
+                -fx-text-fill: white;
+                -fx-background-radius: 20;
+                -fx-padding: 8 20;
+                -fx-font-weight: bold;
+                -fx-cursor: hand;
+            }
+            .button-vert:hover {
+                -fx-background-color: #2ecc71;
+                -fx-scale-x: 1.05;
+                -fx-scale-y: 1.05;
+                -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 5);
+            }
+
+            .button-bleu {
+                -fx-background-color: #2980b9;
+                -fx-text-fill: white;
+                -fx-background-radius: 20;
+                -fx-padding: 8 20;
+                -fx-font-weight: bold;
+                -fx-cursor: hand;
+            }
+            .button-bleu:hover {
+                -fx-background-color: #3498db;
+                -fx-scale-x: 1.05;
+                -fx-scale-y: 1.05;
+                -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 5);
+            }
+
+            .button-rouge {
+                -fx-background-color: #c0392b;
+                -fx-text-fill: white;
+                -fx-background-radius: 20;
+                -fx-padding: 8 20;
+                -fx-font-weight: bold;
+                -fx-cursor: hand;
+            }
+            .button-rouge:hover {
+                -fx-background-color: #e74c3c;
+                -fx-scale-x: 1.05;
+                -fx-scale-y: 1.05;
+                -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 5);
+            }
+
+            .button-gris {
+                -fx-background-color: #95a5a6;
+                -fx-text-fill: white;
+                -fx-background-radius: 20;
+                -fx-padding: 8 20;
+                -fx-cursor: hand;
+            }
+            .button-gris:hover {
+                -fx-background-color: #7f8c8d;
+            }
+
+            /* Styles des champs de recherche */
+            .search-field {
+                -fx-background-radius: 20;
+                -fx-border-radius: 20;
+                -fx-padding: 8 15;
+                -fx-border-color: #e0e0e0;
+                -fx-background-color: white;
+            }
+            .search-field:focused {
+                -fx-border-color: #3498db;
+                -fx-effect: dropshadow(gaussian, rgba(52,152,219,0.3), 10, 0, 0, 0);
+            }
+
+            /* Styles des panneaux */
+            .panel-blanc {
+                -fx-background-color: white;
+                -fx-background-radius: 15;
+                -fx-padding: 15;
+                -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);
+            }
+
+            /* Styles des labels */
+            .titre-section {
+                -fx-font-weight: bold;
+                -fx-font-size: 16px;
+                -fx-text-fill: #2c3e50;
+            }
+
+            .sous-titre {
+                -fx-font-size: 12px;
+                -fx-text-fill: #7f8c8d;
+            }
+
+            /* Style pour la réponse existante */
+            .reponse-existante {
+                -fx-background-color: #e8f5e9;
+                -fx-background-radius: 10;
+                -fx-padding: 15;
+            }
+
+            /* Style pour les détails */
+            .details-panel {
+                -fx-background-color: #f8f9fa;
+                -fx-background-radius: 10;
+                -fx-padding: 15;
+            }
+
+            /* Style pour le message de statut */
+            .status-label {
+                -fx-font-size: 13px;
+                -fx-padding: 10;
+                -fx-background-color: #f0f0f0;
+                -fx-background-radius: 8;
+                -fx-text-fill: #2c3e50;
+            }
+
+            /* Style pour le séparateur */
+            .separator .line {
+                -fx-border-color: #e0e0e0;
+                -fx-border-width: 1;
+            }
+
+            /* Style pour la TableView */
+            .table-view {
+                -fx-background-radius: 10;
+                -fx-border-radius: 10;
+            }
+
+            .table-view .column-header {
+                -fx-background-color: #3498db;
+                -fx-text-fill: white;
+            }
+
+            .table-row-cell:odd {
+                -fx-background-color: #f9f9f9;
+            }
+
+            .table-row-cell:selected {
+                -fx-background-color: #3498db;
+                -fx-text-fill: white;
+            }
+
+            /* Animation pour les boutons */
+            .button {
+                -fx-transition: all 0.3s ease;
+            }
+        " />
+    </stylesheets>
 
     <children>
         <VBox spacing="14.0"
@@ -19,32 +173,42 @@
                 <Insets top="20" right="20" bottom="20" left="20"/>
             </padding>
 
-            <!-- Titre -->
-            <Label text="Gestion des Réponses (Admin)"
-                   style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+            <!-- En-tête avec titre -->
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="📋" style="-fx-font-size: 28px;"/>
+                <VBox>
+                    <Label text="Gestion des Réponses"
+                           style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                    <Label text="Administration des réclamations" styleClass="sous-titre"/>
+                </VBox>
+            </HBox>
 
-            <!-- Barre de recherche + boutons CRUD -->
+            <Separator/>
+
+            <!-- Barre de recherche -->
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <TextField fx:id="searchField"
                            promptText="Rechercher par type ou message..."
-                           HBox.hgrow="ALWAYS"/>
-                <Button text="Rechercher" onAction="#rechercherReponse"/>
-                <Button text="Réinitialiser" onAction="#reinitialiserRecherche"/>
+                           HBox.hgrow="ALWAYS"
+                           styleClass="search-field"/>
+                <Button text="🔍 Rechercher"
+                        onAction="#rechercherReponse"
+                        styleClass="button-bleu"/>
+                <Button text="⟲ Réinitialiser"
+                        onAction="#reinitialiserRecherche"
+                        styleClass="button-gris"/>
             </HBox>
 
-            <!-- SplitPane pour séparer réclamations et réponses -->
-            <SplitPane dividerPositions="0.6" VBox.vgrow="ALWAYS">
+            <!-- SplitPane -->
+            <SplitPane dividerPositions="0.6" VBox.vgrow="ALWAYS"
+                       style="-fx-background-color: transparent; -fx-box-border: transparent;">
                 <items>
                     <!-- Panneau gauche : Liste des réclamations -->
-                    <VBox spacing="10">
-                        <padding>
-                            <Insets right="5"/>
-                        </padding>
+                    <VBox spacing="10" styleClass="panel-blanc">
+                        <Label text="📌 Réclamations en attente" styleClass="titre-section"/>
 
-                        <Label text="Réclamations en attente"
-                               style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
-
-                        <TableView fx:id="tableReclamation" VBox.vgrow="ALWAYS">
+                        <TableView fx:id="tableReclamation" VBox.vgrow="ALWAYS"
+                                   styleClass="table-view">
                             <columns>
                                 <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
                                 <TableColumn fx:id="colType" text="Type" prefWidth="80"/>
@@ -52,76 +216,87 @@
                                 <TableColumn fx:id="colStatut" text="Statut" prefWidth="80"/>
                                 <TableColumn fx:id="colDate" text="Date" prefWidth="120"/>
                             </columns>
+                            <columnResizePolicy>
+                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                            </columnResizePolicy>
                         </TableView>
                     </VBox>
 
                     <!-- Panneau droit : Détails et réponse -->
-                    <VBox spacing="15">
-                        <padding>
-                            <Insets left="5"/>
-                        </padding>
+                    <VBox spacing="15" styleClass="panel-blanc">
 
-                        <!-- Détails de la réclamation sélectionnée -->
-                        <Label text="Détails de la réclamation"
-                               style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+                        <!-- Détails de la réclamation -->
+                        <Label text="📝 Détails de la réclamation" styleClass="titre-section"/>
 
-                        <GridPane hgap="10" vgap="8">
+                        <GridPane hgap="10" vgap="8" styleClass="details-panel">
                             <columnConstraints>
                                 <ColumnConstraints minWidth="100" prefWidth="100"/>
                                 <ColumnConstraints hgrow="ALWAYS"/>
                             </columnConstraints>
 
-                            <Label text="ID:" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
-                            <Label fx:id="detailIdLabel" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                            <Label text="🆔 ID:" GridPane.rowIndex="0" GridPane.columnIndex="0"
+                                   style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
+                            <Label fx:id="detailIdLabel" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                                   style="-fx-text-fill: #2c3e50;"/>
 
-                            <Label text="Type:" GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
-                            <Label fx:id="detailTypeLabel" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                            <Label text="📌 Type:" GridPane.rowIndex="1" GridPane.columnIndex="0"
+                                   style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
+                            <Label fx:id="detailTypeLabel" GridPane.rowIndex="1" GridPane.columnIndex="1"
+                                   style="-fx-text-fill: #2c3e50;"/>
 
-                            <Label text="Message:" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
+                            <Label text="💬 Message:" GridPane.rowIndex="2" GridPane.columnIndex="0"
+                                   style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
                             <TextArea fx:id="detailMessageArea"
                                       editable="false"
                                       prefRowCount="3"
                                       wrapText="true"
+                                      style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #e0e0e0; -fx-border-radius: 8;"
                                       GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-                            <Label text="Date:" GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
-                            <Label fx:id="detailDateLabel" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                            <Label text="📅 Date:" GridPane.rowIndex="3" GridPane.columnIndex="0"
+                                   style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
+                            <Label fx:id="detailDateLabel" GridPane.rowIndex="3" GridPane.columnIndex="1"
+                                   style="-fx-text-fill: #2c3e50;"/>
                         </GridPane>
 
                         <Separator/>
 
-                        <!-- Section Réponse -->
-                        <Label text="Réponse"
-                               style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
-
-                        <!-- Réponse existante (si disponible) -->
-                        <VBox spacing="5" fx:id="reponseExistanteBox" managed="false" visible="false">
-                            <Label text="Réponse actuelle:" style="-fx-font-weight: bold;"/>
+                        <!-- Réponse existante -->
+                        <VBox spacing="10" fx:id="reponseExistanteBox" managed="false" visible="false"
+                              styleClass="reponse-existante">
+                            <Label text="✅ Réponse actuelle"
+                                   style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #27ae60;"/>
                             <TextArea fx:id="reponseExistanteArea"
                                       editable="false"
                                       prefRowCount="3"
-                                      wrapText="true"/>
-                            <Label fx:id="reponseDateLabel" style="-fx-text-fill: gray;"/>
+                                      wrapText="true"
+                                      style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #a5d6a7; -fx-border-radius: 8;"/>
+                            <Label fx:id="reponseDateLabel" style="-fx-text-fill: #2e7d32; -fx-font-size: 11px;"/>
                         </VBox>
 
                         <!-- Formulaire de réponse -->
-                        <VBox spacing="8">
-                            <Label text="Nouvelle réponse:" style="-fx-font-weight: bold;"/>
+                        <VBox spacing="10">
+                            <Label text="✏️ Nouvelle réponse"
+                                   style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2c3e50;"/>
+
                             <TextArea fx:id="reponseField"
                                       prefRowCount="4"
                                       wrapText="true"
-                                      promptText="Écrivez votre réponse ici..."/>
+                                      promptText="Écrivez votre réponse ici..."
+                                      style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e0e0e0; -fx-padding: 10;"/>
 
                             <HBox spacing="10" alignment="CENTER_RIGHT">
-                                <Button text="Envoyer la réponse"
+                                <Button text="📤 Envoyer"
                                         onAction="#repondreReclamation"
-                                        style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
-                                <Button text="Modifier la réponse"
+                                        styleClass="button-vert"/>
+
+                                <Button text="✏️ Modifier"
                                         onAction="#modifierReponse"
-                                        style="-fx-background-color: #2196F3; -fx-text-fill: white;"/>
-                                <Button text="Supprimer la réponse"
+                                        styleClass="button-bleu"/>
+
+                                <Button text="🗑️ Supprimer"
                                         onAction="#supprimerReponse"
-                                        style="-fx-background-color: #f44336; -fx-text-fill: white;"/>
+                                        styleClass="button-rouge"/>
                             </HBox>
                         </VBox>
 
@@ -129,11 +304,10 @@
                         <Label fx:id="statusLabel"
                                text=""
                                wrapText="true"
-                               style="-fx-font-size: 13px;"/>
+                               styleClass="status-label"/>
                     </VBox>
                 </items>
             </SplitPane>
-
         </VBox>
     </children>
 </AnchorPane>

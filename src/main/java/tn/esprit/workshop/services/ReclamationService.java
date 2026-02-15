@@ -9,7 +9,7 @@ import java.util.List;
 
 public class ReclamationService {
 
-    private final Connection cnx = MyBDConnexion.getInstance().getConnection();
+    private static final Connection cnx = MyBDConnexion.getInstance().getConnection();
 
     // CREATE
     public void insertOne(Reclamation r) throws SQLException {
@@ -78,7 +78,7 @@ public class ReclamationService {
     }
 
     // DELETE
-    public void deleteOne(int id) throws SQLException {
+    public static void deleteOne(int id) throws SQLException {
         String sql = "DELETE FROM reclamation WHERE id = ?";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setInt(1, id);
