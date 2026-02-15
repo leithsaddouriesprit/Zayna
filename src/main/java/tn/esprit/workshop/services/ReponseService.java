@@ -15,7 +15,7 @@ public class ReponseService {
     public void insertOne(Reponse r) throws SQLException {
         String sql = "INSERT INTO reponse (reclamation_id, message, date_reponse) VALUES (?, ?, ?)";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
-            ps.setInt(1, r.getReclamationId());
+            ps.setInt(1, r.getreclamation_id());
             ps.setString(2, r.getMessage());
             ps.setTimestamp(3, Timestamp.valueOf(r.getDate()));
             ps.executeUpdate();
@@ -43,14 +43,14 @@ public class ReponseService {
     }
     // Rechercher une réponse par id de réclamation
     public Reponse getByReclamationId(int reclamationId) throws SQLException {
-        String sql = "SELECT * FROM reponse WHERE reclamationId = ?";
+        String sql = "SELECT * FROM reponse WHERE reclamation_id = ?"; // ✅
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setInt(1, reclamationId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return new Reponse(
-                        rs.getInt("reponseID"),
-                        rs.getInt("reclamationId"),
+                        rs.getInt("id"),
+                        rs.getInt("reclamation_id"),
                         rs.getString("message"),
                         rs.getTimestamp("date_reponse").toLocalDateTime()
                 );
@@ -81,7 +81,7 @@ public class ReponseService {
     public void update(Reponse r) throws SQLException {
         String sql = "UPDATE reponse SET reclamation_id = ?, message = ?, date_reponse = ? WHERE id = ?";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
-            ps.setInt(1, r.getReclamationId());
+            ps.setInt(1, r.getreclamation_id());
             ps.setString(2, r.getMessage());
             ps.setTimestamp(3, Timestamp.valueOf(r.getDate()));
             ps.setInt(4, r.getId());

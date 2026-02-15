@@ -54,7 +54,7 @@ public class GestionReclamationController implements Initializable {
 
         try {
             // 🔹 Appel du service pour insérer et récupérer l'ID de la réclamation
-            int reclamationId = service.ajouterReclamationEtRetournerId(
+            int reclamation_id = service.ajouterReclamationEtRetournerId(
                     1,          // userId fixe ici, peut être dynamique
                     "Parent",   // type utilisateur ou autre logique métier
                     type,
@@ -63,7 +63,7 @@ public class GestionReclamationController implements Initializable {
             );
 
             // 🔹 Message succès
-            statusLabel.setText("Réclamation envoyée ✔ (ID = " + reclamationId + ")");
+            statusLabel.setText("Réclamation envoyée ✔ (ID = " + reclamation_id + ")");
 
             // 🔹 Reset des champs
             typeChoice.setValue(null);
