@@ -34,7 +34,7 @@ public class MainFFX extends Application {
     public void start(Stage primaryStage) {
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/GestionReclamation.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/GestionReponse.fxml"));
             Parent root = loader.load(); ///flowmain incor pain scroll pain i dont know what im using in builder
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);

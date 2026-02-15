@@ -58,24 +58,40 @@ public class ReponseService {
         }
         return null;
     }
-    public String getReponseByReclamationId(int reclamationId) throws SQLException {
-
-        String query = "SELECT message FROM reponse WHERE reclamation_id = ?";
-
-        try (PreparedStatement ps = cnx.prepareStatement(query)) {
-
+    // Dans ReponseService.java - Version améliorée
+    public Reponse getReponseByReclamationId(int reclamationId) throws SQLException {
+        String sql = "SELECT * FROM reponse WHERE reclamation_id = ?";
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setInt(1, reclamationId);
-
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return rs.getString("message");
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Reponse r = new Reponse();
+                    r.setId(rs.getInt("id"));
+                    r.setreclamation_id(rs.getInt("reclamation_id"));
+                    r.setMessage(rs.getString("message"));
+                    r.setDate(rs.getTimestamp("date_reponse").toLocalDateTime());
+                    return r;
+                }
             }
         }
-
-        return null; // si aucune réponse trouvée
+        return null;
     }
 
+    // Version simplifiée pour retourner juste le message (si vous préférez garder l'existant)
+    public String getReponseMessageByReclamationId(int reclamationId) throws SQLException {
+        Reponse r = getReponseByReclamationId(reclamationId);
+        return r != null ? r.getMessage() : null;
+    }
+
+    // Dans ReponseService.java
+    public void deleteByReclamationId(int reclamationId) throws SQLException {
+        String sql = "DELETE FROM reponse WHERE reclamation_id = ?";
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+            ps.setInt(1, reclamationId);
+            int rowsAffected = ps.executeUpdate();
+            System.out.println("Réponses supprimées : " + rowsAffected);
+        }
+    }
     // READ BY ID
     public Reponse getById(int id) throws SQLException {
         String sql = "SELECT * FROM reponse WHERE id = ?";
