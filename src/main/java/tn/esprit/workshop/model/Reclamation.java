@@ -43,4 +43,11 @@ public class Reclamation {
 
     public String getStatut() { return statut; }
     public void setStatut(String statut) { this.statut = statut; }
+
+    public int getuser_id() {
+        return 0;
+    }
+    public void setuser_id(int user_id) {
+    }
+
 }
