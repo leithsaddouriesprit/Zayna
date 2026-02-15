@@ -5,7 +5,7 @@ import java.sql.Timestamp;
 public class Reclamation {
 
     private int id;
-    private int userId;
+    private int user_id;
     private String type;
     private String description;
     private Timestamp dateReclamation;
@@ -13,9 +13,9 @@ public class Reclamation {
 
     public Reclamation() {}
 
-    public Reclamation(int id, int userId, String type, String description, String statut) {
+    public Reclamation(int id, int user_id, String type, String description, String statut) {
         this.id = id;
-        this.userId = userId;
+        this.user_id = user_id;
         this.type = type;
         this.description = description;
         this.statut = statut;
@@ -29,8 +29,8 @@ public class Reclamation {
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
-    public int getUserId() { return userId; }
-    public void setUserId(int userId) { this.userId = userId; }
+    public int getuser_id() { return user_id; }
+    public void setuser_id(int user_id) { this.user_id = user_id; }
 
     public String getType() { return type; }
     public void setType(String type) { this.type = type; }
@@ -44,10 +44,6 @@ public class Reclamation {
     public String getStatut() { return statut; }
     public void setStatut(String statut) { this.statut = statut; }
 
-    public int getuser_id() {
-        return 0;
-    }
-    public void setuser_id(int user_id) {
-    }
+
 
 }
