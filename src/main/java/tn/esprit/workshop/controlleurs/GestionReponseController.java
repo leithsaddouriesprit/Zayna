@@ -4,7 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.VBox;  // ← IMPORTANT: Ajouter cet import
+import javafx.scene.layout.VBox;
 import tn.esprit.workshop.model.Reclamation;
 import tn.esprit.workshop.services.ReclamationService;
 import tn.esprit.workshop.services.ReponseService;
@@ -33,7 +33,7 @@ public class GestionReponseController {
     @FXML private Label detailDateLabel;
 
     // Section réponse existante
-    @FXML private VBox reponseExistanteBox;  // Maintenant reconnu grâce à l'import
+    @FXML private VBox reponseExistanteBox;
     @FXML private TextArea reponseExistanteArea;
     @FXML private Label reponseDateLabel;
 
@@ -52,7 +52,10 @@ public class GestionReponseController {
     public void initialize() {
         configurerColonnes();
         configurerListenerSelection();
-        afficherReclamationsEnAttente();
+
+        // ✅ CHANGEMENT 1 : Afficher TOUTES les réclamations au démarrage
+        afficherToutesReclamations();
+        statusLabel.setText("Affichage de toutes les réclamations");
     }
 
     private void configurerColonnes() {
@@ -73,6 +76,25 @@ public class GestionReponseController {
                     setText(null);
                 } else {
                     setText(format.format(item));
+                }
+            }
+        });
+
+        // ✅ AJOUT : Style conditionnel pour le statut
+        colStatut.setCellFactory(column -> new TableCell<Reclamation, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item);
+                    if ("EN_ATTENTE".equals(item)) {
+                        setStyle("-fx-text-fill: orange; -fx-font-weight: bold;");
+                    } else if ("TRAITEE".equals(item)) {
+                        setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+                    }
                 }
             }
         });
@@ -183,8 +205,8 @@ public class GestionReponseController {
             reclamationSelectionnee.setStatut("TRAITEE");
             reclamationService.updateOne(reclamationSelectionnee);
 
-            // Rafraîchir l'affichage
-            afficherReclamationsEnAttente();
+            // ✅ CHANGEMENT 2 : Rafraîchir avec TOUTES les réclamations
+            afficherToutesReclamations();
             chargerReponseExistante(reclamationSelectionnee.getId());
 
         } catch (SQLException e) {
@@ -242,8 +264,8 @@ public class GestionReponseController {
 
                 statusLabel.setText("✅ Réponse supprimée avec succès");
 
-                // Rafraîchir
-                afficherReclamationsEnAttente();
+                // ✅ CHANGEMENT 3 : Rafraîchir avec TOUTES les réclamations
+                afficherToutesReclamations();
                 reponseExistante = null;
 
                 if (reponseExistanteBox != null) {
@@ -266,7 +288,8 @@ public class GestionReponseController {
     private void rechercherReponse() {
         String keyword = searchField.getText().trim();
         if (keyword.isEmpty()) {
-            afficherReclamationsEnAttente();
+            // ✅ CHANGEMENT 4 : Réinitialiser avec TOUTES les réclamations
+            afficherToutesReclamations();
             return;
         }
 
@@ -283,10 +306,34 @@ public class GestionReponseController {
     @FXML
     private void reinitialiserRecherche() {
         searchField.clear();
-        afficherReclamationsEnAttente();
-        statusLabel.setText("Affichage de toutes les réclamations en attente");
+        // ✅ CHANGEMENT 5 : Réinitialiser avec TOUTES les réclamations
+        afficherToutesReclamations();
+        statusLabel.setText("Affichage de toutes les réclamations");
     }
 
+    // ✅ NOUVELLE MÉTHODE : Afficher toutes les réclamations
+    private void afficherToutesReclamations() {
+        try {
+            List<Reclamation> reclamations = reclamationService.selectAll(); // Toutes les réclamations
+            tableReclamation.setItems(FXCollections.observableArrayList(reclamations));
+
+            if (!reclamations.isEmpty()) {
+                tableReclamation.getSelectionModel().selectFirst();
+            } else {
+                statusLabel.setText("Aucune réclamation disponible");
+                if (reponseExistanteBox != null) {
+                    reponseExistanteBox.setManaged(false);
+                    reponseExistanteBox.setVisible(false);
+                }
+            }
+
+        } catch (SQLException e) {
+            statusLabel.setText("❌ Erreur chargement des réclamations");
+            e.printStackTrace();
+        }
+    }
+
+    // ✅ ANCIENNE MÉTHODE (conservée mais plus utilisée)
     private void afficherReclamationsEnAttente() {
         try {
             List<Reclamation> reclamations = reclamationService.rechercherParStatut("EN_ATTENTE");
@@ -296,7 +343,6 @@ public class GestionReponseController {
                 tableReclamation.getSelectionModel().selectFirst();
             } else {
                 statusLabel.setText("Aucune réclamation en attente");
-                // Cacher la boîte de réponse existante si aucune réclamation
                 if (reponseExistanteBox != null) {
                     reponseExistanteBox.setManaged(false);
                     reponseExistanteBox.setVisible(false);
