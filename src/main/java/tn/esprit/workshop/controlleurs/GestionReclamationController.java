@@ -143,6 +143,30 @@ public class GestionReclamationController implements Initializable {
             e.printStackTrace();
         }
     }
+    @FXML
+    private void modifierReclamation() {
+
+        Reclamation selected = tableReclamation.getSelectionModel().getSelectedItem();
+
+        if (selected == null) {
+            statusLabel.setText("❌ Sélectionnez une réclamation à modifier");
+            return;
+        }
+
+        try {
+            selected.setType(typeChoice.getValue());
+            selected.setDescription(messageField.getText());
+
+            service.updateOne(selected);
+
+            afficherReclamations();
+            statusLabel.setText("✅ Réclamation modifiée");
+
+        } catch (SQLException e) {
+            statusLabel.setText("❌ Erreur modification");
+            e.printStackTrace();
+        }
+    }
 
     @FXML
     private void viderFormulaire() {
@@ -175,4 +199,27 @@ public class GestionReclamationController implements Initializable {
             }
         }
     }
+    @FXML private TextField searchField;
+    @FXML
+    private void rechercherReclamation() {
+
+        String keyword = searchField.getText();
+
+        if (keyword == null || keyword.isEmpty()) {
+            afficherReclamations();
+            return;
+        }
+
+        try {
+            tableReclamation.setItems(
+                    FXCollections.observableArrayList(
+                            service.rechercherParMotCle(keyword)
+                    )
+            );
+        } catch (SQLException e) {
+            statusLabel.setText("❌ Erreur recherche");
+            e.printStackTrace();
+        }
+    }
+
 }
