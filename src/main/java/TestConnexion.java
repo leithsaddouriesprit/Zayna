@@ -11,6 +11,6 @@ public class TestConnexion {
             System.out.println("✅ IntelliJ connecté à MySQL !");
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }////h
     }
 }
