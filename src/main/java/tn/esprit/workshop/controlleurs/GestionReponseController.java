@@ -56,8 +56,26 @@ public class GestionReponseController {
         // ✅ CHANGEMENT 1 : Afficher TOUTES les réclamations au démarrage
         afficherToutesReclamations();
         statusLabel.setText("Affichage de toutes les réclamations");
+        reponseField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.length() > 500) {
+                reponseField.setText(oldValue);
+                statusLabel.setText("⚠️ Réponse trop longue (max 500 caractères)");
+            } else if (newValue.length() < 5 && newValue.length() > 0) {
+                statusLabel.setText("⚠️ Minimum 5 caractères requis");
+            } else if (newValue.length() > 0) {
+                statusLabel.setText("✓ " + newValue.length() + "/500 caractères");
+            } else {
+                statusLabel.setText("");
+            }
+        });
     }
-
+    private void showAlert(String title, String content, Alert.AlertType type) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
     private void configurerColonnes() {
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colType.setCellValueFactory(new PropertyValueFactory<>("type"));
@@ -169,7 +187,34 @@ public class GestionReponseController {
 
     @FXML
     private void repondreReclamation() {
-        if (!validerSelectionEtReponse()) return;
+        // ✅ Validation de la sélection
+        if (reclamationSelectionnee == null) {
+            showAlert("Erreur", "❌ Veuillez sélectionner une réclamation !", Alert.AlertType.WARNING);
+            return;
+        }
+
+        String reponseTexte = reponseField.getText();
+
+        // ✅ Validation du champ vide
+        if (reponseTexte == null || reponseTexte.trim().isEmpty()) {
+            showAlert("Erreur", "❌ Veuillez écrire une réponse !", Alert.AlertType.WARNING);
+            reponseField.requestFocus();
+            return;
+        }
+
+        // ✅ Validation de la longueur minimale
+        if (reponseTexte.trim().length() < 5) {
+            showAlert("Erreur", "❌ La réponse doit contenir au moins 5 caractères !", Alert.AlertType.WARNING);
+            reponseField.requestFocus();
+            return;
+        }
+
+        // ✅ Validation de la longueur maximale
+        if (reponseTexte.trim().length() > 500) {
+            showAlert("Erreur", "❌ La réponse ne peut pas dépasser 500 caractères !", Alert.AlertType.WARNING);
+            reponseField.requestFocus();
+            return;
+        }
 
         try {
             if (reponseExistante != null) {
@@ -185,73 +230,107 @@ public class GestionReponseController {
                 }
 
                 // Mettre à jour la réponse existante
-                reponseExistante.setMessage(reponseField.getText().trim());
+                reponseExistante.setMessage(reponseTexte.trim());
                 reponseExistante.setDate(LocalDateTime.now());
                 reponseService.update(reponseExistante);
-                statusLabel.setText("✅ Réponse modifiée avec succès");
+                showAlert("Succès", "✅ Réponse modifiée avec succès !", Alert.AlertType.INFORMATION);
 
             } else {
                 // Créer une nouvelle réponse
                 Reponse nouvelleReponse = new Reponse(
                         reclamationSelectionnee.getId(),
-                        reponseField.getText().trim(),
+                        reponseTexte.trim(),
                         LocalDateTime.now()
                 );
                 reponseService.insertOne(nouvelleReponse);
-                statusLabel.setText("✅ Réponse envoyée avec succès");
+                showAlert("Succès", "✅ Réponse envoyée avec succès !", Alert.AlertType.INFORMATION);
             }
 
             // Mettre à jour le statut de la réclamation
             reclamationSelectionnee.setStatut("TRAITEE");
             reclamationService.updateOne(reclamationSelectionnee);
 
-            // ✅ CHANGEMENT 2 : Rafraîchir avec TOUTES les réclamations
+            // Rafraîchir l'affichage
             afficherToutesReclamations();
             chargerReponseExistante(reclamationSelectionnee.getId());
 
         } catch (SQLException e) {
-            statusLabel.setText("❌ Erreur lors de l'envoi de la réponse");
+            showAlert("Erreur", "❌ Erreur lors de l'envoi : " + e.getMessage(), Alert.AlertType.ERROR);
             e.printStackTrace();
         }
     }
-
     @FXML
     private void modifierReponse() {
+        // ✅ Validation de l'existence d'une réponse
         if (reponseExistante == null) {
-            statusLabel.setText("❌ Aucune réponse à modifier !");
+            showAlert("Erreur", "❌ Aucune réponse à modifier !", Alert.AlertType.WARNING);
             return;
         }
 
-        if (reponseField.getText().trim().isEmpty()) {
-            statusLabel.setText("❌ La réponse ne peut pas être vide !");
+        String reponseTexte = reponseField.getText();
+
+        // ✅ Validation du champ vide
+        if (reponseTexte == null || reponseTexte.trim().isEmpty()) {
+            showAlert("Erreur", "❌ La réponse ne peut pas être vide !", Alert.AlertType.WARNING);
+            reponseField.requestFocus();
             return;
         }
 
-        try {
-            reponseExistante.setMessage(reponseField.getText().trim());
-            reponseExistante.setDate(LocalDateTime.now());
-            reponseService.update(reponseExistante);
+        // ✅ Validation de la longueur minimale
+        if (reponseTexte.trim().length() < 5) {
+            showAlert("Erreur", "❌ La réponse doit contenir au moins 5 caractères !", Alert.AlertType.WARNING);
+            reponseField.requestFocus();
+            return;
+        }
 
-            statusLabel.setText("✅ Réponse modifiée avec succès");
-            chargerReponseExistante(reclamationSelectionnee.getId());
+        // ✅ Validation de la longueur maximale
+        if (reponseTexte.trim().length() > 500) {
+            showAlert("Erreur", "❌ La réponse ne peut pas dépasser 500 caractères !", Alert.AlertType.WARNING);
+            reponseField.requestFocus();
+            return;
+        }
 
-        } catch (SQLException e) {
-            statusLabel.setText("❌ Erreur lors de la modification");
-            e.printStackTrace();
+        // ✅ Vérifier si des modifications ont été apportées
+        if (reponseExistante.getMessage().equals(reponseTexte.trim())) {
+            showAlert("Information", "ℹ️ Aucune modification détectée", Alert.AlertType.INFORMATION);
+            return;
+        }
+
+        // ✅ Demander confirmation
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirmation");
+        confirm.setHeaderText("Modifier la réponse");
+        confirm.setContentText("Voulez-vous vraiment modifier cette réponse ?");
+
+        if (confirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+            try {
+                reponseExistante.setMessage(reponseTexte.trim());
+                reponseExistante.setDate(LocalDateTime.now());
+                reponseService.update(reponseExistante);
+
+                showAlert("Succès", "✅ Réponse modifiée avec succès !", Alert.AlertType.INFORMATION);
+                chargerReponseExistante(reclamationSelectionnee.getId());
+
+            } catch (SQLException e) {
+                showAlert("Erreur", "❌ Erreur lors de la modification : " + e.getMessage(), Alert.AlertType.ERROR);
+                e.printStackTrace();
+            }
         }
     }
 
     @FXML
     private void supprimerReponse() {
+        // ✅ Validation de l'existence d'une réponse
         if (reponseExistante == null) {
-            statusLabel.setText("❌ Aucune réponse à supprimer !");
+            showAlert("Erreur", "❌ Aucune réponse à supprimer !", Alert.AlertType.WARNING);
             return;
         }
 
+        // ✅ Demander confirmation avec plus de détails
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Confirmation");
+        confirm.setTitle("Confirmation de suppression");
         confirm.setHeaderText("Supprimer la réponse");
-        confirm.setContentText("Êtes-vous sûr de vouloir supprimer cette réponse ?");
+        confirm.setContentText("Êtes-vous sûr de vouloir supprimer cette réponse ?\nCette action est irréversible.");
 
         Optional<ButtonType> result = confirm.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
@@ -262,9 +341,9 @@ public class GestionReponseController {
                 reclamationSelectionnee.setStatut("EN_ATTENTE");
                 reclamationService.updateOne(reclamationSelectionnee);
 
-                statusLabel.setText("✅ Réponse supprimée avec succès");
+                showAlert("Succès", "✅ Réponse supprimée avec succès !", Alert.AlertType.INFORMATION);
 
-                // ✅ CHANGEMENT 3 : Rafraîchir avec TOUTES les réclamations
+                // Rafraîchir
                 afficherToutesReclamations();
                 reponseExistante = null;
 
@@ -278,26 +357,44 @@ public class GestionReponseController {
                 }
 
             } catch (SQLException e) {
-                statusLabel.setText("❌ Erreur lors de la suppression");
+                showAlert("Erreur", "❌ Erreur lors de la suppression : " + e.getMessage(), Alert.AlertType.ERROR);
                 e.printStackTrace();
             }
         }
     }
-
     @FXML
     private void rechercherReponse() {
         String keyword = searchField.getText().trim();
+
+        // ✅ Validation du mot-clé vide
         if (keyword.isEmpty()) {
-            // ✅ CHANGEMENT 4 : Réinitialiser avec TOUTES les réclamations
             afficherToutesReclamations();
+            statusLabel.setText("Affichage de toutes les réclamations");
+            return;
+        }
+
+        // ✅ Validation de la longueur minimale
+        if (keyword.length() < 2) {
+            showAlert("Information", "ℹ️ Le mot-clé doit contenir au moins 2 caractères", Alert.AlertType.INFORMATION);
+            searchField.requestFocus();
             return;
         }
 
         try {
             List<Reclamation> resultats = reclamationService.rechercherParMotCle(keyword);
+
+            // ✅ Message selon les résultats
+            if (resultats.isEmpty()) {
+                showAlert("Résultat", "ℹ️ Aucune réclamation trouvée pour : " + keyword, Alert.AlertType.INFORMATION);
+                statusLabel.setText("🔍 Aucun résultat pour : " + keyword);
+            } else {
+                statusLabel.setText("🔍 " + resultats.size() + " résultat(s) pour : " + keyword);
+            }
+
             tableReclamation.setItems(FXCollections.observableArrayList(resultats));
-            statusLabel.setText("🔍 Résultats pour : " + keyword);
+
         } catch (SQLException e) {
+            showAlert("Erreur", "❌ Erreur recherche : " + e.getMessage(), Alert.AlertType.ERROR);
             statusLabel.setText("❌ Erreur recherche");
             e.printStackTrace();
         }
