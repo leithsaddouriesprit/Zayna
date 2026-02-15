@@ -3,164 +3,11 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import java.lang.String?>
 
 <AnchorPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="tn.esprit.workshop.controlleurs.GestionReponseController">
-
-    <stylesheets>
-        <String fx:value="data:text/css,
-            /* Styles globaux */
-            .root {
-                -fx-background-color: #f5f7fa;
-            }
-
-            /* Styles des boutons */
-            .button-vert {
-                -fx-background-color: #27ae60;
-                -fx-text-fill: white;
-                -fx-background-radius: 20;
-                -fx-padding: 8 20;
-                -fx-font-weight: bold;
-                -fx-cursor: hand;
-            }
-            .button-vert:hover {
-                -fx-background-color: #2ecc71;
-                -fx-scale-x: 1.05;
-                -fx-scale-y: 1.05;
-                -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 5);
-            }
-
-            .button-bleu {
-                -fx-background-color: #2980b9;
-                -fx-text-fill: white;
-                -fx-background-radius: 20;
-                -fx-padding: 8 20;
-                -fx-font-weight: bold;
-                -fx-cursor: hand;
-            }
-            .button-bleu:hover {
-                -fx-background-color: #3498db;
-                -fx-scale-x: 1.05;
-                -fx-scale-y: 1.05;
-                -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 5);
-            }
-
-            .button-rouge {
-                -fx-background-color: #c0392b;
-                -fx-text-fill: white;
-                -fx-background-radius: 20;
-                -fx-padding: 8 20;
-                -fx-font-weight: bold;
-                -fx-cursor: hand;
-            }
-            .button-rouge:hover {
-                -fx-background-color: #e74c3c;
-                -fx-scale-x: 1.05;
-                -fx-scale-y: 1.05;
-                -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 5);
-            }
-
-            .button-gris {
-                -fx-background-color: #95a5a6;
-                -fx-text-fill: white;
-                -fx-background-radius: 20;
-                -fx-padding: 8 20;
-                -fx-cursor: hand;
-            }
-            .button-gris:hover {
-                -fx-background-color: #7f8c8d;
-            }
-
-            /* Styles des champs de recherche */
-            .search-field {
-                -fx-background-radius: 20;
-                -fx-border-radius: 20;
-                -fx-padding: 8 15;
-                -fx-border-color: #e0e0e0;
-                -fx-background-color: white;
-            }
-            .search-field:focused {
-                -fx-border-color: #3498db;
-                -fx-effect: dropshadow(gaussian, rgba(52,152,219,0.3), 10, 0, 0, 0);
-            }
-
-            /* Styles des panneaux */
-            .panel-blanc {
-                -fx-background-color: white;
-                -fx-background-radius: 15;
-                -fx-padding: 15;
-                -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);
-            }
-
-            /* Styles des labels */
-            .titre-section {
-                -fx-font-weight: bold;
-                -fx-font-size: 16px;
-                -fx-text-fill: #2c3e50;
-            }
-
-            .sous-titre {
-                -fx-font-size: 12px;
-                -fx-text-fill: #7f8c8d;
-            }
-
-            /* Style pour la réponse existante */
-            .reponse-existante {
-                -fx-background-color: #e8f5e9;
-                -fx-background-radius: 10;
-                -fx-padding: 15;
-            }
-
-            /* Style pour les détails */
-            .details-panel {
-                -fx-background-color: #f8f9fa;
-                -fx-background-radius: 10;
-                -fx-padding: 15;
-            }
-
-            /* Style pour le message de statut */
-            .status-label {
-                -fx-font-size: 13px;
-                -fx-padding: 10;
-                -fx-background-color: #f0f0f0;
-                -fx-background-radius: 8;
-                -fx-text-fill: #2c3e50;
-            }
-
-            /* Style pour le séparateur */
-            .separator .line {
-                -fx-border-color: #e0e0e0;
-                -fx-border-width: 1;
-            }
-
-            /* Style pour la TableView */
-            .table-view {
-                -fx-background-radius: 10;
-                -fx-border-radius: 10;
-            }
-
-            .table-view .column-header {
-                -fx-background-color: #3498db;
-                -fx-text-fill: white;
-            }
-
-            .table-row-cell:odd {
-                -fx-background-color: #f9f9f9;
-            }
-
-            .table-row-cell:selected {
-                -fx-background-color: #3498db;
-                -fx-text-fill: white;
-            }
-
-            /* Animation pour les boutons */
-            .button {
-                -fx-transition: all 0.3s ease;
-            }
-        " />
-    </stylesheets>
+            fx:controller="tn.esprit.workshop.controlleurs.GestionReponseController"
+            style="-fx-background-color: #f5f7fa;">
 
     <children>
         <VBox spacing="14.0"
@@ -179,7 +26,8 @@
                 <VBox>
                     <Label text="Gestion des Réponses"
                            style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
-                    <Label text="Administration des réclamations" styleClass="sous-titre"/>
+                    <Label text="Administration des réclamations"
+                           style="-fx-font-size: 12px; -fx-text-fill: #7f8c8d;"/>
                 </VBox>
             </HBox>
 
@@ -190,25 +38,28 @@
                 <TextField fx:id="searchField"
                            promptText="Rechercher par type ou message..."
                            HBox.hgrow="ALWAYS"
-                           styleClass="search-field"/>
+                           style="-fx-background-radius: 20; -fx-border-radius: 20; -fx-padding: 8 15; -fx-border-color: #e0e0e0; -fx-background-color: white;"/>
                 <Button text="🔍 Rechercher"
                         onAction="#rechercherReponse"
-                        styleClass="button-bleu"/>
+                        style="-fx-background-color: #2980b9; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-font-weight: bold; -fx-cursor: hand;"/>
                 <Button text="⟲ Réinitialiser"
                         onAction="#reinitialiserRecherche"
-                        styleClass="button-gris"/>
+                        style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;"/>
             </HBox>
 
             <!-- SplitPane -->
             <SplitPane dividerPositions="0.6" VBox.vgrow="ALWAYS"
-                       style="-fx-background-color: transparent; -fx-box-border: transparent;">
+                       style="-fx-background-color: transparent;">
                 <items>
                     <!-- Panneau gauche : Liste des réclamations -->
-                    <VBox spacing="10" styleClass="panel-blanc">
-                        <Label text="📌 Réclamations en attente" styleClass="titre-section"/>
+                    <VBox spacing="10"
+                          style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);">
+
+                        <Label text="📌 Réclamations en attente"
+                               style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #2c3e50;"/>
 
                         <TableView fx:id="tableReclamation" VBox.vgrow="ALWAYS"
-                                   styleClass="table-view">
+                                   style="-fx-background-radius: 10;">
                             <columns>
                                 <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
                                 <TableColumn fx:id="colType" text="Type" prefWidth="80"/>
@@ -223,12 +74,15 @@
                     </VBox>
 
                     <!-- Panneau droit : Détails et réponse -->
-                    <VBox spacing="15" styleClass="panel-blanc">
+                    <VBox spacing="15"
+                          style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);">
 
                         <!-- Détails de la réclamation -->
-                        <Label text="📝 Détails de la réclamation" styleClass="titre-section"/>
+                        <Label text="📝 Détails de la réclamation"
+                               style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #2c3e50;"/>
 
-                        <GridPane hgap="10" vgap="8" styleClass="details-panel">
+                        <GridPane hgap="10" vgap="8"
+                                  style="-fx-background-color: #f8f9fa; -fx-background-radius: 10; -fx-padding: 15;">
                             <columnConstraints>
                                 <ColumnConstraints minWidth="100" prefWidth="100"/>
                                 <ColumnConstraints hgrow="ALWAYS"/>
@@ -263,7 +117,7 @@
 
                         <!-- Réponse existante -->
                         <VBox spacing="10" fx:id="reponseExistanteBox" managed="false" visible="false"
-                              styleClass="reponse-existante">
+                              style="-fx-background-color: #e8f5e9; -fx-background-radius: 10; -fx-padding: 15;">
                             <Label text="✅ Réponse actuelle"
                                    style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #27ae60;"/>
                             <TextArea fx:id="reponseExistanteArea"
@@ -288,15 +142,13 @@
                             <HBox spacing="10" alignment="CENTER_RIGHT">
                                 <Button text="📤 Envoyer"
                                         onAction="#repondreReclamation"
-                                        styleClass="button-vert"/>
-
+                                        style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-font-weight: bold; -fx-cursor: hand;"/>
                                 <Button text="✏️ Modifier"
                                         onAction="#modifierReponse"
-                                        styleClass="button-bleu"/>
-
+                                        style="-fx-background-color: #2980b9; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-font-weight: bold; -fx-cursor: hand;"/>
                                 <Button text="🗑️ Supprimer"
                                         onAction="#supprimerReponse"
-                                        styleClass="button-rouge"/>
+                                        style="-fx-background-color: #c0392b; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-font-weight: bold; -fx-cursor: hand;"/>
                             </HBox>
                         </VBox>
 
@@ -304,7 +156,7 @@
                         <Label fx:id="statusLabel"
                                text=""
                                wrapText="true"
-                               styleClass="status-label"/>
+                               style="-fx-font-size: 13px; -fx-padding: 10; -fx-background-color: #f0f0f0; -fx-background-radius: 8; -fx-text-fill: #2c3e50;"/>
                     </VBox>
                 </items>
             </SplitPane>
