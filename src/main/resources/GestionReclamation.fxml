@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.workshop.controlleurs.GestionReclamationController">
+
+    <children>
+        <VBox spacing="14.0"
+              AnchorPane.topAnchor="20.0"
+              AnchorPane.bottomAnchor="20.0"
+              AnchorPane.leftAnchor="20.0"
+              AnchorPane.rightAnchor="20.0">
+
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <!-- Titre -->
+            <Label text="Nouvelle Réclamation"
+                   style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+
+            <!-- Formulaire -->
+            <GridPane hgap="12" vgap="12">
+
+                <columnConstraints>
+                    <ColumnConstraints minWidth="120" prefWidth="150"/>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                </columnConstraints>
+
+                <!-- Type -->
+                <Label text="Type :"
+                       GridPane.rowIndex="0"
+                       GridPane.columnIndex="0"/>
+
+                <ChoiceBox fx:id="typeChoice"
+                           prefWidth="200"
+                           GridPane.rowIndex="0"
+                           GridPane.columnIndex="1"/>
+
+                <!-- Message -->
+                <Label text="Message :"
+                       GridPane.rowIndex="1"
+                       GridPane.columnIndex="0"/>
+
+                <TextArea fx:id="messageField"
+                          prefRowCount="3"
+                          wrapText="true"
+                          GridPane.rowIndex="1"
+                          GridPane.columnIndex="1"/>
+
+            </GridPane>
+
+            <!-- Bouton -->
+            <HBox spacing="10" alignment="CENTER_RIGHT">
+                <Button text="Envoyer"
+                        onAction="#envoyerReclamation"/>
+            </HBox>
+
+            <!-- Message statut -->
+            <Label fx:id="statusLabel"
+                   text=""
+                   wrapText="true"
+                   style="-fx-font-size: 13px;"/>
+
+            <!-- Table -->
+            <TableView fx:id="tableReclamation" VBox.vgrow="ALWAYS">
+
+                <columns>
+                    <TableColumn fx:id="colId" text="ID" prefWidth="60"/>
+                    <TableColumn fx:id="colType" text="Type" prefWidth="120"/>
+                    <TableColumn fx:id="colDescription" text="Message" prefWidth="300"/>
+                    <TableColumn fx:id="colStatut" text="Statut" prefWidth="120"/>
+                </columns>
+
+            </TableView>
+
+        </VBox>
+    </children>
+</AnchorPane>
