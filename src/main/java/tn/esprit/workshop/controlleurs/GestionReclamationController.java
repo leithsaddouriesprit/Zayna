@@ -2,14 +2,17 @@ package tn.esprit.workshop.controlleurs;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import tn.esprit.workshop.model.Reclamation;
 import tn.esprit.workshop.services.ReclamationService;
+import tn.esprit.workshop.utilis.MyBDConnexion;
+import java.net.URL;
+import java.sql.*;
+import java.util.ResourceBundle;
 
-import java.sql.SQLException;
-
-public class GestionReclamationController {
+public class GestionReclamationController implements Initializable {
 
     @FXML private ChoiceBox<String> typeChoice;
     @FXML private TextArea messageField;
@@ -23,8 +26,8 @@ public class GestionReclamationController {
 
     private final ReclamationService service = new ReclamationService();
 
-    @FXML
-    public void initialize() {
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
 
         typeChoice.getItems().addAll("Bus", "Ecole");
 
@@ -39,29 +42,43 @@ public class GestionReclamationController {
     @FXML
     private void envoyerReclamation() {
 
-        if(typeChoice.getValue() == null || messageField.getText().isEmpty()){
+        // 🔹 Lecture et nettoyage des champs
+        String type = (typeChoice.getValue() == null) ? "" : typeChoice.getValue().trim();
+        String message = (messageField.getText() == null) ? "" : messageField.getText().trim();
+
+        // 🔹 Validation
+        if(type.isEmpty() || message.isEmpty()){
             statusLabel.setText("Veuillez remplir tous les champs !");
             return;
         }
 
         try {
-            Reclamation r = new Reclamation(
-                    1,
-                    "Parent",
-                    typeChoice.getValue(),
-                    messageField.getText(),
+            // 🔹 Appel du service pour insérer et récupérer l'ID de la réclamation
+            int reclamationId = service.ajouterReclamationEtRetournerId(
+                    1,          // userId fixe ici, peut être dynamique
+                    "Parent",   // type utilisateur ou autre logique métier
+                    type,
+                    message,
                     "EN_ATTENTE"
             );
 
-            service.insertOne(r);
-            afficherReclamations();
+            // 🔹 Message succès
+            statusLabel.setText("Réclamation envoyée ✔ (ID = " + reclamationId + ")");
+
+            // 🔹 Reset des champs
+            typeChoice.setValue(null);
             messageField.clear();
-            statusLabel.setText("Réclamation envoyée ✔");
+
+            // 🔹 Actualiser la table
+            afficherReclamations();
 
         } catch (SQLException e) {
-            statusLabel.setText("Erreur !");
+            statusLabel.setText("Erreur lors de l'envoi ❌ (voir console)");
+            e.printStackTrace();
         }
     }
+
+
 
     private void afficherReclamations(){
         try {
@@ -69,7 +86,10 @@ public class GestionReclamationController {
                     FXCollections.observableArrayList(service.selectAll())
             );
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
+
+
+
 }
