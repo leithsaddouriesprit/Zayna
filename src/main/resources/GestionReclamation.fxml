@@ -9,7 +9,11 @@
             fx:controller="tn.esprit.workshop.controlleurs.GestionReclamationController">
 
     <children>
-        <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10" AnchorPane.bottomAnchor="10">
+        <VBox spacing="10"
+              AnchorPane.topAnchor="10"
+              AnchorPane.leftAnchor="10"
+              AnchorPane.rightAnchor="10"
+              AnchorPane.bottomAnchor="10">
 
             <!-- Formulaire -->
             <GridPane hgap="10" vgap="10">
@@ -24,14 +28,14 @@
                 <Label text="Message :" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
                 <TextArea fx:id="messageField" GridPane.rowIndex="1" GridPane.columnIndex="1" prefRowCount="3"/>
 
-                <HBox spacing="10" alignment="CENTER_RIGHT" GridPane.rowIndex="2" GridPane.columnIndex="1">
+                <HBox spacing="10" alignment="CENTER_RIGHT"
+                      GridPane.rowIndex="2" GridPane.columnIndex="1">
                     <Button text="Vider" onAction="#viderFormulaire"/>
                     <Button text="Envoyer" onAction="#envoyerReclamation"/>
                     <Button text="Modifier" onAction="#modifierReclamation"/>
                     <Button text="Supprimer" onAction="#supprimerReclamation"/>
                     <TextField fx:id="searchField" promptText="Rechercher..."/>
                     <Button text="Rechercher" onAction="#rechercherReclamation"/>
-
                 </HBox>
             </GridPane>
 
@@ -47,6 +51,18 @@
                     <TableColumn fx:id="colStatut" text="Statut"/>
                 </columns>
             </TableView>
+
+            <!-- 🔥 SECTION REPONSE ADMIN -->
+            <Separator/>
+
+            <Label text="Réponse de l'administration"
+                   style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+
+            <TextArea fx:id="reponseArea"
+                      editable="false"
+                      prefRowCount="3"
+                      wrapText="true"
+                      promptText="Aucune réponse pour le moment..."/>
 
         </VBox>
     </children>
