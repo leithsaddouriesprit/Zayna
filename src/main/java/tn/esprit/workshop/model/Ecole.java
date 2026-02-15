@@ -1,15 +1,22 @@
 package tn.esprit.workshop.model;
 
-import java.util.Objects;
-
 public class Ecole {
     private int id;
-    private String nomEcole;
+    private String nom;
+    private String position;
+    private double prixMensuel;
+    private String description;
+    private String informations;
 
-public Ecole() {}
-    public Ecole(int id, String nomEcole) {
+    public Ecole() {}
+
+    public Ecole(int id, String nom, String position, double prixMensuel, String description, String informations) {
         this.id = id;
-        this.nomEcole = nomEcole;
+        this.nom = nom;
+        this.position = position;
+        this.prixMensuel = prixMensuel;
+        this.description = description;
+        this.informations = informations;
     }
 
     public int getId() {
@@ -20,30 +27,44 @@ public Ecole() {}
         this.id = id;
     }
 
-    public String getNomEcole() {
-        return nomEcole;
+    public String getNom() {
+        return nom;
     }
 
-    public void setNomEcole(String nomEcole) {
-        this.nomEcole = nomEcole;
+    public void setNom(String nom) {
+        this.nom = nom;
     }
 
-    @Override
-    public String toString() {
-        return "Ecole{" +
-                "id=" + id +
-                ", nomEcole='" + nomEcole + '\'' +
-                '}';
+    public String getPosition() {
+        return position;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Ecole ecole)) return false;
-        return id == ecole.id && Objects.equals(nomEcole, ecole.nomEcole);
+    public void setPosition(String position) {
+        this.position = position;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, nomEcole);
+    public double getPrixMensuel() {
+        return prixMensuel;
+    }
+
+    public void setPrixMensuel(double prixMensuel) {
+        this.prixMensuel = prixMensuel;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getInformations() {
+        return informations;
+    }
+
+    public void setInformations(String informations) {
+        this.informations = informations;
     }
 }
+

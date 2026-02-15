@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="500.0" prefWidth="700.0"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="tn.esprit.workshop.controlleurs.EcoleController">
+
+    <children>
+
+        <VBox spacing="12" layoutX="30" layoutY="20">
+
+            <Label text="Gestion des Ecoles" style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+
+            <TextField fx:id="tfNom" promptText="Nom de l'école"/>
+
+            <TextField fx:id="tfPosition" promptText="Position (Ariana, La Marsa...)"/>
+
+            <TextField fx:id="tfPrix" promptText="Prix mensuel (DT)"/>
+
+            <TextArea fx:id="tfDescription" promptText="Description de l'école"/>
+
+            <TextArea fx:id="tfInfos" promptText="Informations supplémentaires"/>
+
+            <HBox spacing="10">
+                <Button text="Ajouter" onAction="#ajouterEcole"/>
+                <Button text="Modifier" onAction="#modifierEcole"/>
+                <Button text="Supprimer" onAction="#supprimerEcole"/>
+            </HBox>
+
+            <TableView fx:id="tableEcole" prefWidth="620">
+
+                <columns>
+                    <TableColumn fx:id="colNom" text="Nom"/>
+                    <TableColumn fx:id="colPosition" text="Position"/>
+                    <TableColumn fx:id="colPrix" text="Prix"/>
+                    <TableColumn fx:id="colDescription" text="Description" prefWidth="200"/>
+                    <TableColumn fx:id="colInformations" text="Informations" prefWidth="140"/>
+                </columns>
+
+            </TableView>
+
+        </VBox>
+
+    </children>
+
+</AnchorPane>

@@ -4,7 +4,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import tn.esprit.workshop.model.Ecole;
 import tn.esprit.workshop.model.User;
 import tn.esprit.workshop.services.UserService;
 
