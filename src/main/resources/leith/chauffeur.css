@@ -1,0 +1,123 @@
+/* ===== Root background ===== */
+.root {
+    -fx-background-color: linear-gradient(to bottom right, #0F172A, #111827, #0B1220);
+    -fx-padding: 26;
+    -fx-font-family: "Segoe UI", "Inter", "SF Pro Display";
+}
+
+/* ===== Card container ===== */
+.card {
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-background-insets: 0;
+    -fx-background-radius: 18;
+    -fx-border-color: rgba(255, 255, 255, 0.16);
+    -fx-border-radius: 18;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 28, 0.22, 0, 10);
+}
+
+/* ===== Titles ===== */
+.title {
+    -fx-text-fill: #F9FAFB;
+    -fx-font-size: 22px;
+    -fx-font-weight: 800;
+}
+
+.subtitle {
+    -fx-text-fill: rgba(249, 250, 251, 0.75);
+    -fx-font-size: 13px;
+}
+
+/* ===== Separator ===== */
+.sep {
+    -fx-opacity: 0.25;
+}
+
+/* ===== Labels ===== */
+.field-label {
+    -fx-text-fill: rgba(249, 250, 251, 0.85);
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+}
+
+/* ===== TextField style ===== */
+.field {
+    -fx-background-color: rgba(255, 255, 255, 0.10);
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: rgba(255, 255, 255, 0.18);
+    -fx-border-width: 1;
+    -fx-text-fill: #F9FAFB;
+    -fx-prompt-text-fill: rgba(249, 250, 251, 0.45);
+    -fx-padding: 10 12 10 12;
+    -fx-font-size: 13px;
+}
+
+.field:focused {
+    -fx-border-color: rgba(96, 165, 250, 0.85); /* blue */
+    -fx-effect: dropshadow(gaussian, rgba(96,165,250,0.30), 14, 0.18, 0, 0);
+}
+
+/* ===== Spinner ===== */
+.spinner {
+    -fx-background-color: transparent;
+}
+.spinner .text-field {
+    -fx-background-color: rgba(255, 255, 255, 0.10);
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: rgba(255, 255, 255, 0.18);
+    -fx-border-width: 1;
+    -fx-text-fill: #F9FAFB;
+    -fx-prompt-text-fill: rgba(249, 250, 251, 0.45);
+    -fx-padding: 10 12 10 12;
+    -fx-font-size: 13px;
+}
+.spinner .increment-arrow-button,
+.spinner .decrement-arrow-button {
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-background-radius: 10;
+    -fx-padding: 6;
+}
+.spinner .increment-arrow-button:hover,
+.spinner .decrement-arrow-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.14);
+}
+
+/* ===== ChoiceBox ===== */
+.choice {
+    -fx-background-color: rgba(255, 255, 255, 0.10);
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: rgba(255, 255, 255, 0.18);
+    -fx-border-width: 1;
+    -fx-mark-color: rgba(249, 250, 251, 0.85);
+    -fx-padding: 6 10 6 10;
+}
+.choice > .label {
+    -fx-text-fill: #F9FAFB;
+    -fx-font-size: 13px;
+}
+
+/* ===== Primary button ===== */
+.primary-btn {
+    -fx-background-color: linear-gradient(to right, #60A5FA, #A78BFA);
+    -fx-background-radius: 12;
+    -fx-text-fill: #0B1220;
+    -fx-font-weight: 800;
+    -fx-padding: 10 16 10 16;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 18, 0.18, 0, 6);
+}
+.primary-btn:hover {
+    -fx-opacity: 0.92;
+}
+.primary-btn:pressed {
+    -fx-translate-y: 1;
+}
+
+/* ===== Message label ===== */
+.message {
+    -fx-text-fill: rgba(249, 250, 251, 0.85);
+    -fx-font-size: 13px;
+}
