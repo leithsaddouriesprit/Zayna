@@ -166,7 +166,6 @@ public class GestionReclamationController implements Initializable {
     private void supprimerReclamation() {
 
         Reclamation selected = tableReclamation.getSelectionModel().getSelectedItem();
-
         if (selected == null) {
             statusLabel.setText("❌ Sélectionnez une réclamation");
             return;
@@ -177,15 +176,17 @@ public class GestionReclamationController implements Initializable {
 
         if (confirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
             try {
-                ReclamationService.deleteOne(selected.getId());
-                statusLabel.setText("✅ Supprimée");
+                service.deleteOne(selected); // Utiliser l'instance de service
+                statusLabel.setText("✅ Réclamation supprimée");
                 afficherReclamations();
                 viderFormulaire();
             } catch (SQLException e) {
                 statusLabel.setText("❌ Erreur suppression");
+                e.printStackTrace();
             }
         }
     }
+
 
     // ================= RECHERCHE =================
 
