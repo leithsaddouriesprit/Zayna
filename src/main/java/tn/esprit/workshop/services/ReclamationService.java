@@ -78,13 +78,24 @@ public class ReclamationService {
     }
 
     // DELETE
-    public static void deleteOne(int id) throws SQLException {
-        String sql = "DELETE FROM reclamation WHERE id = ?";
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
-            ps.setInt(1, id);
+    public void deleteOne(Reclamation r) throws SQLException {
+        // 1. Supprimer les réponses liées
+        String sqlReponse = "DELETE FROM reponse WHERE reclamation_id = ?";
+        try (PreparedStatement ps = cnx.prepareStatement(sqlReponse)) {
+            ps.setInt(1, r.getId());
+            ps.executeUpdate();
+        }
+
+        // 2. Supprimer la réclamation
+        String sqlReclamation = "DELETE FROM reclamation WHERE id = ?";
+        try (PreparedStatement ps = cnx.prepareStatement(sqlReclamation)) {
+            ps.setInt(1, r.getId());
             ps.executeUpdate();
         }
     }
+
+
+
 
     // Rechercher par statut
     public List<Reclamation> rechercherParStatut(String statut) throws SQLException {
