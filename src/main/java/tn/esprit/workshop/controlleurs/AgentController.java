@@ -4,12 +4,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import tn.esprit.workshop.model.Ecole;
-import tn.esprit.workshop.services.EcoleService;
+import tn.esprit.workshop.model.Agent;
+import tn.esprit.workshop.services.AgentService;
 
 import java.sql.SQLException;
 
-public class EcoleController {
+public class AgentController {
 
     @FXML
     private TextField tfNom;
@@ -23,21 +23,21 @@ public class EcoleController {
     private TextArea tfInfos;
 
     @FXML
-    private TableView<Ecole> tableEcole;
+    private TableView<Agent> tableEcole;
     @FXML
-    private TableColumn<Ecole, String> colNom;
+    private TableColumn<Agent, String> colNom;
     @FXML
-    private TableColumn<Ecole, String> colPosition;
+    private TableColumn<Agent, String> colPosition;
     @FXML
-    private TableColumn<Ecole, Double> colPrix;
+    private TableColumn<Agent, Double> colPrix;
     @FXML
-    private TableColumn<Ecole, String> colDescription;
+    private TableColumn<Agent, String> colDescription;
     @FXML
-    private TableColumn<Ecole, String> colInformations;
+    private TableColumn<Agent, String> colInformations;
 
 
-    private final EcoleService service = new EcoleService();
-    private ObservableList<Ecole> ecoleList = FXCollections.observableArrayList();
+    private final AgentService service = new AgentService();
+    private ObservableList<Agent> ecoleList = FXCollections.observableArrayList();
 
 
     @FXML
@@ -52,7 +52,7 @@ public class EcoleController {
         loadTable();
 
         tableEcole.setOnMouseClicked(event -> {
-            Ecole e = tableEcole.getSelectionModel().getSelectedItem();
+            Agent e = tableEcole.getSelectionModel().getSelectedItem();
             if (e != null) {
                 tfNom.setText(e.getNom());
                 tfPosition.setText(e.getPosition());
@@ -66,7 +66,7 @@ public class EcoleController {
     @FXML
     public void ajouterEcole() {
         try {
-            Ecole e = new Ecole();
+            Agent e = new Agent();
 
             e.setNom(tfNom.getText());
             e.setPosition(tfPosition.getText());
@@ -86,7 +86,7 @@ public class EcoleController {
     // ================= SUPPRIMER =================
     @FXML
     public void supprimerEcole() {
-        Ecole selected = tableEcole.getSelectionModel().getSelectedItem();
+        Agent selected = tableEcole.getSelectionModel().getSelectedItem();
 
         if (selected == null) {
             showAlert("Attention", "Sélectionnez une école !");
@@ -105,7 +105,7 @@ public class EcoleController {
     @FXML
     public void modifierEcole() {
 
-        Ecole selected = tableEcole.getSelectionModel().getSelectedItem();
+        Agent selected = tableEcole.getSelectionModel().getSelectedItem();
 
         if (selected == null) {
             showAlert("Attention", "Choisissez une école !");

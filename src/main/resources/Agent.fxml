@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="600.0" prefWidth="800.0"
+            style="-fx-background-color: #f8f9fa; -fx-padding: 20;"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="tn.esprit.workshop.controlleurs.EcoleController">
+
+    <children>
+        <VBox spacing="15" layoutX="30" layoutY="20"
+              style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 5);">
+
+            <!-- Titre amélioré -->
+            <Label text="Gestion des Écoles"
+                   style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-background-color: #e8f4f8; -fx-padding: 10 20; -fx-background-radius: 25;"/>
+
+            <!-- Champs avec styles -->
+            <TextField fx:id="tfNom" promptText="Nom de l'école"
+                       style="-fx-font-size: 14px; -fx-padding: 12; -fx-border-radius: 8; -fx-border-color: #ddd;"/>
+
+            <TextField fx:id="tfPosition" promptText="Position (Ariana, La Marsa...)"
+                       style="-fx-font-size: 14px; -fx-padding: 12; -fx-border-radius: 8; -fx-border-color: #ddd;"/>
+
+            <TextField fx:id="tfPrix" promptText="Prix mensuel (DT)"
+                       style="-fx-font-size: 14px; -fx-padding: 12; -fx-border-radius: 8; -fx-border-color: #ddd;"/>
+
+            <TextArea fx:id="tfDescription" promptText="Description de l'école" prefHeight="80"
+                      style="-fx-font-size: 14px; -fx-padding: 12; -fx-border-radius: 8; -fx-border-color: #ddd;"/>
+
+            <TextArea fx:id="tfInfos" promptText="Informations supplémentaires" prefHeight="80"
+                      style="-fx-font-size: 14px; -fx-padding: 12; -fx-border-radius: 8; -fx-border-color: #ddd;"/>
+
+            <!-- Boutons améliorés -->
+            <HBox spacing="15" alignment="CENTER">
+                <Button text="Ajouter" onAction="#ajouterEcole"
+                        style="-fx-font-size: 14px; -fx-padding: 10 20; -fx-background-radius: 25; -fx-background-color: #27ae60; -fx-text-fill: white;"/>
+                <Button text="Modifier" onAction="#modifierEcole"
+                        style="-fx-font-size: 14px; -fx-padding: 10 20; -fx-background-radius: 25; -fx-background-color: #3498db; -fx-text-fill: white;"/>
+                <Button text="Supprimer" onAction="#supprimerEcole"
+                        style="-fx-font-size: 14px; -fx-padding: 10 20; -fx-background-radius: 25; -fx-background-color: #e74c3c; -fx-text-fill: white;"/>
+            </HBox>
+
+            <!-- TableView améliorée -->
+            <TableView fx:id="tableEcole" prefWidth="740" prefHeight="250"
+                       style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
+
+                <columns>
+                    <TableColumn fx:id="colNom" text="Nom" prefWidth="150"/>
+                    <TableColumn fx:id="colPosition" text="Position" prefWidth="150"/>
+                    <TableColumn fx:id="colPrix" text="Prix" prefWidth="100"/>
+                    <TableColumn fx:id="colDescription" text="Description" prefWidth="200"/>
+                    <TableColumn fx:id="colInformations" text="Informations" prefWidth="140"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </children>
+</AnchorPane>

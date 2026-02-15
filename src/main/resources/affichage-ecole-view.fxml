@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="600.0" prefWidth="900.0"
+            style="-fx-background-color: #f8f9fa; -fx-padding: 20;"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="tn.esprit.workshop.controlleurs.AffichageEcoleController">
+
+    <children>
+        <VBox spacing="15" layoutX="30" layoutY="20"
+              style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 5);">
+
+            <!-- Titre -->
+            <Label text="📚 Annuaire des Écoles"
+                   style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-background-color: #e8f4f8; -fx-padding: 10 20; -fx-background-radius: 25;"/>
+
+            <!-- Barre de recherche et compteur -->
+            <HBox spacing="15" alignment="CENTER_LEFT">
+                <TextField fx:id="tfSearch" promptText="🔍 Rechercher une école..." prefWidth="400"
+                           style="-fx-font-size: 14px; -fx-padding: 12; -fx-border-radius: 8; -fx-border-color: #ddd;"/>
+
+                <Button text="🔄 Actualiser" onAction="#refreshTable"
+                        style="-fx-font-size: 14px; -fx-padding: 10 20; -fx-background-radius: 25; -fx-background-color: #17a2b8; -fx-text-fill: white;"/>
+
+                <Label fx:id="lblCount" text="Total des écoles : 0"
+                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #495057; -fx-background-color: #e9ecef; -fx-padding: 8 15; -fx-background-radius: 15;"/>
+            </HBox>
+
+            <!-- TableView des écoles -->
+            <TableView fx:id="tableEcoles" prefWidth="840" prefHeight="350"
+                       style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
+
+                <columns>
+                    <TableColumn fx:id="colNom" text="Nom de l'école" prefWidth="180"/>
+                    <TableColumn fx:id="colPosition" text="Position" prefWidth="150"/>
+                    <TableColumn fx:id="colPrix" text="Prix (DT/mois)" prefWidth="120"/>
+                    <TableColumn fx:id="colDescription" text="Description" prefWidth="250"/>
+                    <TableColumn fx:id="colAgentId" text="ID Agent" prefWidth="80"/>
+                </columns>
+            </TableView>
+
+            <!-- Bouton d'action -->
+            <HBox spacing="15" alignment="CENTER">
+                <Button text="📋 Voir Détails" onAction="#showDetails"
+                        style="-fx-font-size: 14px; -fx-padding: 12 25; -fx-background-radius: 25; -fx-background-color: #3498db; -fx-text-fill: white;"/>
+            </HBox>
+        </VBox>
+    </children>
+</AnchorPane>

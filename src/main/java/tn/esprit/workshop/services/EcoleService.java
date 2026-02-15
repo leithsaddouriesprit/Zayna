@@ -85,5 +85,3 @@ public class EcoleService {
         return ecoles;
     }
 }
-
-
