@@ -29,45 +29,110 @@
                            promptText="Rechercher par type ou message..."
                            HBox.hgrow="ALWAYS"/>
                 <Button text="Rechercher" onAction="#rechercherReponse"/>
-                <Button text="Modifier" onAction="#modifierReponse"/>
-                <Button text="Supprimer" onAction="#supprimerReponse"/>
+                <Button text="Réinitialiser" onAction="#reinitialiserRecherche"/>
             </HBox>
 
-            <!-- Formulaire Réponse -->
-            <GridPane hgap="12" vgap="12">
-                <columnConstraints>
-                    <ColumnConstraints minWidth="120" prefWidth="150"/>
-                    <ColumnConstraints hgrow="ALWAYS"/>
-                </columnConstraints>
+            <!-- SplitPane pour séparer réclamations et réponses -->
+            <SplitPane dividerPositions="0.6" VBox.vgrow="ALWAYS">
+                <items>
+                    <!-- Panneau gauche : Liste des réclamations -->
+                    <VBox spacing="10">
+                        <padding>
+                            <Insets right="5"/>
+                        </padding>
 
-                <Label text="Réponse :" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                <TextArea fx:id="reponseField"
-                          prefRowCount="3"
-                          wrapText="true"
-                          GridPane.rowIndex="0"
-                          GridPane.columnIndex="1"/>
-            </GridPane>
+                        <Label text="Réclamations en attente"
+                               style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
 
-            <!-- Bouton Répondre -->
-            <HBox spacing="10" alignment="CENTER_RIGHT">
-                <Button text="Répondre" onAction="#repondreReclamation"/>
-            </HBox>
+                        <TableView fx:id="tableReclamation" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+                                <TableColumn fx:id="colType" text="Type" prefWidth="80"/>
+                                <TableColumn fx:id="colDescription" text="Message" prefWidth="200"/>
+                                <TableColumn fx:id="colStatut" text="Statut" prefWidth="80"/>
+                                <TableColumn fx:id="colDate" text="Date" prefWidth="120"/>
+                            </columns>
+                        </TableView>
+                    </VBox>
 
-            <!-- Message de statut -->
-            <Label fx:id="statusLabel"
-                   text=""
-                   wrapText="true"
-                   style="-fx-font-size: 13px; -fx-text-fill: green;"/>
+                    <!-- Panneau droit : Détails et réponse -->
+                    <VBox spacing="15">
+                        <padding>
+                            <Insets left="5"/>
+                        </padding>
 
-            <!-- Table des réclamations -->
-            <TableView fx:id="tableReclamation" VBox.vgrow="ALWAYS">
-                <columns>
-                    <TableColumn fx:id="colId" text="ID" prefWidth="60"/>
-                    <TableColumn fx:id="colType" text="Type" prefWidth="120"/>
-                    <TableColumn fx:id="colDescription" text="Message" prefWidth="300"/>
-                    <TableColumn fx:id="colStatut" text="Statut" prefWidth="120"/>
-                </columns>
-            </TableView>
+                        <!-- Détails de la réclamation sélectionnée -->
+                        <Label text="Détails de la réclamation"
+                               style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+
+                        <GridPane hgap="10" vgap="8">
+                            <columnConstraints>
+                                <ColumnConstraints minWidth="100" prefWidth="100"/>
+                                <ColumnConstraints hgrow="ALWAYS"/>
+                            </columnConstraints>
+
+                            <Label text="ID:" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
+                            <Label fx:id="detailIdLabel" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                            <Label text="Type:" GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
+                            <Label fx:id="detailTypeLabel" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                            <Label text="Message:" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
+                            <TextArea fx:id="detailMessageArea"
+                                      editable="false"
+                                      prefRowCount="3"
+                                      wrapText="true"
+                                      GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                            <Label text="Date:" GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
+                            <Label fx:id="detailDateLabel" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                        </GridPane>
+
+                        <Separator/>
+
+                        <!-- Section Réponse -->
+                        <Label text="Réponse"
+                               style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+
+                        <!-- Réponse existante (si disponible) -->
+                        <VBox spacing="5" fx:id="reponseExistanteBox" managed="false" visible="false">
+                            <Label text="Réponse actuelle:" style="-fx-font-weight: bold;"/>
+                            <TextArea fx:id="reponseExistanteArea"
+                                      editable="false"
+                                      prefRowCount="3"
+                                      wrapText="true"/>
+                            <Label fx:id="reponseDateLabel" style="-fx-text-fill: gray;"/>
+                        </VBox>
+
+                        <!-- Formulaire de réponse -->
+                        <VBox spacing="8">
+                            <Label text="Nouvelle réponse:" style="-fx-font-weight: bold;"/>
+                            <TextArea fx:id="reponseField"
+                                      prefRowCount="4"
+                                      wrapText="true"
+                                      promptText="Écrivez votre réponse ici..."/>
+
+                            <HBox spacing="10" alignment="CENTER_RIGHT">
+                                <Button text="Envoyer la réponse"
+                                        onAction="#repondreReclamation"
+                                        style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
+                                <Button text="Modifier la réponse"
+                                        onAction="#modifierReponse"
+                                        style="-fx-background-color: #2196F3; -fx-text-fill: white;"/>
+                                <Button text="Supprimer la réponse"
+                                        onAction="#supprimerReponse"
+                                        style="-fx-background-color: #f44336; -fx-text-fill: white;"/>
+                            </HBox>
+                        </VBox>
+
+                        <!-- Message de statut -->
+                        <Label fx:id="statusLabel"
+                               text=""
+                               wrapText="true"
+                               style="-fx-font-size: 13px;"/>
+                    </VBox>
+                </items>
+            </SplitPane>
 
         </VBox>
     </children>
