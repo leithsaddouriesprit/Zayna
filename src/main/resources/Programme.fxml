@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/20" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.workshop.controlleurs.ProgrammeController"
+      spacing="10" alignment="TOP_CENTER">
+
+    <Label text="Gestion des Programmes" style="-fx-font-size:16px; -fx-font-weight:bold;"/>
+
+    <!-- Choix de l'école -->
+    <ComboBox fx:id="cbEcole" promptText="Sélectionnez une école" prefWidth="200"/>
+
+    <TextField fx:id="tfNom" promptText="Nom du programme"/>
+    <TextField fx:id="tfNiveau" promptText="Niveau"/>
+    <TextField fx:id="tfDuree" promptText="Durée"/>
+    <TextField fx:id="tfPrix" promptText="Prix"/>
+    <TextArea fx:id="tfDescription" promptText="Description" prefRowCount="3"/>
+
+    <HBox spacing="10">
+        <Button text="Ajouter" onAction="#ajouterProgramme"/>
+        <Button text="Modifier" onAction="#modifierProgramme"/>
+        <Button text="Supprimer" onAction="#supprimerProgramme"/>
+    </HBox>
+
+    <TableView fx:id="tableProgramme" prefHeight="250">
+        <columns>
+            <TableColumn fx:id="colEcole" text="Ecole" prefWidth="150"/>
+            <TableColumn fx:id="colNom" text="Nom" prefWidth="150"/>
+            <TableColumn fx:id="colNiveau" text="Niveau" prefWidth="100"/>
+            <TableColumn fx:id="colDuree" text="Durée" prefWidth="100"/>
+            <TableColumn fx:id="colPrix" text="Prix" prefWidth="80"/>
+        </columns>
+    </TableView>
+
+</VBox>

@@ -1,6 +1,5 @@
 package tn.esprit.workshop.services;
 
-
 import tn.esprit.workshop.model.Ecole;
 import tn.esprit.workshop.utilis.MyBDConnexion;
 
@@ -17,11 +16,13 @@ public class EcoleService {
     }
 
     // ================= AJOUT =================
-    public void insertOne(Ecole ecole) throws SQLException {
+    // 🔥 retourne l'id de l'école créée
+    public int insertOne(Ecole ecole) throws SQLException {
 
         String req = "INSERT INTO ecole (nom, position, prix_mensuel, description, informations) VALUES (?,?,?,?,?)";
 
-        PreparedStatement ps = connection.prepareStatement(req);
+        // IMPORTANT : pour récupérer l'id auto_increment
+        PreparedStatement ps = connection.prepareStatement(req, Statement.RETURN_GENERATED_KEYS);
 
         ps.setString(1, ecole.getNom());
         ps.setString(2, ecole.getPosition());
@@ -30,6 +31,15 @@ public class EcoleService {
         ps.setString(5, ecole.getInformations());
 
         ps.executeUpdate();
+
+        // récupérer l'id généré
+        ResultSet rs = ps.getGeneratedKeys();
+
+        if (rs.next()) {
+            return rs.getInt(1);
+        }
+
+        return -1;
     }
 
     // ================= MODIFIER =================

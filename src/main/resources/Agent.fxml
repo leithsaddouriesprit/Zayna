@@ -14,11 +14,11 @@
         <VBox spacing="15" layoutX="30" layoutY="20"
               style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 5);">
 
-            <!-- Titre amélioré -->
+            <!-- Titre -->
             <Label text="Gestion des Écoles"
                    style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-background-color: #e8f4f8; -fx-padding: 10 20; -fx-background-radius: 25;"/>
 
-            <!-- Champs avec styles -->
+            <!-- Champs -->
             <TextField fx:id="tfNom" promptText="Nom de l'école"
                        style="-fx-font-size: 14px; -fx-padding: 12; -fx-border-radius: 8; -fx-border-color: #ddd;"/>
 
@@ -34,7 +34,7 @@
             <TextArea fx:id="tfInfos" promptText="Informations supplémentaires" prefHeight="80"
                       style="-fx-font-size: 14px; -fx-padding: 12; -fx-border-radius: 8; -fx-border-color: #ddd;"/>
 
-            <!-- Boutons améliorés -->
+            <!-- Boutons -->
             <HBox spacing="15" alignment="CENTER">
                 <Button text="Ajouter" onAction="#ajouterEcole"
                         style="-fx-font-size: 14px; -fx-padding: 10 20; -fx-background-radius: 25; -fx-background-color: #27ae60; -fx-text-fill: white;"/>
@@ -44,18 +44,22 @@
                         style="-fx-font-size: 14px; -fx-padding: 10 20; -fx-background-radius: 25; -fx-background-color: #e74c3c; -fx-text-fill: white;"/>
             </HBox>
 
-            <!-- TableView améliorée -->
+            <!-- TABLE -->
             <TableView fx:id="tableEcole" prefWidth="740" prefHeight="250"
                        style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
 
                 <columns>
-                    <TableColumn fx:id="colNom" text="Nom" prefWidth="150"/>
-                    <TableColumn fx:id="colPosition" text="Position" prefWidth="150"/>
-                    <TableColumn fx:id="colPrix" text="Prix" prefWidth="100"/>
-                    <TableColumn fx:id="colDescription" text="Description" prefWidth="200"/>
-                    <TableColumn fx:id="colInformations" text="Informations" prefWidth="140"/>
+                    <TableColumn fx:id="colNom" text="Nom" prefWidth="130"/>
+                    <TableColumn fx:id="colPosition" text="Position" prefWidth="130"/>
+                    <TableColumn fx:id="colPrix" text="Prix" prefWidth="90"/>
+                    <TableColumn fx:id="colDescription" text="Description" prefWidth="170"/>
+                    <TableColumn fx:id="colInformations" text="Informations" prefWidth="120"/>
+
+                    <!-- ⭐ colonne bouton programme -->
+                    <TableColumn fx:id="colAction" text="Programme" prefWidth="150"/>
                 </columns>
             </TableView>
+
         </VBox>
     </children>
 </AnchorPane>

@@ -18,8 +18,8 @@ public class MainFFX extends Application {
     public void start(Stage primaryStage) {
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/affichage-ecole-view.fxml"));
-            Parent root = loader.load(); ///flowmain incor pain scroll pain i dont know what im using in builder
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Agent.fxml"));
+            Parent root = loader.load();
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
             primaryStage.show();
