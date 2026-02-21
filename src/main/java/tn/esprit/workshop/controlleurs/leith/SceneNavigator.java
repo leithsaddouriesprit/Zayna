@@ -31,5 +31,21 @@ public class SceneNavigator {
             LOGGER.log(Level.SEVERE, "Error while opening MapTracking view", e);
         }
     }
+    public static void openChatAI() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    SceneNavigator.class.getResource("/leith/AI/ChatAI.fxml")
+            );
+            Parent root = loader.load();
+
+            Stage stage = new Stage();
+            stage.setTitle("Zayna - Assistant IA");
+            stage.setScene(new Scene(root, 900, 650));
+            stage.show();
+
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error while opening ChatAI view", e);
+        }
+    }
 
 }

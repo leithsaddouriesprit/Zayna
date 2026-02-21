@@ -48,14 +48,14 @@ public class MainFFX extends Application {
 
     }
     */
-
+/*
 /// tracking scene
   @Override
   public void start(Stage primaryStage) {
 
       try {
           FXMLLoader loader = new FXMLLoader(
-                  getClass().getResource("/leith/MapTracking.fxml")
+                  getClass().getResource("/leith/PostulerChauffeur.fxml")
           );
 
           // if user.role =="parent"
@@ -84,8 +84,9 @@ public class MainFFX extends Application {
 
   }
 
-
-   /* /// chauffeur scene
+*/
+   /*
+    /// chauffeur scene
 @Override
 public void start(Stage primaryStage) {
     try {
@@ -110,7 +111,27 @@ public void start(Stage primaryStage) {
         System.out.println("Erreur FXML: " + e.getMessage());
         System.out.println(e.getMessage());
     }
-}*/
+}
+*/
 
+/// AI chat
+@Override
+public void start(Stage primaryStage) {
+    try {
+        FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/leith/AI/ChatAI.fxml")
+        );
 
+        Parent root = loader.load();
+
+        Scene scene = new Scene(root, 900, 650);
+        primaryStage.setTitle("Zayna – Assistant IA");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+
+    } catch (IOException e) {
+        System.out.println("Erreur FXML: " + e.getMessage());
+        System.out.println(e.getMessage());
+    }
+}
 }

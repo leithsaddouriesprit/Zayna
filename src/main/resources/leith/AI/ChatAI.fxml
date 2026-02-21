@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.workshop.controlleurs.leith.AI.ChatAIController">
+
+    <top>
+        <HBox spacing="10" style="-fx-padding: 10;">
+            <Label text="🤖 ZAYNA - Assistant IA" style="-fx-font-size: 16px; -fx-font-weight: 800;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Retour" onAction="#goBack"/>
+        </HBox>
+    </top>
+
+    <center>
+        <TextArea fx:id="taChat" editable="false" wrapText="true" />
+    </center>
+
+    <bottom>
+        <HBox spacing="10" style="-fx-padding: 10;">
+            <TextField fx:id="tfMessage" promptText="Écris ton message..." HBox.hgrow="ALWAYS" onAction="#send"/>
+            <Button fx:id="btnSend" text="Envoyer" onAction="#send"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>
