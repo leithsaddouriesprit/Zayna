@@ -2,64 +2,398 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="600.0" prefWidth="800.0"
-            style="-fx-background-color: #f8f9fa; -fx-padding: 20;"
-            xmlns="http://javafx.com/javafx/17"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="tn.esprit.workshop.controlleurs.EcoleController">
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="tn.esprit.workshop.controlleurs.AgentController"
+      spacing="20" alignment="TOP_CENTER"
+      style="
+          -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #667eea 0%, #764ba2 50%, #6b8cff 100%);
+          -fx-background-radius: 30px;
+          -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 30, 0, 0, 15);
+          -fx-padding: 25px;
+          -fx-max-width: 1100px;
+          -fx-font-family: 'Segoe UI', 'Poppins', 'Arial', sans-serif;
+      ">
 
-    <children>
-        <VBox spacing="15" layoutX="30" layoutY="20"
-              style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 5);">
+    <style>
+        /* ===== STYLE GLOBAL ===== */
+        * {
+        -fx-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-            <!-- Titre -->
-            <Label text="Gestion des Écoles"
-                   style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-background-color: #e8f4f8; -fx-padding: 10 20; -fx-background-radius: 25;"/>
+        /* ===== CONTENEUR PRINCIPAL ===== */
+        .main-container {
+        -fx-background-color: rgba(255, 255, 255, 0.97);
+        -fx-background-radius: 25px;
+        -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 20, 0, 0, 5);
+        -fx-padding: 30px;
+        }
 
-            <!-- Champs -->
-            <TextField fx:id="tfNom" promptText="Nom de l'école"
-                       style="-fx-font-size: 14px; -fx-padding: 12; -fx-border-radius: 8; -fx-border-color: #ddd;"/>
+        /* ===== EN-TÊTE ===== */
+        .header {
+        -fx-padding: 0 0 20px 0;
+        -fx-border-width: 0 0 3px 0;
+        -fx-border-color: linear-gradient(from 0% 0% to 100% 100%, #667eea 0%, #764ba2 100%);
+        -fx-border-insets: 0 0 20px 0;
+        }
 
-            <TextField fx:id="tfPosition" promptText="Position (Ariana, La Marsa...)"
-                       style="-fx-font-size: 14px; -fx-padding: 12; -fx-border-radius: 8; -fx-border-color: #ddd;"/>
+        .titre-principal {
+        -fx-font-size: 28px;
+        -fx-font-weight: bold;
+        -fx-text-fill: #1a2639;
+        -fx-effect: dropshadow(gaussian, rgba(102, 126, 234, 0.3), 10, 0, 0, 2);
+        -fx-letter-spacing: 0.5px;
+        }
 
-            <TextField fx:id="tfPrix" promptText="Prix mensuel (DT)"
-                       style="-fx-font-size: 14px; -fx-padding: 12; -fx-border-radius: 8; -fx-border-color: #ddd;"/>
+        .titre-principal:hover {
+        -fx-scale-x: 1.02;
+        -fx-scale-y: 1.02;
+        }
 
-            <TextArea fx:id="tfDescription" promptText="Description de l'école" prefHeight="80"
-                      style="-fx-font-size: 14px; -fx-padding: 12; -fx-border-radius: 8; -fx-border-color: #ddd;"/>
+        /* ===== CARTE DE FORMULAIRE ===== */
+        .form-card {
+        -fx-background-color: #f8fafd;
+        -fx-background-radius: 20px;
+        -fx-padding: 20px;
+        -fx-border-color: rgba(102, 126, 234, 0.2);
+        -fx-border-width: 2px;
+        -fx-border-radius: 20px;
+        -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 10, 0, 0, 2);
+        }
 
-            <TextArea fx:id="tfInfos" promptText="Informations supplémentaires" prefHeight="80"
-                      style="-fx-font-size: 14px; -fx-padding: 12; -fx-border-radius: 8; -fx-border-color: #ddd;"/>
+        .form-grid {
+        -fx-padding: 10px 0;
+        -fx-hgap: 20px;
+        -fx-vgap: 15px;
+        }
 
-            <!-- Boutons -->
+        .field-label {
+        -fx-font-size: 14px;
+        -fx-font-weight: 600;
+        -fx-text-fill: #2c3e50;
+        -fx-alignment: CENTER_RIGHT;
+        -fx-padding: 0 15px 0 0;
+        -fx-min-width: 100px;
+        }
+
+        /* ===== CHAMPS DE SAISIE AMÉLIORÉS ===== */
+        .custom-field, .custom-area {
+        -fx-background-color: white;
+        -fx-border-color: #e0e7ed;
+        -fx-border-width: 2px;
+        -fx-border-radius: 15px;
+        -fx-background-radius: 15px;
+        -fx-padding: 14px 18px;
+        -fx-font-size: 15px;
+        -fx-prompt-text-fill: #94a3b8;
+        -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.02), 5, 0, 0, 2);
+        }
+
+        .custom-field {
+        -fx-min-width: 350px;
+        -fx-max-width: 350px;
+        -fx-pref-height: 45px;
+        }
+
+        .custom-field:hover, .custom-area:hover {
+        -fx-border-color: #667eea;
+        -fx-effect: dropshadow(gaussian, rgba(102, 126, 234, 0.15), 12, 0, 0, 3);
+        -fx-scale-x: 1.01;
+        -fx-scale-y: 1.01;
+        }
+
+        .custom-field:focused, .custom-area:focused {
+        -fx-border-color: #764ba2;
+        -fx-border-width: 2.5px;
+        -fx-effect: dropshadow(gaussian, rgba(118, 75, 162, 0.25), 15, 0, 0, 4);
+        -fx-background-color: #fefefe;
+        }
+
+        .custom-area {
+        -fx-min-height: 90px;
+        -fx-min-width: 720px;
+        -fx-max-width: 720px;
+        -fx-wrap-text: true;
+        }
+
+        /* ===== ICÔNES DANS LES CHAMPS ===== */
+        .field-icon {
+        -fx-padding: 0 5px 0 0;
+        }
+
+        /* ===== BOUTONS D'ACTION ===== */
+        .boutons-container {
+        -fx-spacing: 18px;
+        -fx-alignment: center;
+        -fx-padding: 20px 0 15px 0;
+        }
+
+        .button-action {
+        -fx-background-radius: 12px;
+        -fx-padding: 12px 25px;
+        -fx-font-size: 15px;
+        -fx-font-weight: bold;
+        -fx-cursor: hand;
+        -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 8, 0, 0, 3);
+        -fx-min-width: 120px;
+        -fx-alignment: center;
+        -fx-spacing: 10px;
+        }
+
+        .button-action:hover {
+        -fx-scale-x: 1.05;
+        -fx-scale-y: 1.05;
+        -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 15, 0, 0, 5);
+        }
+
+        .button-action:pressed {
+        -fx-scale-x: 0.98;
+        -fx-scale-y: 0.98;
+        }
+
+        .button-ajouter {
+        -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #2ecc71 0%, #27ae60 100%);
+        -fx-text-fill: white;
+        }
+
+        .button-modifier {
+        -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #f39c12 0%, #e67e22 100%);
+        -fx-text-fill: white;
+        }
+
+        .button-supprimer {
+        -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #e74c3c 0%, #c0392b 100%);
+        -fx-text-fill: white;
+        }
+
+        .button-vider {
+        -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #95a5a6 0%, #7f8c8d 100%);
+        -fx-text-fill: white;
+        }
+
+        /* ===== TABLEAU AMÉLIORÉ ===== */
+        .table-title {
+        -fx-font-size: 18px;
+        -fx-font-weight: bold;
+        -fx-text-fill: #1a2639;
+        -fx-padding: 15px 0 10px 0;
+        -fx-graphic: url('https://img.icons8.com/color/48/table.png');
+        -fx-graphic-text-gap: 10px;
+        }
+
+        .custom-table {
+        -fx-background-color: transparent;
+        -fx-border-color: rgba(226, 232, 240, 0.5);
+        -fx-border-width: 1px;
+        -fx-border-radius: 18px;
+        -fx-background-radius: 18px;
+        -fx-padding: 8px;
+        -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 15, 0, 0, 3);
+        -fx-pref-height: 300px;
+        }
+
+        .custom-table .column-header-background {
+        -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #667eea 0%, #764ba2 100%);
+        -fx-background-radius: 15px 15px 0 0;
+        -fx-padding: 12px 0;
+        }
+
+        .custom-table .column-header .label {
+        -fx-font-size: 14px;
+        -fx-font-weight: bold;
+        -fx-text-fill: white;
+        -fx-alignment: center;
+        -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 2, 0, 0, 1);
+        }
+
+        .custom-table .table-row-cell {
+        -fx-background-color: white;
+        -fx-border-color: transparent transparent #edf2f7 transparent;
+        -fx-border-width: 0 0 1px 0;
+        -fx-padding: 5px 0;
+        }
+
+        .custom-table .table-row-cell:odd {
+        -fx-background-color: #fafcff;
+        }
+
+        .custom-table .table-row-cell:hover {
+        -fx-background-color: #e8f0fe;
+        -fx-scale-x: 1.005;
+        -fx-scale-y: 1.005;
+        }
+
+        .custom-table .table-row-cell:selected {
+        -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #d5e6ff 0%, #e9d8fd 100%);
+        }
+
+        .custom-table .table-cell {
+        -fx-padding: 12px 10px;
+        -fx-font-size: 13.5px;
+        -fx-text-fill: #2c3e50;
+        -fx-alignment: center;
+        }
+
+        /* Bouton dans la table */
+        .table-button {
+        -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #9b59b6 0%, #8e44ad 100%);
+        -fx-text-fill: white;
+        -fx-background-radius: 20;
+        -fx-cursor: hand;
+        -fx-font-weight: bold;
+        -fx-padding: 6 18;
+        -fx-font-size: 12px;
+        -fx-effect: dropshadow(gaussian, rgba(155, 89, 182, 0.3), 5, 0, 0, 2);
+        }
+
+        .table-button:hover {
+        -fx-background-color: #8e44ad;
+        -fx-scale-x: 1.05;
+        -fx-scale-y: 1.05;
+        -fx-effect: dropshadow(gaussian, rgba(142, 68, 173, 0.4), 8, 0, 0, 3);
+        }
+
+        /* ===== SCROLLBAR PERSONNALISÉE ===== */
+        .scroll-bar:vertical {
+        -fx-background-color: transparent;
+        -fx-background-radius: 10px;
+        -fx-padding: 5px;
+        }
+
+        .scroll-bar:vertical .thumb {
+        -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #cbd5e0 0%, #a0aec0 100%);
+        -fx-background-radius: 10px;
+        }
+
+        .scroll-bar:vertical .thumb:hover {
+        -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #a0aec0 0%, #718096 100%);
+        }
+
+        .scroll-bar:vertical .track {
+        -fx-background-color: #edf2f7;
+        -fx-background-radius: 10px;
+        }
+    </style>
+
+    <!-- Conteneur principal -->
+    <VBox spacing="20" alignment="TOP_CENTER" styleClass="main-container">
+
+        <!-- En-tête avec icône -->
+        <HBox alignment="CENTER" styleClass="header">
             <HBox spacing="15" alignment="CENTER">
-                <Button text="Ajouter" onAction="#ajouterEcole"
-                        style="-fx-font-size: 14px; -fx-padding: 10 20; -fx-background-radius: 25; -fx-background-color: #27ae60; -fx-text-fill: white;"/>
-                <Button text="Modifier" onAction="#modifierEcole"
-                        style="-fx-font-size: 14px; -fx-padding: 10 20; -fx-background-radius: 25; -fx-background-color: #3498db; -fx-text-fill: white;"/>
-                <Button text="Supprimer" onAction="#supprimerEcole"
-                        style="-fx-font-size: 14px; -fx-padding: 10 20; -fx-background-radius: 25; -fx-background-color: #e74c3c; -fx-text-fill: white;"/>
+                <ImageView fitHeight="50" fitWidth="50">
+                    <Image url="https://img.icons8.com/fluency/48/school.png"/>
+                </ImageView>
+                <Label text="Interface Agent - Gestion des Écoles" styleClass="titre-principal"/>
             </HBox>
+        </HBox>
 
-            <!-- TABLE -->
-            <TableView fx:id="tableEcole" prefWidth="740" prefHeight="250"
-                       style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
+        <!-- Carte de formulaire -->
+        <VBox styleClass="form-card" spacing="5">
+            <Label text="➕ Ajouter / Modifier une école"
+                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-padding: 0 0 10px 0;"/>
 
-                <columns>
-                    <TableColumn fx:id="colNom" text="Nom" prefWidth="130"/>
-                    <TableColumn fx:id="colPosition" text="Position" prefWidth="130"/>
-                    <TableColumn fx:id="colPrix" text="Prix" prefWidth="90"/>
-                    <TableColumn fx:id="colDescription" text="Description" prefWidth="170"/>
-                    <TableColumn fx:id="colInformations" text="Informations" prefWidth="120"/>
+            <!-- Grille des champs avec espacement amélioré -->
+            <GridPane styleClass="form-grid" alignment="CENTER">
+                <!-- Nom -->
+                <Label text="🏫 Nom:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="field-label"/>
+                <HBox spacing="10" alignment="CENTER_LEFT" GridPane.rowIndex="0" GridPane.columnIndex="1">
+                    <ImageView fitHeight="20" fitWidth="20">
+                        <Image url="https://img.icons8.com/color/48/school.png"/>
+                    </ImageView>
+                    <TextField fx:id="tfNom" promptText="Ex: ESPRIT, IHEC, FST..." styleClass="custom-field"/>
+                </HBox>
 
-                    <!-- ⭐ colonne bouton programme -->
-                    <TableColumn fx:id="colAction" text="Programme" prefWidth="150"/>
-                </columns>
-            </TableView>
+                <!-- Position -->
+                <Label text="📍 Position:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="field-label"/>
+                <HBox spacing="10" alignment="CENTER_LEFT" GridPane.rowIndex="1" GridPane.columnIndex="1">
+                    <ImageView fitHeight="20" fitWidth="20">
+                        <Image url="https://img.icons8.com/color/48/place-marker--v1.png"/>
+                    </ImageView>
+                    <TextField fx:id="tfPosition" promptText="Ex: Ariana, Tunis, La Marsa..." styleClass="custom-field"/>
+                </HBox>
 
+                <!-- Prix -->
+                <Label text="💰 Prix:" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="field-label"/>
+                <HBox spacing="10" alignment="CENTER_LEFT" GridPane.rowIndex="2" GridPane.columnIndex="1">
+                    <ImageView fitHeight="20" fitWidth="20">
+                        <Image url="https://img.icons8.com/color/48/price-tag.png"/>
+                    </ImageView>
+                    <TextField fx:id="tfPrix" promptText="Ex: 4500" styleClass="custom-field"/>
+                </HBox>
+
+                <!-- Description -->
+                <Label text="📝 Description:" GridPane.rowIndex="3" GridPane.columnIndex="0" styleClass="field-label"
+                       style="-fx-alignment: TOP_RIGHT; -fx-padding: 10 15 0 0;"/>
+                <HBox spacing="10" alignment="TOP_LEFT" GridPane.rowIndex="3" GridPane.columnIndex="1">
+                    <ImageView fitHeight="20" fitWidth="20" style="-fx-padding: 8 0 0 0;">
+                        <Image url="https://img.icons8.com/color/48/description.png"/>
+                    </ImageView>
+                    <TextArea fx:id="tfDescription" promptText="Description détaillée de l'école..." prefHeight="80" styleClass="custom-area"/>
+                </HBox>
+
+                <!-- Informations -->
+                <Label text="ℹ️ Infos:" GridPane.rowIndex="4" GridPane.columnIndex="0" styleClass="field-label"
+                       style="-fx-alignment: TOP_RIGHT; -fx-padding: 10 15 0 0;"/>
+                <HBox spacing="10" alignment="TOP_LEFT" GridPane.rowIndex="4" GridPane.columnIndex="1">
+                    <ImageView fitHeight="20" fitWidth="20" style="-fx-padding: 8 0 0 0;">
+                        <Image url="https://img.icons8.com/color/48/info.png"/>
+                    </ImageView>
+                    <TextArea fx:id="tfInfos" promptText="Informations supplémentaires..." prefHeight="80" styleClass="custom-area"/>
+                </HBox>
+            </GridPane>
         </VBox>
-    </children>
-</AnchorPane>
+
+        <!-- Boutons CRUD -->
+        <HBox styleClass="boutons-container">
+            <Button text="Ajouter" styleClass="button-action button-ajouter" onAction="#ajouterEcole">
+                <graphic>
+                    <ImageView fitHeight="18" fitWidth="18">
+                        <Image url="https://img.icons8.com/color/48/plus-math.png"/>
+                    </ImageView>
+                </graphic>
+            </Button>
+
+            <Button text="Modifier" styleClass="button-action button-modifier" onAction="#modifierEcole">
+                <graphic>
+                    <ImageView fitHeight="18" fitWidth="18">
+                        <Image url="https://img.icons8.com/color/48/edit.png"/>
+                    </ImageView>
+                </graphic>
+            </Button>
+
+            <Button text="Supprimer" styleClass="button-action button-supprimer" onAction="#supprimerEcole">
+                <graphic>
+                    <ImageView fitHeight="18" fitWidth="18">
+                        <Image url="https://img.icons8.com/color/48/delete-forever.png"/>
+                    </ImageView>
+                </graphic>
+            </Button>
+
+            <Button text="Vider" styleClass="button-action button-vider" onAction="#clearFields">
+                <graphic>
+                    <ImageView fitHeight="18" fitWidth="18">
+                        <Image url="https://img.icons8.com/color/48/erase.png"/>
+                    </ImageView>
+                </graphic>
+            </Button>
+        </HBox>
+
+        <!-- Table des écoles -->
+        <Label text="📋 Liste des écoles" styleClass="table-title"/>
+        <TableView fx:id="tableEcole" styleClass="custom-table">
+            <columns>
+                <TableColumn fx:id="colNom" text="Nom" prefWidth="140"/>
+                <TableColumn fx:id="colPosition" text="Position" prefWidth="140"/>
+                <TableColumn fx:id="colPrix" text="Prix (DT)" prefWidth="100"/>
+                <TableColumn fx:id="colDescription" text="Description" prefWidth="180"/>
+                <TableColumn fx:id="colInformations" text="Informations" prefWidth="140"/>
+                <TableColumn fx:id="colAction" text="Programmes" prefWidth="120"/>
+            </columns>
+        </TableView>
+    </VBox>
+</VBox>

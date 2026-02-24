@@ -3,6 +3,9 @@ package tn.esprit.workshop.controlleurs;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
@@ -11,6 +14,7 @@ import tn.esprit.workshop.model.Programme;
 import tn.esprit.workshop.services.EcoleService;
 import tn.esprit.workshop.services.ProgrammeService;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +36,6 @@ public class ProgrammeController {
     @FXML private TableColumn<Programme, String> colDuree;
     @FXML private TableColumn<Programme, Double> colPrix;
 
-    // ===== LABELS POUR STATISTIQUES =====
     @FXML private Label lblTotalProgrammes;
     @FXML private Label lblPrixMoyen;
 
@@ -90,10 +93,10 @@ public class ProgrammeController {
         });
     }
 
-    // ===== CHARGEMENT DES DONNÉES =====
+    // ===== CHARGEMENT DES ÉCOLES =====
     private void loadEcoles() {
         try {
-            List<Ecole> list = ecoleService.selectAll();
+            List<Ecole> list = ecoleService.selectAllEcoles();
             ecoleList.setAll(list);
             cbEcole.setItems(ecoleList);
 
@@ -127,15 +130,7 @@ public class ProgrammeController {
         }
     }
 
-    private String getNomEcole(int id) {
-        Ecole e = getEcoleById(id);
-        return e != null ? e.getNom() : "Inconnue";
-    }
-
-    private Ecole getEcoleById(int id) {
-        return ecoleList.stream().filter(e -> e.getId() == id).findFirst().orElse(null);
-    }
-
+    // ===== CHARGEMENT DES PROGRAMMES =====
     private void loadTable() {
         try {
             List<Programme> list = programmeService.selectAllProgrammes();
@@ -145,6 +140,16 @@ public class ProgrammeController {
         } catch (SQLException e) {
             showAlert("Erreur", "Impossible de charger les programmes : " + e.getMessage(), AlertType.ERROR);
         }
+    }
+
+    // ===== UTILITAIRES =====
+    private String getNomEcole(int id) {
+        Ecole e = getEcoleById(id);
+        return e != null ? e.getNom() : "Inconnue";
+    }
+
+    private Ecole getEcoleById(int id) {
+        return ecoleList.stream().filter(e -> e.getId() == id).findFirst().orElse(null);
     }
 
     // ===== STATISTIQUES =====
@@ -185,6 +190,7 @@ public class ProgrammeController {
     }
 
     // ===== VIDER LES CHAMPS =====
+    @FXML
     private void clearFields() {
         cbEcole.getSelectionModel().clearSelection();
         tfNom.clear();
@@ -224,14 +230,16 @@ public class ProgrammeController {
         return true;
     }
 
-    // ===== ACTIONS CRUD =====
+    // ===== AJOUTER UN PROGRAMME =====
     @FXML
     private void ajouterProgramme() {
         if (!validateFields()) return;
 
         try {
+            Ecole selectedEcole = cbEcole.getSelectionModel().getSelectedItem();
+
             Programme p = new Programme();
-            p.setEcoleId(cbEcole.getSelectionModel().getSelectedItem().getId());
+            p.setEcoleId(selectedEcole.getId());
             p.setNomProgramme(tfNom.getText().trim());
             p.setNiveau(tfNiveau.getText().trim());
             p.setDuree(tfDuree.getText().trim());
@@ -242,13 +250,16 @@ public class ProgrammeController {
             loadTable();
             clearFields();
             showAlert("Succès", "Programme ajouté avec succès !", AlertType.INFORMATION);
+
         } catch (SQLException e) {
             showAlert("Erreur", "Erreur lors de l'ajout : " + e.getMessage(), AlertType.ERROR);
+            e.printStackTrace();
         } catch (NumberFormatException e) {
             showAlert("Erreur", "Format de prix invalide !", AlertType.ERROR);
         }
     }
 
+    // ===== MODIFIER UN PROGRAMME =====
     @FXML
     private void modifierProgramme() {
         Programme selected = tableProgramme.getSelectionModel().getSelectedItem();
@@ -267,7 +278,8 @@ public class ProgrammeController {
         Optional<ButtonType> result = confirm.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
-                selected.setEcoleId(cbEcole.getSelectionModel().getSelectedItem().getId());
+                Ecole selectedEcole = cbEcole.getSelectionModel().getSelectedItem();
+                selected.setEcoleId(selectedEcole.getId());
                 selected.setNomProgramme(tfNom.getText().trim());
                 selected.setNiveau(tfNiveau.getText().trim());
                 selected.setDuree(tfDuree.getText().trim());
@@ -286,6 +298,7 @@ public class ProgrammeController {
         }
     }
 
+    // ===== SUPPRIMER UN PROGRAMME =====
     @FXML
     private void supprimerProgramme() {
         Programme selected = tableProgramme.getSelectionModel().getSelectedItem();
@@ -313,6 +326,23 @@ public class ProgrammeController {
         }
     }
 
+    // ===== RETOUR À L'ACCUEIL AGENT =====
+    @FXML
+    private void retourAccueil() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/tn/esprit/workshop/AgentInterface.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = (Stage) cbEcole.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Interface Agent - Gestion des Écoles");
+            stage.show();
+        } catch (IOException e) {
+            showAlert("Erreur", "Impossible de retourner à l'accueil: " + e.getMessage(), AlertType.ERROR);
+            e.printStackTrace();
+        }
+    }
+
     // ===== FERMETURE DE LA FENÊTRE =====
     @FXML
     private void fermerFenetre() {
@@ -321,9 +351,19 @@ public class ProgrammeController {
     }
 
     // ===== MÉTHODE POUR PRÉ-SÉLECTIONNER UNE ÉCOLE =====
-    public void selectEcole(Ecole ecole) {
+    // 👈👈👈 MÉTHODE APPELÉE DEPUIS AgentController
+    public void setEcoleSelectionnee(Ecole ecole) {
         if (ecole != null) {
             cbEcole.getSelectionModel().select(ecole);
+
+            // Optionnel: Filtrer les programmes pour cette école
+            ObservableList<Programme> filtered = FXCollections.observableArrayList();
+            for (Programme p : programmeList) {
+                if (p.getEcoleId() == ecole.getId()) {
+                    filtered.add(p);
+                }
+            }
+            tableProgramme.setItems(filtered);
         }
     }
 

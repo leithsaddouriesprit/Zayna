@@ -15,14 +15,10 @@ public class EcoleService {
         connection = MyBDConnexion.getInstance().getConnection();
     }
 
-    // ================= AJOUT =================
-    // 🔥 retourne l'id de l'école créée
-    public int insertOne(Ecole ecole) throws SQLException {
-
+    // Ajouter une école
+    public void insertEcole(Ecole ecole) throws SQLException {
         String req = "INSERT INTO ecole (nom, position, prix_mensuel, description, informations) VALUES (?,?,?,?,?)";
-
-        // IMPORTANT : pour récupérer l'id auto_increment
-        PreparedStatement ps = connection.prepareStatement(req, Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement ps = connection.prepareStatement(req);
 
         ps.setString(1, ecole.getNom());
         ps.setString(2, ecole.getPosition());
@@ -31,22 +27,11 @@ public class EcoleService {
         ps.setString(5, ecole.getInformations());
 
         ps.executeUpdate();
-
-        // récupérer l'id généré
-        ResultSet rs = ps.getGeneratedKeys();
-
-        if (rs.next()) {
-            return rs.getInt(1);
-        }
-
-        return -1;
     }
 
-    // ================= MODIFIER =================
-    public void updateOne(Ecole ecole) throws SQLException {
-
+    // Modifier une école
+    public void updateEcole(Ecole ecole) throws SQLException {
         String req = "UPDATE ecole SET nom=?, position=?, prix_mensuel=?, description=?, informations=? WHERE id=?";
-
         PreparedStatement ps = connection.prepareStatement(req);
 
         ps.setString(1, ecole.getNom());
@@ -59,19 +44,16 @@ public class EcoleService {
         ps.executeUpdate();
     }
 
-    // ================= SUPPRIMER =================
-    public void deleteOne(Ecole ecole) throws SQLException {
-
+    // Supprimer une école
+    public void deleteEcole(int id) throws SQLException {
         String req = "DELETE FROM ecole WHERE id=?";
-
         PreparedStatement ps = connection.prepareStatement(req);
-        ps.setInt(1, ecole.getId());
+        ps.setInt(1, id);
         ps.executeUpdate();
     }
 
-    // ================= AFFICHER =================
-    public List<Ecole> selectAll() throws SQLException {
-
+    // Afficher toutes les écoles
+    public List<Ecole> selectAllEcoles() throws SQLException {
         List<Ecole> ecoles = new ArrayList<>();
         String req = "SELECT * FROM ecole";
 
@@ -79,19 +61,35 @@ public class EcoleService {
         ResultSet rs = st.executeQuery(req);
 
         while (rs.next()) {
-
             Ecole e = new Ecole();
-
             e.setId(rs.getInt("id"));
             e.setNom(rs.getString("nom"));
             e.setPosition(rs.getString("position"));
             e.setPrixMensuel(rs.getDouble("prix_mensuel"));
             e.setDescription(rs.getString("description"));
             e.setInformations(rs.getString("informations"));
-
             ecoles.add(e);
         }
-
         return ecoles;
+    }
+
+    // Trouver une école par ID
+    public Ecole findEcoleById(int id) throws SQLException {
+        String req = "SELECT * FROM ecole WHERE id=?";
+        PreparedStatement ps = connection.prepareStatement(req);
+        ps.setInt(1, id);
+
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            Ecole e = new Ecole();
+            e.setId(rs.getInt("id"));
+            e.setNom(rs.getString("nom"));
+            e.setPosition(rs.getString("position"));
+            e.setPrixMensuel(rs.getDouble("prix_mensuel"));
+            e.setDescription(rs.getString("description"));
+            e.setInformations(rs.getString("informations"));
+            return e;
+        }
+        return null;
     }
 }

@@ -22,25 +22,21 @@ public class Programme {
         this.prixProgramme = prixProgramme;
     }
 
-    // GETTERS & SETTERS
+    // GETTERS
     public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
-
     public int getEcoleId() { return ecoleId; }
-    public void setEcoleId(int ecoleId) { this.ecoleId = ecoleId; }
-
     public String getNomProgramme() { return nomProgramme; }
-    public void setNomProgramme(String nomProgramme) { this.nomProgramme = nomProgramme; }
-
     public String getDescriptionProgramme() { return descriptionProgramme; }
-    public void setDescriptionProgramme(String descriptionProgramme) { this.descriptionProgramme = descriptionProgramme; }
-
     public String getNiveau() { return niveau; }
-    public void setNiveau(String niveau) { this.niveau = niveau; }
-
     public String getDuree() { return duree; }
-    public void setDuree(String duree) { this.duree = duree; }
-
     public double getPrixProgramme() { return prixProgramme; }
+
+    // SETTERS
+    public void setId(int id) { this.id = id; }
+    public void setEcoleId(int ecoleId) { this.ecoleId = ecoleId; }
+    public void setNomProgramme(String nomProgramme) { this.nomProgramme = nomProgramme; }
+    public void setDescriptionProgramme(String descriptionProgramme) { this.descriptionProgramme = descriptionProgramme; }
+    public void setNiveau(String niveau) { this.niveau = niveau; }
+    public void setDuree(String duree) { this.duree = duree; }
     public void setPrixProgramme(double prixProgramme) { this.prixProgramme = prixProgramme; }
 }

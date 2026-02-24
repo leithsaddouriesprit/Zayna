@@ -1,6 +1,5 @@
 package tn.esprit.workshop.services;
 
-
 import tn.esprit.workshop.model.Agent;
 import tn.esprit.workshop.utilis.MyBDConnexion;
 
@@ -85,5 +84,3 @@ public class AgentService {
         return agents;
     }
 }
-
-
