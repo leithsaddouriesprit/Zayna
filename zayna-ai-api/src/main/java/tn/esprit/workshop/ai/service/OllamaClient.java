@@ -20,7 +20,7 @@ public class OllamaClient {
             ObjectMapper mapper = new ObjectMapper();
 
             String body = mapper.writeValueAsString(java.util.Map.of(
-                    "model", "mistral:7b",
+                    "model", "llama3.2:3b",
                     "prompt", prompt,
                     "stream", false
             ));
