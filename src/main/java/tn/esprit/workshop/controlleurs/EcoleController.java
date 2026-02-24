@@ -106,6 +106,7 @@ public class EcoleController {
 
             int idEcole = service.insertOne(e);
 
+            System.out.println("l id de l ecole est"+idEcole);
             // Créer un programme par défaut
             Programme p = new Programme(idEcole, "Programme Primaire", "Programme officiel tunisien", "Primaire", "9 mois", 300);
             programmeService.insertProgramme(p);
@@ -188,7 +189,7 @@ public class EcoleController {
     // ================= OUVRIR PROGRAMME =================
     private void openProgrammeWindow(Ecole ecole) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/tn/esprit/workshop/views/Programme.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Programme.fxml"));
             Parent root = loader.load();
 
             // Pré-sélection de l'école
