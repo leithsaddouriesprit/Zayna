@@ -27,7 +27,7 @@ public class ArretServiceTest {
             List<Arret> arrets = arretService.selectAll();
             for (Arret ar : arrets) {
                 System.out.println(
-                        ar.getId() + " | " +
+                        ar.getArretId() + " | " +
                                 ar.getNom() + " | " +
                                 ar.getLatitude() + " | " +
                                 ar.getLongitude()

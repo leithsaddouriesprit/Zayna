@@ -38,14 +38,14 @@ public class EnfantService implements CRUD<Enfant> {
                         "prenom='" + e.getPrenom() + "', " +
                         "trajet_id=" + e.getTrajetId() + ", " +
                         "actif=" + e.isActif() +
-                        " WHERE id=" + e.getId();
+                        " WHERE id=" + e.getEnfantId();
         Statement st = connection.createStatement();
         st.executeUpdate(req);
     }
 
     @Override
     public void deleteOne(Enfant e) throws SQLException {
-        String req = "DELETE FROM enfant WHERE id=" + e.getId();
+        String req = "DELETE FROM enfant WHERE id=" + e.getEnfantId();
         Statement st = connection.createStatement();
         st.executeUpdate(req);
     }
@@ -59,7 +59,7 @@ public class EnfantService implements CRUD<Enfant> {
 
         while (rs.next()) {
             Enfant e = new Enfant();
-            e.setId(rs.getInt("id"));
+            e.setEnfantId(rs.getInt("id"));
             e.setNom(rs.getString("nom"));
             e.setPrenom(rs.getString("prenom"));
             e.setParentId(rs.getInt("parent_id"));
@@ -83,7 +83,7 @@ public class EnfantService implements CRUD<Enfant> {
             if (rs.next()) {
                 enfant = new Enfant();
 
-                enfant.setId(rs.getInt("id"));
+                enfant.setEnfantId(rs.getInt("id"));
                 enfant.setNom(rs.getString("nom"));
                 enfant.setPrenom(rs.getString("prenom"));
                 enfant.setParentId(rs.getInt("parent_id"));
@@ -106,7 +106,7 @@ public class EnfantService implements CRUD<Enfant> {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     Enfant e = new Enfant();
-                    e.setId(rs.getInt("id"));
+                    e.setEnfantId(rs.getInt("id"));
                     e.setNom(rs.getString("nom"));
                     e.setPrenom(rs.getString("prenom"));
                     e.setParentId(rs.getInt("parent_id"));

@@ -2,7 +2,7 @@ package tn.esprit.workshop.model.leith;
 
 public class Bus {
 
-    private int id;
+    private int busId;
     private String numeroBus;
     private String matricule;
     private int capacite;
@@ -11,8 +11,8 @@ public class Bus {
 
     public Bus() {}
 
-    public Bus(int id, String numeroBus, String matricule, int capacite, int idChauffeur, boolean actif) {
-        this.id = id;
+    public Bus(int busId, String numeroBus, String matricule, int capacite, int idChauffeur, boolean actif) {
+        this.busId = busId;
         this.numeroBus = numeroBus;
         this.matricule = matricule;
         this.capacite = capacite;
@@ -20,12 +20,12 @@ public class Bus {
         this.actif = actif;
     }
 
-    public int getId() {
-        return id;
+    public int getBusId() {
+        return busId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setBusId(int busId) {
+        this.busId = busId;
     }
 
     public String getNumeroBus() {
@@ -71,7 +71,7 @@ public class Bus {
     @Override
     public String toString() {
         return "Bus{" +
-                "id=" + id +
+                "busId=" + busId +
                 ", numeroBus='" + numeroBus + '\'' +
                 ", matricule='" + matricule + '\'' +
                 ", capacite=" + capacite +

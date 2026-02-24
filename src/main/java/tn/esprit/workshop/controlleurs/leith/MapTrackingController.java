@@ -473,7 +473,7 @@ public class MapTrackingController {
         // 3) via bus (trajet actif)
         try {
             Trajet t = trajetService.getByBusId(busId);
-            if (t != null) return t.getId();
+            if (t != null) return t.getTrajetId();
         } catch (Exception ex) {
             System.err.println("resolveTrajetId bus: " + ex.getMessage());
         }

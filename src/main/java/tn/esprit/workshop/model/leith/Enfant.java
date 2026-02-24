@@ -2,7 +2,7 @@ package tn.esprit.workshop.model.leith;
 
 public class Enfant {
 
-    private int id;
+    private int enfantId;
     private String nom;
     private String prenom;
     private int parentId;
@@ -12,8 +12,8 @@ public class Enfant {
 
     public Enfant() {}
 
-    public Enfant(int id, String nom, String prenom, int parentId, int trajetId, boolean actif) {
-        this.id = id;
+    public Enfant(int enfantId, String nom, String prenom, int parentId, int trajetId, boolean actif) {
+        this.enfantId = enfantId;
         this.nom = nom;
         this.prenom = prenom;
         this.parentId = parentId;
@@ -21,12 +21,20 @@ public class Enfant {
         this.actif = actif;
     }
 
-    public int getId() {
-        return id;
+    public boolean isOnBoard() {
+        return onBoard;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setOnBoard(boolean onBoard) {
+        this.onBoard = onBoard;
+    }
+
+    public int getEnfantId() {
+        return enfantId;
+    }
+
+    public void setEnfantId(int enfantId) {
+        this.enfantId = enfantId;
     }
 
     public String getNom() {
@@ -68,23 +76,17 @@ public class Enfant {
     public void setActif(boolean actif) {
         this.actif = actif;
     }
-    public boolean isOnBoard() {
-        return onBoard;
-    }
-
-    public void setOnBoard(boolean onBoard) {
-        this.onBoard = onBoard;
-    }
 
     @Override
     public String toString() {
         return "Enfant{" +
-                "id=" + id +
+                "enfantId=" + enfantId +
                 ", nom='" + nom + '\'' +
                 ", prenom='" + prenom + '\'' +
                 ", parentId=" + parentId +
                 ", trajetId=" + trajetId +
                 ", actif=" + actif +
+                ", onBoard=" + onBoard +
                 '}';
     }
 }

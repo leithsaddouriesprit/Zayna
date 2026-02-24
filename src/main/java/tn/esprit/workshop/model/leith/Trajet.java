@@ -4,7 +4,7 @@ import java.time.LocalTime;
 
 public class Trajet {
 
-    private int id;
+    private int trajetId;
     private String nom;
     private int idBus;
     private int idEcole;
@@ -14,9 +14,9 @@ public class Trajet {
 
     public Trajet() {}
 
-    public Trajet(int id, String nom, int idBus, int idEcole,
+    public Trajet(int trajetId, String nom, int idBus, int idEcole,
                   LocalTime heureDepart, boolean actif, String statut) {
-        this.id = id;
+        this.trajetId = trajetId;
         this.nom = nom;
         this.idBus = idBus;
         this.idEcole = idEcole;
@@ -25,12 +25,12 @@ public class Trajet {
         this.statut = statut;
     }
 
-    public int getId() {
-        return id;
+    public int getTrajetId() {
+        return trajetId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setTrajetId(int trajetId) {
+        this.trajetId = trajetId;
     }
 
     public String getNom() {
@@ -84,7 +84,7 @@ public class Trajet {
     @Override
     public String toString() {
         return "Trajet{" +
-                "id=" + id +
+                "trajetId=" + trajetId +
                 ", nom='" + nom + '\'' +
                 ", idBus=" + idBus +
                 ", idEcole=" + idEcole +

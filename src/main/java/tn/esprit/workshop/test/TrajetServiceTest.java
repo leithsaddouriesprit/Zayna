@@ -37,7 +37,7 @@ public class TrajetServiceTest {
             // 4️⃣ INSERT TRAJET (maintenant seulement)
             Trajet t = new Trajet();
             t.setNom("Trajet Test");
-            t.setIdBus(lastBus.getId()); // 🔴 clé étrangère valide
+            t.setIdBus(lastBus.getBusId()); // 🔴 clé étrangère valide
             t.setIdEcole(1);
             t.setHeureDepart(LocalTime.of(7, 30));
             t.setActif(true);

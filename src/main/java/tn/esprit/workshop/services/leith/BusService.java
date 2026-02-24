@@ -39,7 +39,7 @@ public class BusService implements CRUD<Bus> {
                         "capacite=" + bus.getCapacite() + ", " +
                         "id_chauffeur=" + bus.getIdChauffeur() + ", " +
                         "actif=" + bus.isActif() +
-                        " WHERE id=" + bus.getId();
+                        " WHERE id=" + bus.getBusId();
 
         Statement st = connection.createStatement();
         st.executeUpdate(req);
@@ -47,7 +47,7 @@ public class BusService implements CRUD<Bus> {
 
     @Override
     public void deleteOne(Bus bus) throws SQLException {
-        String req = "DELETE FROM bus WHERE id=" + bus.getId();
+        String req = "DELETE FROM bus WHERE id=" + bus.getBusId();
         Statement st = connection.createStatement();
         st.executeUpdate(req);
     }
@@ -61,7 +61,7 @@ public class BusService implements CRUD<Bus> {
 
         while (rs.next()) {
             Bus b = new Bus();
-            b.setId(rs.getInt("id"));
+            b.setBusId(rs.getInt("id"));
             b.setNumeroBus(rs.getString("numero_bus"));
             b.setMatricule(rs.getString("matricule"));
             b.setCapacite(rs.getInt("capacite"));
@@ -82,7 +82,7 @@ public class BusService implements CRUD<Bus> {
 
             Bus bus = new Bus();
 
-            bus.setId(rs.getInt("id"));
+            bus.setBusId(rs.getInt("id"));
             bus.setNumeroBus(rs.getString("numero_bus"));
             bus.setMatricule(rs.getString("matricule"));
             bus.setCapacite(rs.getInt("capacite"));

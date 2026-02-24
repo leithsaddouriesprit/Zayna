@@ -29,7 +29,7 @@ public class BusServiceTest {
             System.out.println("📋 Liste des bus :");
             for (Bus b : buses) {
                 System.out.println(
-                        b.getId() + " | " +
+                        b.getBusId() + " | " +
                                 b.getNumeroBus() + " | " +
                                 b.getMatricule()
                 );

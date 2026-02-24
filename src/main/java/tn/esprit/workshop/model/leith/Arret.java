@@ -2,7 +2,7 @@ package tn.esprit.workshop.model.leith;
 
 public class Arret {
 
-    private int id;
+    private int arretId;
     private int idTrajet;
     private String nom;
     private double latitude;
@@ -12,10 +12,10 @@ public class Arret {
 
     public Arret() {}
 
-    public Arret(int id, int idTrajet, String nom,
+    public Arret(int arretId, int idTrajet, String nom,
                  double latitude, double longitude,
                  int ordre, String heurePrevue) {
-        this.id = id;
+        this.arretId = arretId;
         this.idTrajet = idTrajet;
         this.nom = nom;
         this.latitude = latitude;
@@ -24,12 +24,12 @@ public class Arret {
         this.heurePrevue = heurePrevue;
     }
 
-    public int getId() {
-        return id;
+    public int getArretId() {
+        return arretId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setArretId(int arretId) {
+        this.arretId = arretId;
     }
 
     public int getIdTrajet() {
@@ -83,7 +83,7 @@ public class Arret {
     @Override
     public String toString() {
         return "Arret{" +
-                "id=" + id +
+                "id=" + arretId +
                 ", idTrajet=" + idTrajet +
                 ", nom='" + nom + '\'' +
                 ", latitude=" + latitude +

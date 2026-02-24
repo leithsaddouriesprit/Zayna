@@ -41,7 +41,7 @@ public class TrajetService implements CRUD<Trajet> {
                         "heure_depart='" + t.getHeureDepart() + "', " +
                         "actif=" + t.isActif() + ", " +
                         "statut='" + t.getStatut() + "'" +
-                        " WHERE id=" + t.getId();
+                        " WHERE id=" + t.getTrajetId();
 
         Statement st = connection.createStatement();
         st.executeUpdate(req);
@@ -49,7 +49,7 @@ public class TrajetService implements CRUD<Trajet> {
 
     @Override
     public void deleteOne(Trajet t) throws SQLException {
-        String req = "DELETE FROM trajet WHERE id=" + t.getId();
+        String req = "DELETE FROM trajet WHERE id=" + t.getTrajetId();
         Statement st = connection.createStatement();
         st.executeUpdate(req);
     }
@@ -63,7 +63,7 @@ public class TrajetService implements CRUD<Trajet> {
 
         while (rs.next()) {
             Trajet t = new Trajet();
-            t.setId(rs.getInt("id"));
+            t.setTrajetId(rs.getInt("id"));
             t.setNom(rs.getString("nom"));
             t.setIdBus(rs.getInt("id_bus"));
             t.setIdEcole(rs.getInt("id_ecole"));
@@ -88,7 +88,7 @@ public class TrajetService implements CRUD<Trajet> {
 
         if (rs.next()) {
             Trajet t = new Trajet();
-            t.setId(rs.getInt("id"));
+            t.setTrajetId(rs.getInt("id"));
             t.setNom(rs.getString("nom"));
             t.setIdBus(rs.getInt("id_bus"));
             t.setIdEcole(rs.getInt("id_ecole"));
@@ -114,7 +114,7 @@ public class TrajetService implements CRUD<Trajet> {
 
             if (rs.next()) {
                 Trajet t = new Trajet();
-                t.setId(rs.getInt("id"));
+                t.setTrajetId(rs.getInt("id"));
                 t.setNom(rs.getString("nom"));
                 t.setIdBus(rs.getInt("id_bus"));
                 t.setIdEcole(rs.getInt("id_ecole"));

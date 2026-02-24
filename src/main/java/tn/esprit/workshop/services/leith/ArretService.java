@@ -41,7 +41,7 @@ public class ArretService implements CRUD<Arret> {
                         "longitude=" + a.getLongitude() + ", " +
                         "ordre_arret=" + a.getOrdre() + ", " +
                         "heure_prevue='" + a.getHeurePrevue() + "'" +
-                        " WHERE id=" + a.getId();
+                        " WHERE id=" + a.getArretId();
 
         Statement st = connection.createStatement();
         st.executeUpdate(req);
@@ -49,7 +49,7 @@ public class ArretService implements CRUD<Arret> {
 
     @Override
     public void deleteOne(Arret a) throws SQLException {
-        String req = "DELETE FROM arret WHERE id=" + a.getId();
+        String req = "DELETE FROM arret WHERE id=" + a.getArretId();
         Statement st = connection.createStatement();
         st.executeUpdate(req);
     }
@@ -63,7 +63,7 @@ public class ArretService implements CRUD<Arret> {
 
         while (rs.next()) {
             Arret a = new Arret();
-            a.setId(rs.getInt("id"));
+            a.setArretId(rs.getInt("id"));
             a.setIdTrajet(rs.getInt("id_trajet"));
             a.setNom(rs.getString("nom"));
             a.setLatitude(rs.getDouble("latitude"));
@@ -83,7 +83,7 @@ public class ArretService implements CRUD<Arret> {
 
         while (rs.next()) {
             Arret a = new Arret();
-            a.setId(rs.getInt("id"));
+            a.setArretId(rs.getInt("id"));
             a.setIdTrajet(rs.getInt("id_trajet"));
             a.setNom(rs.getString("nom"));
             a.setLatitude(rs.getDouble("latitude"));
@@ -106,7 +106,7 @@ public class ArretService implements CRUD<Arret> {
 
         if (rs.next()) {
             Trajet t = new Trajet();
-            t.setId(rs.getInt("id"));
+            t.setTrajetId(rs.getInt("id"));
             t.setNom(rs.getString("nom"));
             t.setIdBus(rs.getInt("id_bus"));
             t.setIdEcole(rs.getInt("id_ecole"));
@@ -127,7 +127,7 @@ public class ArretService implements CRUD<Arret> {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Arret a = new Arret();
-                    a.setId(rs.getInt("id"));
+                    a.setIdTrajet(rs.getInt("id"));
                     a.setIdTrajet(rs.getInt("id_trajet"));
                     a.setNom(rs.getString("nom"));
                     a.setLatitude(rs.getDouble("latitude"));
@@ -149,7 +149,7 @@ public class ArretService implements CRUD<Arret> {
 
         if (rs.next()) {
             Arret a = new Arret();
-            a.setId(rs.getInt("id"));
+            a.setArretId(rs.getInt("id"));
             a.setIdTrajet(rs.getInt("id_trajet"));
             a.setNom(rs.getString("nom"));
             a.setLatitude(rs.getDouble("latitude"));
@@ -173,7 +173,7 @@ public class ArretService implements CRUD<Arret> {
 
         if (rs.next()) {
             Arret a = new Arret();
-            a.setId(rs.getInt("id"));
+            a.setArretId(rs.getInt("id"));
             a.setIdTrajet(rs.getInt("id_trajet"));
             a.setNom(rs.getString("nom"));
             a.setLatitude(rs.getDouble("latitude"));

@@ -13,17 +13,31 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+
 public class ChatAIController {
 
     @FXML private TextArea taChat;
     @FXML private TextField tfMessage;
     @FXML private Button btnSend;
+    private Integer busId;
+    private Integer enfantId;
 
     private final HttpClient http = HttpClient.newHttpClient();
 
     @FXML
     public void initialize() {
         taChat.appendText("AI: Salut ! Pose-moi une question sur ZAYNA.\n\n");
+    }
+
+    public void init(Integer busId, Integer enfantId) {
+        this.busId = busId;
+        this.enfantId = enfantId;
+        taChat.appendText("Système: Contexte chargé (busId=" + busId + ", enfantId=" + enfantId + ")\n\n");
+
+    }
+    @FXML
+    void openAI(ActionEvent event) {
+        SceneNavigator.openChatAI(1, 1);
     }
 
     @FXML
@@ -38,8 +52,15 @@ public class ChatAIController {
 
         new Thread(() -> {
             try {
-                String json = "{\"message\":\"" + escape(msg) + "\"}";
+                int b = (busId != null ? busId : 1);
+                int e = (enfantId != null ? enfantId : 1);
 
+                String json =
+                        "{"
+                                + "\"message\":\"" + escape(msg) + "\","
+                                + "\"busId\":" + b + ","
+                                + "\"enfantId\":" + e
+                                + "}";
                 HttpRequest req = HttpRequest.newBuilder()
                         .uri(URI.create("http://localhost:8081/ai/chat"))
                         .header("Content-Type", "application/json")
@@ -67,6 +88,7 @@ public class ChatAIController {
         }).start();
     }
 
+
     @FXML
     void goBack(ActionEvent event) {
         ((Stage) taChat.getScene().getWindow()).close();
@@ -86,9 +108,6 @@ public class ChatAIController {
             return body; // fallback
         }
     }
-    @FXML
-    void openAI(ActionEvent event) {
-        SceneNavigator.openChatAI();
-    }
+
 
 }
