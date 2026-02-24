@@ -1,0 +1,142 @@
+/* ============================================================
+   ZAYNA — Interface Chat IA (thème sombre, style pro)
+   ============================================================ */
+
+/* ---------- Racine ---------- */
+.chat-root {
+    -fx-background-color: #0d1117;
+    -fx-font-family: "Segoe UI", "Inter", system-ui, sans-serif;
+}
+
+/* ---------- En-tête ---------- */
+.chat-header {
+    -fx-background-color: linear-gradient(to right, #161b22 0%, #21262d 100%);
+    -fx-border-color: rgba(255, 255, 255, 0.06);
+    -fx-border-width: 0 0 1 0;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 12, 0, 0, 2);
+}
+
+.chat-header-title {
+    -fx-text-fill: #f0f6fc;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-letter-spacing: 0.5px;
+}
+
+.chat-header-subtitle {
+    -fx-text-fill: #8b949e;
+    -fx-font-size: 13px;
+    -fx-font-weight: normal;
+}
+
+.chat-btn-back {
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-background-radius: 8;
+    -fx-text-fill: #c9d1d9;
+    -fx-font-size: 13px;
+    -fx-padding: 8 16;
+    -fx-cursor: hand;
+    -fx-border-color: rgba(255, 255, 255, 0.12);
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+}
+
+.chat-btn-back:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.12);
+    -fx-text-fill: #f0f6fc;
+    -fx-border-color: rgba(255, 255, 255, 0.18);
+}
+
+.chat-btn-back:pressed {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* ---------- Zone des messages ---------- */
+.chat-body {
+    -fx-background-color: #0d1117;
+}
+
+.chat-messages {
+    -fx-background-color: #0d1117;
+    -fx-text-fill: #e6edf3;
+    -fx-font-size: 14px;
+    -fx-font-family: "Segoe UI", "Cascadia Code", "Consolas", monospace;
+    -fx-padding: 16 20;
+    -fx-control-inner-background: #0d1117;
+    -fx-background-insets: 0;
+    -fx-border-width: 0;
+    -fx-wrap-text: true;
+    -fx-effect: none;
+}
+
+.chat-messages .content {
+    -fx-background-color: #0d1117;
+    -fx-cursor: text;
+}
+
+.chat-messages .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 8;
+}
+
+.chat-messages .scroll-bar:vertical .thumb {
+    -fx-background-color: rgba(255, 255, 255, 0.18);
+    -fx-background-radius: 4;
+}
+
+.chat-messages .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.28);
+}
+
+/* ---------- Pied : saisie + bouton Envoyer ---------- */
+.chat-footer {
+    -fx-background-color: linear-gradient(to top, #161b22 0%, #0d1117 100%);
+    -fx-border-color: rgba(255, 255, 255, 0.06);
+    -fx-border-width: 1 0 0 0;
+}
+
+.chat-input {
+    -fx-background-color: #21262d;
+    -fx-background-radius: 24;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 24;
+    -fx-border-width: 1;
+    -fx-text-fill: #e6edf3;
+    -fx-prompt-text-fill: #6e7681;
+    -fx-font-size: 14px;
+    -fx-padding: 12 20;
+    -fx-pref-height: 44;
+}
+
+.chat-input:focused {
+    -fx-border-color: #58a6ff;
+    -fx-effect: dropshadow(gaussian, rgba(88, 166, 255, 0.25), 8, 0, 0, 0);
+}
+
+.chat-btn-send {
+    -fx-background-color: linear-gradient(to bottom, #238636 0%, #2ea043 100%);
+    -fx-background-radius: 22;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 12 24;
+    -fx-pref-height: 44;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(35, 134, 54, 0.4), 8, 0, 0, 2);
+}
+
+.chat-btn-send:hover {
+    -fx-background-color: linear-gradient(to bottom, #2ea043 0%, #3fb950 100%);
+    -fx-effect: dropshadow(gaussian, rgba(46, 160, 67, 0.5), 10, 0, 0, 2);
+}
+
+.chat-btn-send:pressed {
+    -fx-background-color: #238636;
+    -fx-translate-y: 1;
+}
+
+.chat-btn-send:disabled {
+    -fx-background-color: #21262d;
+    -fx-text-fill: #6e7681;
+    -fx-effect: none;
+}

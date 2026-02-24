@@ -44,7 +44,6 @@ public class AiController {
 
         Réponds en français en une seule phrase claire.
         """;
-
         String answer = ollama.generate(prompt);
         return new ChatResponse(answer);
 

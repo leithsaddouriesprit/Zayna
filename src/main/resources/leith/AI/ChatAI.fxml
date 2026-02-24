@@ -1,28 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="tn.esprit.workshop.controlleurs.leith.AI.ChatAIController">
+            fx:controller="tn.esprit.workshop.controlleurs.leith.AI.ChatAIController"
+            stylesheets="/leith/AI/chat-ai.css"
+            styleClass="chat-root">
 
     <top>
-        <HBox spacing="10" style="-fx-padding: 10;">
-            <Label text="🤖 ZAYNA - Assistant IA" style="-fx-font-size: 16px; -fx-font-weight: 800;"/>
+        <HBox styleClass="chat-header" alignment="CENTER_LEFT" spacing="12">
+            <padding>
+                <Insets top="14" right="20" bottom="14" left="20"/>
+            </padding>
+            <Label text="ZAYNA" styleClass="chat-header-title"/>
+            <Label text="Assistant IA" styleClass="chat-header-subtitle"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Retour" onAction="#goBack"/>
+            <Button text="Retour" styleClass="chat-btn-back" onAction="#goBack"/>
         </HBox>
     </top>
 
     <center>
-        <TextArea fx:id="taChat" editable="false" wrapText="true" />
+        <VBox styleClass="chat-body" VBox.vgrow="ALWAYS">
+            <TextArea fx:id="taChat" styleClass="chat-messages" editable="false" wrapText="true" VBox.vgrow="ALWAYS"/>
+        </VBox>
     </center>
 
     <bottom>
-        <HBox spacing="10" style="-fx-padding: 10;">
-            <TextField fx:id="tfMessage" promptText="Écris ton message..." HBox.hgrow="ALWAYS" onAction="#send"/>
-            <Button fx:id="btnSend" text="Envoyer" onAction="#send"/>
+        <HBox styleClass="chat-footer" alignment="CENTER" spacing="12">
+            <padding>
+                <Insets top="16" right="20" bottom="20" left="20"/>
+            </padding>
+            <TextField fx:id="tfMessage" styleClass="chat-input" promptText="Écrire un message..." HBox.hgrow="ALWAYS" onAction="#send"/>
+            <Button fx:id="btnSend" text="Envoyer" styleClass="chat-btn-send" onAction="#send"/>
         </HBox>
     </bottom>
 
