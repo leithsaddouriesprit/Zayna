@@ -4,39 +4,50 @@ import org.springframework.web.bind.annotation.*;
 import tn.esprit.workshop.ai.dto.ChatRequest;
 import tn.esprit.workshop.ai.dto.ChatResponse;
 import tn.esprit.workshop.ai.service.OllamaClient;
+import tn.esprit.workshop.ai.service.ContextBuilderService;
 
 @RestController
 @RequestMapping("/ai")
 public class AiController {
 
     private final OllamaClient ollama;
-
-    public AiController(OllamaClient ollama) {
+    private final ContextBuilderService contextBuilder;
+    public AiController(OllamaClient ollama, ContextBuilderService contextBuilder) {
         this.ollama = ollama;
+        this.contextBuilder = contextBuilder;
     }
 
-    @GetMapping("/context")
-    public String context() {
-        return """
-        Contexte ZAYNA:
-        - busId: 12
-        - nextStop: Ecole
-        - etaMinutes: 8
-        - speedKmh: 30
-        - status: EN ROUTE
-        """;
-    }
+
+
+
 
     @PostMapping("/chat")
     public ChatResponse chat(@RequestBody ChatRequest req) {
 
-        String ctx = context(); // <-- ICI on récupère le contexte
-        String prompt = ctx
-                + "\nQuestion utilisateur: " + req.message
-                + "\nRéponds brièvement et clairement.";
+        String ctx = contextBuilder.build(req.busId, req.enfantId);
+
+        String prompt =
+                """
+                Tu es l'assistant officiel de ZAYNA.
+        
+                RÈGLE ABSOLUE:
+                - Utilise uniquement les données du JSON fourni dans CONTEXTE_ZAYNA.
+                - N'invente aucune information.
+                - Si l'information demandée n'est pas présente dans le JSON, réponds exactement:
+                  "Je n'ai pas cette information."
+        
+                CONTEXTE_ZAYNA (JSON):
+                """ + ctx + """
+
+        QUESTION_UTILISATEUR:
+        """ + req.message + """
+
+        Réponds en français en une seule phrase claire.
+        """;
 
         String answer = ollama.generate(prompt);
         return new ChatResponse(answer);
+
     }
 
     @GetMapping("/test")
