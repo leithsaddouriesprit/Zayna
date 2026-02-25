@@ -95,4 +95,27 @@ public class BusService implements CRUD<Bus> {
         return null;
     }
 
+    /**
+     * Bus assigned to this chauffeur (at most one). Ignores buses without chauffeur.
+     */
+    public Bus getByChauffeurId(int chauffeurId) throws SQLException {
+        String sql = "SELECT id, numero_bus, matricule, capacite, id_chauffeur, actif FROM bus WHERE id_chauffeur = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, chauffeurId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Bus bus = new Bus();
+                    bus.setBusId(rs.getInt("id"));
+                    bus.setNumeroBus(rs.getString("numero_bus"));
+                    bus.setMatricule(rs.getString("matricule"));
+                    bus.setCapacite(rs.getInt("capacite"));
+                    bus.setIdChauffeur(rs.getInt("id_chauffeur"));
+                    bus.setActif(rs.getBoolean("actif"));
+                    return bus;
+                }
+            }
+        }
+        return null;
+    }
+
 }

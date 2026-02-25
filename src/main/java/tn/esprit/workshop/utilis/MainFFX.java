@@ -6,9 +6,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import tn.esprit.workshop.controlleurs.leith.SceneNavigator;
 import tn.esprit.workshop.controlleurs.leith.MapTrackingController;
 import tn.esprit.workshop.controlleurs.leith.PostulerChauffeurController;
 import tn.esprit.workshop.controlleurs.leith.TrackingMode;
+import tn.esprit.workshop.utilis.AppSession;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -86,33 +88,43 @@ public class MainFFX extends Application {
   }
 
 */
-
+/*
     /// chauffeur scene
-@Override
-public void start(Stage primaryStage) {
-    try {
-        FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/leith/PostulerChauffeur.fxml")
-        );
+    @Override
+    public void start(Stage primaryStage) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/leith/PostulerChauffeur.fxml")
+            );
 
-        Parent root = loader.load();
+            Parent root = loader.load();
 
-        // récupérer le controller (comme MapTracking)
-        PostulerChauffeurController controller = loader.getController();
+            // récupérer le controller (comme MapTracking)
+            PostulerChauffeurController controller = loader.getController();
 
-        // Optionnel : init si tu veux passer un truc (ex: idEcole)
-        // controller.init(1);
+            // Optionnel : init si tu veux passer un truc (ex: idEcole)
+            // controller.init(1);
 
-        Scene scene = new Scene(root, 800, 550);
-        primaryStage.setTitle("Zayna – Candidature Chauffeur");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+            Scene scene = new Scene(root, 800, 550);
+            primaryStage.setTitle("Zayna – Candidature Chauffeur");
+            primaryStage.setScene(scene);
+            primaryStage.show();
 
-    } catch (IOException e) {
-        System.out.println("Erreur FXML: " + e.getMessage());
-        System.out.println(e.getMessage());
+        } catch (IOException e) {
+            System.out.println("Erreur FXML: " + e.getMessage());
+            System.out.println(e.getMessage());
+        }
     }
-}
+
+*/
+
+
+    /// Chauffeur module (hub + suivi + espace). Set session chauffeur_id then open ChauffeurHome.
+    @Override
+    public void start(Stage primaryStage) {
+        AppSession.getInstance().setChauffeurId(1); // or from login
+        SceneNavigator.openChauffeurHome();
+    }
 
 /*
 /// AI chat

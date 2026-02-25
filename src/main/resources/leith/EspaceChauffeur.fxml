@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import java.net.URL?>
+<StackPane xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="tn.esprit.workshop.controlleurs.leith.EspaceChauffeurController"
+           styleClass="root espace-chauffeur">
+    <stylesheets>
+        <URL value="@/leith/Parent-home.css"/>
+        <URL value="@/leith/chauffeur-module.css"/>
+    </stylesheets>
+
+    <ScrollPane styleClass="espace-scroll" fitToWidth="true" fitToHeight="true">
+        <VBox styleClass="espace-card" spacing="20" alignment="CENTER_LEFT">
+            <padding>
+                <Insets top="24" right="24" bottom="24" left="24"/>
+            </padding>
+
+            <Label text="Espace Chauffeur" styleClass="title-label"/>
+            <Label text="Bus" styleClass="section-title"/>
+            <Label fx:id="lblNumeroBus" text="—" styleClass="info-label"/>
+            <Label fx:id="lblMatricule" text="—" styleClass="info-label"/>
+            <Label fx:id="lblCapacite" text="—" styleClass="info-label"/>
+
+            <Separator/>
+            <Label text="Trajet" styleClass="section-title"/>
+            <Label fx:id="lblTrajetNom" text="—" styleClass="info-label"/>
+            <Label fx:id="lblHeureDepart" text="—" styleClass="info-label"/>
+
+            <Separator/>
+            <Label text="Arrêts" styleClass="section-title"/>
+            <TableView fx:id="tableArrets" VBox.vgrow="ALWAYS" styleClass="table-view">
+                <columns>
+                    <TableColumn fx:id="colOrdre" text="Ordre" prefWidth="60"/>
+                    <TableColumn fx:id="colNom" text="Nom" prefWidth="150"/>
+                    <TableColumn fx:id="colHeure" text="Heure prévue" prefWidth="100"/>
+                    <TableColumn fx:id="colLat" text="Latitude" prefWidth="90"/>
+                    <TableColumn fx:id="colLng" text="Longitude" prefWidth="90"/>
+                </columns>
+            </TableView>
+
+            <Button fx:id="btnReclamer" text="Réclamer" onAction="#onReclamer"/>
+        </VBox>
+    </ScrollPane>
+</StackPane>

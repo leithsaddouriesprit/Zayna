@@ -127,7 +127,7 @@ public class ArretService implements CRUD<Arret> {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Arret a = new Arret();
-                    a.setIdTrajet(rs.getInt("id"));
+                    a.setArretId(rs.getInt("id"));
                     a.setIdTrajet(rs.getInt("id_trajet"));
                     a.setNom(rs.getString("nom"));
                     a.setLatitude(rs.getDouble("latitude"));

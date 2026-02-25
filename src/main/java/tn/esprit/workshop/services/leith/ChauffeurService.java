@@ -20,23 +20,21 @@ public class ChauffeurService {
     }
 
     public Chauffeur getById(int id) throws SQLException {
-
-        String req = "SELECT * FROM chauffeur WHERE id = " + id;
-        Statement st = connection.createStatement();
-        ResultSet rs = st.executeQuery(req);
-
-        if (rs.next()) {
-
-            Chauffeur c = new Chauffeur();
-            c.setId(rs.getInt("id"));
-            c.setNom(rs.getString("nom"));
-            c.setPrenom(rs.getString("prenom"));
-            c.setAge(rs.getInt("age"));
-            c.setNbAnsExperience(rs.getInt("nb_ans_experience"));
-
-            return c;
+        String sql = "SELECT id, nom, prenom, age, nb_ans_experience FROM chauffeur WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Chauffeur c = new Chauffeur();
+                    c.setId(rs.getInt("id"));
+                    c.setNom(rs.getString("nom"));
+                    c.setPrenom(rs.getString("prenom"));
+                    c.setAge(rs.getInt("age"));
+                    c.setNbAnsExperience(rs.getInt("nb_ans_experience"));
+                    return c;
+                }
+            }
         }
-
         return null;
     }
 
@@ -65,7 +63,7 @@ public class ChauffeurService {
                 "(chauffeur_id, statut, date_envoi, maladie, " +
                 " permis_recto, permis_recto_nom, permis_recto_mime, " +
                 " permis_verso, permis_verso_nom, permis_verso_mime) " +
-                "VALUES (?, 'ENVOYEE', CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?)";
+                "VALUES (?, 'EN_ATTENTE', CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, chauffeurId);

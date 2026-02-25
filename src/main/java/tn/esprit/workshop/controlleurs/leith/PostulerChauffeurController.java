@@ -4,7 +4,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import tn.esprit.workshop.services.leith.CandidatureService;
 import tn.esprit.workshop.services.leith.ChauffeurService;
+import tn.esprit.workshop.utilis.AppSession;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
@@ -66,10 +68,15 @@ public class PostulerChauffeurController implements Initializable {
     private String permisVersoMime;
 
     private ChauffeurService chauffeurService;
+    private CandidatureService candidatureService;
+
+    private static final String STATUT_REFUSEE = "REFUSEE";
+    private static final String STATUT_ANNULEE = "ANNULEE";
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         chauffeurService = new ChauffeurService();
+        candidatureService = new CandidatureService();
         tfNom.setTextFormatter(new TextFormatter<>(c ->
                 c.getControlNewText().matches("[\\p{L} \\-']*") ? c : null));
 
@@ -349,13 +356,40 @@ public class PostulerChauffeurController implements Initializable {
             maladie = tfMaladieDetails.getText().trim();
         }
         try {
-            int chauffeurId = chauffeurService.ajouterChauffeurEtRetournerId(nom, prenom, age, exp);
-            chauffeurService.envoyerCandidatureAgentEcole(
-                    chauffeurId,
-                    permisRectoBytes, permisRectoName, permisRectoMime,
-                    permisVersoBytes, permisVersoName, permisVersoMime,
-                    maladie
-            );
+            Integer sessionChauffeurId = AppSession.getInstance().getChauffeurId();
+            int chauffeurId;
+            if (sessionChauffeurId != null) {
+                tn.esprit.workshop.model.leith.Candidature c = candidatureService.findByChauffeurId(sessionChauffeurId);
+                if (c == null) {
+                    chauffeurService.envoyerCandidatureAgentEcole(
+                            sessionChauffeurId,
+                            permisRectoBytes, permisRectoName, permisRectoMime,
+                            permisVersoBytes, permisVersoName, permisVersoMime,
+                            maladie
+                    );
+                    chauffeurId = sessionChauffeurId;
+                } else if (STATUT_REFUSEE.equals(c.getStatut()) || STATUT_ANNULEE.equals(c.getStatut())) {
+                    candidatureService.updateToEnAttenteWithDocuments(
+                            sessionChauffeurId,
+                            permisRectoBytes, permisRectoName, permisRectoMime,
+                            permisVersoBytes, permisVersoName, permisVersoMime,
+                            maladie
+                    );
+                    chauffeurId = sessionChauffeurId;
+                } else {
+                    showError("Vous avez déjà une candidature en cours ou acceptée.");
+                    return;
+                }
+            } else {
+                chauffeurId = chauffeurService.ajouterChauffeurEtRetournerId(nom, prenom, age, exp);
+                chauffeurService.envoyerCandidatureAgentEcole(
+                        chauffeurId,
+                        permisRectoBytes, permisRectoName, permisRectoMime,
+                        permisVersoBytes, permisVersoName, permisVersoMime,
+                        maladie
+                );
+                AppSession.getInstance().setChauffeurId(chauffeurId);
+            }
             showSuccess("Candidature envoyée ✅ (ID chauffeur = " + chauffeurId + ")");
 
             // reset

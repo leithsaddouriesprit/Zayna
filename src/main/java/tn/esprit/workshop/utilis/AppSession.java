@@ -9,6 +9,7 @@ public final class AppSession {
 
     private int parentId;
     private Integer selectedEnfantId;
+    private Integer chauffeurId;
 
     private AppSession() {
     }
@@ -31,5 +32,13 @@ public final class AppSession {
 
     public void setSelectedEnfantId(Integer selectedEnfantId) {
         this.selectedEnfantId = selectedEnfantId;
+    }
+
+    public Integer getChauffeurId() {
+        return chauffeurId;
+    }
+
+    public void setChauffeurId(Integer chauffeurId) {
+        this.chauffeurId = chauffeurId;
     }
 }
