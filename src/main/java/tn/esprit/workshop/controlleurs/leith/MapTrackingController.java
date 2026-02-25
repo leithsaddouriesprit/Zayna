@@ -11,6 +11,7 @@ import javafx.util.Duration;
 import tn.esprit.workshop.model.leith.*;
 import tn.esprit.workshop.model.tous.Chauffeur;
 import tn.esprit.workshop.services.leith.*;
+import tn.esprit.workshop.utilis.AppSession;
 
 import java.net.URL;
 import java.util.Objects;
@@ -175,8 +176,21 @@ public class MapTrackingController {
 
 
 
-    /// on injecte le contexte (busId + mode + enfantId)
+    /**
+     * Initialisation par enfantId uniquement (flux Parent). Déduit busId et trajetId.
+     * Si enfantId est null, utilise AppSession.getSelectedEnfantId().
+     */
+    public void init(Integer enfantId) throws SQLException {
+        Integer eid = enfantId != null ? enfantId : AppSession.getInstance().getSelectedEnfantId();
+        if (eid == null) return;
+        Enfant e = enfantService.getEnfantById(eid);
+        if (e == null) return;
+        Trajet t = trajetService.getTrajetByEnfant(eid);
+        if (t == null) return;
+        init(t.getIdBus(), TrackingMode.PARENT, eid, t.getTrajetId());
+    }
 
+    /** Injecte le contexte (busId + mode + enfantId + trajetId). */
     public void init(int busId, TrackingMode mode, Integer enfantId, Integer trajetId) throws SQLException {
         this.busId = busId;
         this.mode = mode;

@@ -99,6 +99,29 @@ public class EnfantService implements CRUD<Enfant> {
 
         return enfant;
     }
+    /**
+     * Retourne la liste des enfants du parent (id, nom, prenom).
+     */
+    public List<Enfant> getByParentId(int parentId) throws SQLException {
+        List<Enfant> list = new ArrayList<>();
+        String sql = "SELECT id, nom, prenom, parent_id, trajet_id, actif FROM enfant WHERE parent_id = ? AND actif = 1";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, parentId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Enfant e = new Enfant();
+                e.setEnfantId(rs.getInt("id"));
+                e.setNom(rs.getString("nom"));
+                e.setPrenom(rs.getString("prenom"));
+                e.setParentId(rs.getInt("parent_id"));
+                e.setTrajetId(rs.getInt("trajet_id"));
+                e.setActif(rs.getBoolean("actif"));
+                list.add(e);
+            }
+        }
+        return list;
+    }
+
     public Enfant getEnfantByTrajetId(int trajetId) throws SQLException {
         String sql = "SELECT * FROM enfant WHERE trajet_id = ? LIMIT 1";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {

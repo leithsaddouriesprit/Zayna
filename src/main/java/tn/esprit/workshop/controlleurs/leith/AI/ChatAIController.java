@@ -7,7 +7,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import tn.esprit.workshop.controlleurs.leith.SceneNavigator;
+import tn.esprit.workshop.utilis.AppSession;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -19,7 +20,6 @@ public class ChatAIController {
     @FXML private TextArea taChat;
     @FXML private TextField tfMessage;
     @FXML private Button btnSend;
-    private Integer busId;
     private Integer enfantId;
 
     private final HttpClient http = HttpClient.newHttpClient();
@@ -29,15 +29,15 @@ public class ChatAIController {
         taChat.appendText("AI: Salut ! Pose-moi une question sur ZAYNA.\n\n");
     }
 
-    public void init(Integer busId, Integer enfantId) {
-        this.busId = busId;
-        this.enfantId = enfantId;
-        taChat.appendText("Système: Contexte chargé (busId=" + busId + ", enfantId=" + enfantId + ")\n\n");
-
-    }
-    @FXML
-    void openAI(ActionEvent event) {
-        SceneNavigator.openChatAI(1, 1);
+    /**
+     * Initialise le contexte avec l'enfant sélectionné.
+     * Si enfantId est null, utilise AppSession.getSelectedEnfantId().
+     */
+    public void init(Integer enfantId) {
+        this.enfantId = enfantId != null ? enfantId : AppSession.getInstance().getSelectedEnfantId();
+        if (this.enfantId != null) {
+            taChat.appendText("Système: Contexte chargé (enfantId=" + this.enfantId + ").\n\n");
+        }
     }
 
     @FXML
@@ -45,22 +45,25 @@ public class ChatAIController {
         String msg = tfMessage.getText();
         if (msg == null || msg.isBlank()) return;
 
+        Integer eid = enfantId != null ? enfantId : AppSession.getInstance().getSelectedEnfantId();
+        if (eid == null) {
+            taChat.appendText("AI: Erreur -> Aucun enfant sélectionné.\n\n");
+            return;
+        }
+
         taChat.appendText("Moi: " + msg + "\n");
         tfMessage.clear();
-
         btnSend.setDisable(true);
+
+        int parentId = AppSession.getInstance().getParentId();
 
         new Thread(() -> {
             try {
-                int b = (busId != null ? busId : 1);
-                int e = (enfantId != null ? enfantId : 1);
-
-                String json =
-                        "{"
-                                + "\"message\":\"" + escape(msg) + "\","
-                                + "\"busId\":" + b + ","
-                                + "\"enfantId\":" + e
-                                + "}";
+                String json = "{"
+                        + "\"message\":\"" + escape(msg) + "\","
+                        + "\"enfantId\":" + eid + ","
+                        + "\"parentId\":" + parentId
+                        + "}";
                 HttpRequest req = HttpRequest.newBuilder()
                         .uri(URI.create("http://localhost:8081/ai/chat"))
                         .header("Content-Type", "application/json")
@@ -68,17 +71,12 @@ public class ChatAIController {
                         .build();
 
                 HttpResponse<String> res = http.send(req, HttpResponse.BodyHandlers.ofString());
-
-                System.out.println("STATUS = " + res.statusCode());
-                System.out.println("BODY   = " + res.body());
-
                 String reply = extractReply(res.body());
 
                 Platform.runLater(() -> {
                     taChat.appendText("AI: " + reply + "\n\n");
                     btnSend.setDisable(false);
                 });
-
             } catch (Exception e) {
                 Platform.runLater(() -> {
                     taChat.appendText("AI: Erreur -> " + e.getMessage() + "\n\n");

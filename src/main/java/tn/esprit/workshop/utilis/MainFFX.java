@@ -114,7 +114,7 @@ public void start(Stage primaryStage) {
     }
 }
 */
-
+/*
 /// AI chat
 @Override
 public void start(Stage primaryStage) {
@@ -135,6 +135,30 @@ public void start(Stage primaryStage) {
         System.out.println(e.getMessage());
     }
 }
+*/
 
+    /// parent flux
+    @Override
+    public void start(Stage primaryStage) {
+        try {
+            // 1) (Optionnel) Simuler un parent connecté pour tester
+            AppSession.getInstance().setParentId(1); // parent_id existant dans la table enfant
+
+            // 2) Charger l'écran ParentHome (page principale parent)
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/leith/ParentHome.fxml")
+            );
+            Parent root = loader.load();
+
+            // 3) Afficher
+            Scene scene = new Scene(root, 1000, 700);
+            primaryStage.setTitle("ZAYNA – Espace Parent");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+
+        } catch (Exception e) {
+            System.out.println("Erreur lancement ParentHome: " + e.getMessage());
+        }
+    }
 
 }
