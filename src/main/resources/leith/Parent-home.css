@@ -1,0 +1,126 @@
+/* ===== Parent Home (ZAYNA) ===== */
+
+.root {
+    -fx-font-family: "Inter", "Segoe UI", "Arial";
+    -fx-background-color: #0f172a; /* slate-900 */
+}
+
+/* Conteneur principal */
+.vbox {
+    -fx-background-color: rgba(255, 255, 255, 0.06);
+    -fx-background-radius: 18;
+    -fx-border-radius: 18;
+    -fx-border-color: rgba(255, 255, 255, 0.10);
+    -fx-border-width: 1;
+    -fx-padding: 24;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.45), 24, 0.25, 0, 10);
+}
+
+/* Titres */
+.label {
+    -fx-text-fill: rgba(255,255,255,0.92);
+    -fx-font-size: 13px;
+}
+
+.label.title {
+    -fx-font-size: 20px;
+    -fx-font-weight: 800;
+    -fx-text-fill: white;
+}
+
+/* ListView */
+.list-view {
+    -fx-background-color: rgba(255,255,255,0.08);
+    -fx-background-radius: 14;
+    -fx-border-radius: 14;
+    -fx-border-color: rgba(255,255,255,0.10);
+    -fx-border-width: 1;
+    -fx-padding: 6;
+}
+
+.list-view .virtual-flow {
+    -fx-background-color: transparent;
+}
+
+.list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(255,255,255,0.90);
+    -fx-font-size: 13px;
+    -fx-padding: 10 12;
+    -fx-background-radius: 12;
+}
+
+.list-cell:filled:hover {
+    -fx-background-color: rgba(255,255,255,0.10);
+    -fx-cursor: hand;
+}
+
+.list-cell:filled:selected {
+    -fx-background-color: rgba(34,197,94,0.22); /* green */
+    -fx-text-fill: white;
+    -fx-font-weight: 700;
+}
+
+/* Scrollbar minimal */
+.scroll-bar:vertical, .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+.scroll-bar .thumb {
+    -fx-background-color: rgba(255,255,255,0.20);
+    -fx-background-radius: 999;
+}
+.scroll-bar .thumb:hover {
+    -fx-background-color: rgba(255,255,255,0.30);
+}
+.scroll-bar .increment-button, .scroll-bar .decrement-button {
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+}
+
+/* Boutons */
+.button {
+    -fx-background-radius: 14;
+    -fx-padding: 10 16;
+    -fx-font-weight: 700;
+    -fx-font-size: 13px;
+    -fx-text-fill: white;
+    -fx-background-color: rgba(255,255,255,0.12);
+    -fx-border-color: rgba(255,255,255,0.14);
+    -fx-border-width: 1;
+    -fx-border-radius: 14;
+}
+
+.button:hover {
+    -fx-background-color: rgba(255,255,255,0.18);
+    -fx-cursor: hand;
+}
+
+.button:pressed {
+    -fx-translate-y: 1;
+}
+
+/* Bouton Tracking (accent bleu) */
+.button.primary {
+    -fx-background-color: rgba(59,130,246,0.85);
+    -fx-border-color: rgba(59,130,246,0.95);
+}
+
+.button.primary:hover {
+    -fx-background-color: rgba(59,130,246,0.95);
+}
+
+/* Bouton IA (accent vert) */
+.button.success {
+    -fx-background-color: rgba(34,197,94,0.85);
+    -fx-border-color: rgba(34,197,94,0.95);
+}
+
+.button.success:hover {
+    -fx-background-color: rgba(34,197,94,0.95);
+}
+
+/* Disabled */
+.button:disabled {
+    -fx-opacity: 0.45;
+    -fx-cursor: default;
+}

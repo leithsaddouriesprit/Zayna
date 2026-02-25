@@ -35,9 +35,12 @@ public class ChatAIController {
      */
     public void init(Integer enfantId) {
         this.enfantId = enfantId != null ? enfantId : AppSession.getInstance().getSelectedEnfantId();
+        /*
         if (this.enfantId != null) {
             taChat.appendText("Système: Contexte chargé (enfantId=" + this.enfantId + ").\n\n");
         }
+
+         */
     }
 
     @FXML

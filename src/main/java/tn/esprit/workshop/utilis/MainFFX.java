@@ -86,7 +86,7 @@ public class MainFFX extends Application {
   }
 
 */
-   /*
+
     /// chauffeur scene
 @Override
 public void start(Stage primaryStage) {
@@ -113,7 +113,7 @@ public void start(Stage primaryStage) {
         System.out.println(e.getMessage());
     }
 }
-*/
+
 /*
 /// AI chat
 @Override
@@ -136,7 +136,7 @@ public void start(Stage primaryStage) {
     }
 }
 */
-
+/*
     /// parent flux
     @Override
     public void start(Stage primaryStage) {
@@ -160,5 +160,5 @@ public void start(Stage primaryStage) {
             System.out.println("Erreur lancement ParentHome: " + e.getMessage());
         }
     }
-
+*/
 }

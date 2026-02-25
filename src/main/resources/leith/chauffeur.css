@@ -1,8 +1,26 @@
 /* ===== Root background ===== */
 .root {
     -fx-background-color: linear-gradient(to bottom right, #0F172A, #111827, #0B1220);
-    -fx-padding: 26;
+    -fx-padding: 0; /* padding géré par page-wrap */
     -fx-font-family: "Segoe UI", "Inter", "SF Pro Display";
+}
+
+/* ===== ScrollPane transparent (important) ===== */
+.root-scroll {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+.root-scroll .viewport {
+    -fx-background-color: transparent;
+}
+.root-scroll .corner {
+    -fx-background-color: transparent;
+}
+
+/* Wrapper pour centrer la card + marge */
+.page-wrap {
+    -fx-padding: 26;
 }
 
 /* ===== Card container ===== */
@@ -22,7 +40,6 @@
     -fx-font-size: 22px;
     -fx-font-weight: 800;
 }
-
 .subtitle {
     -fx-text-fill: rgba(249, 250, 251, 0.75);
     -fx-font-size: 13px;
@@ -52,9 +69,8 @@
     -fx-padding: 10 12 10 12;
     -fx-font-size: 13px;
 }
-
 .field:focused {
-    -fx-border-color: rgba(96, 165, 250, 0.85); /* blue */
+    -fx-border-color: rgba(96, 165, 250, 0.85);
     -fx-effect: dropshadow(gaussian, rgba(96,165,250,0.30), 14, 0.18, 0, 0);
 }
 
@@ -84,7 +100,7 @@
     -fx-background-color: rgba(255, 255, 255, 0.14);
 }
 
-/* ===== ChoiceBox ===== */
+/* ===== ChoiceBox (fix: texte blanc + fond dark) ===== */
 .choice {
     -fx-background-color: rgba(255, 255, 255, 0.10);
     -fx-background-radius: 12;
@@ -97,6 +113,40 @@
 .choice > .label {
     -fx-text-fill: #F9FAFB;
     -fx-font-size: 13px;
+}
+
+/* dropdown list */
+.choice-box .context-menu {
+    -fx-background-color: rgba(17, 24, 39, 0.98);
+    -fx-background-radius: 12;
+}
+.choice-box .menu-item .label {
+    -fx-text-fill: #F9FAFB;
+}
+.choice-box .menu-item:focused {
+    -fx-background-color: rgba(96, 165, 250, 0.25);
+}
+
+/* ===== Upload card ===== */
+.upload-card {
+    -fx-background-color: rgba(255, 255, 255, 0.06);
+    -fx-background-radius: 14;
+    -fx-border-color: rgba(255, 255, 255, 0.12);
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+    -fx-padding: 14;
+}
+.upload-side {
+    -fx-padding: 6;
+}
+
+/* image preview frame */
+.preview-img {
+    -fx-background-color: rgba(0, 0, 0, 0.15);
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: rgba(255,255,255,0.12);
+    -fx-border-width: 1;
 }
 
 /* ===== Primary button ===== */
