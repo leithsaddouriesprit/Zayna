@@ -118,14 +118,14 @@ public class MainFFX extends Application {
 
 */
 
-
+/*
     /// Chauffeur module (hub + suivi + espace). Set session chauffeur_id then open ChauffeurHome.
     @Override
     public void start(Stage primaryStage) {
         AppSession.getInstance().setChauffeurId(1); // or from login
         SceneNavigator.openChauffeurHome();
     }
-
+*/
 /*
 /// AI chat
 @Override
@@ -148,7 +148,7 @@ public void start(Stage primaryStage) {
     }
 }
 */
-/*
+
     /// parent flux
     @Override
     public void start(Stage primaryStage) {
@@ -172,5 +172,5 @@ public void start(Stage primaryStage) {
             System.out.println("Erreur lancement ParentHome: " + e.getMessage());
         }
     }
-*/
+
 }
