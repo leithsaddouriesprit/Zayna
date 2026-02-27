@@ -13,12 +13,20 @@ public class ReclamationService {
 
     // CREATE
     public void insertOne(Reclamation r) throws SQLException {
-        String sql = "INSERT INTO reclamation (user_id, type, description, statut) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO reclamation (user_id, type, description, statut, " +
+                "chauffeur_nom, chauffeur_prenom, bus_matricule, cantine_type, ecole_nom, autre_precision) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setInt(1, r.getUserId());
             ps.setString(2, r.getType());
             ps.setString(3, r.getDescription());
             ps.setString(4, r.getStatut());
+            ps.setString(5, r.getChauffeurNom());
+            ps.setString(6, r.getChauffeurPrenom());
+            ps.setString(7, r.getBusMatricule());
+            ps.setString(8, r.getCantineType());
+            ps.setString(9, r.getEcoleNom());
+            ps.setString(10, r.getAutrePrecision());
             ps.executeUpdate();
         }
     }
@@ -67,12 +75,20 @@ public class ReclamationService {
 
     // UPDATE
     public void updateOne(Reclamation r) throws SQLException {
-        String sql = "UPDATE reclamation SET type = ?, description = ?, statut = ? WHERE id = ?";
+        String sql = "UPDATE reclamation SET type = ?, description = ?, statut = ?, " +
+                "chauffeur_nom = ?, chauffeur_prenom = ?, bus_matricule = ?, " +
+                "cantine_type = ?, ecole_nom = ?, autre_precision = ? WHERE id = ?";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setString(1, r.getType());
             ps.setString(2, r.getDescription());
             ps.setString(3, r.getStatut());
-            ps.setInt(4, r.getId());
+            ps.setString(4, r.getChauffeurNom());
+            ps.setString(5, r.getChauffeurPrenom());
+            ps.setString(6, r.getBusMatricule());
+            ps.setString(7, r.getCantineType());
+            ps.setString(8, r.getEcoleNom());
+            ps.setString(9, r.getAutrePrecision());
+            ps.setInt(10, r.getId());
             ps.executeUpdate();
         }
     }
@@ -128,13 +144,23 @@ public class ReclamationService {
     }
 
     // Ajouter et retourner ID
-    public int ajouterReclamationEtRetournerId(int userId, String type, String description, String statut) throws SQLException {
-        String sql = "INSERT INTO reclamation (user_id, type, description, statut) VALUES (?, ?, ?, ?)";
+    public int ajouterReclamationEtRetournerId(int userId, String type, String description, String statut,
+                                               String chauffeurNom, String chauffeurPrenom, String busMatricule,
+                                               String cantineType, String ecoleNom, String autrePrecision) throws SQLException {
+        String sql = "INSERT INTO reclamation (user_id, type, description, statut, " +
+                "chauffeur_nom, chauffeur_prenom, bus_matricule, cantine_type, ecole_nom, autre_precision) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = cnx.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, userId);
             ps.setString(2, type);
             ps.setString(3, description);
             ps.setString(4, statut);
+            ps.setString(5, chauffeurNom);
+            ps.setString(6, chauffeurPrenom);
+            ps.setString(7, busMatricule);
+            ps.setString(8, cantineType);
+            ps.setString(9, ecoleNom);
+            ps.setString(10, autrePrecision);
             ps.executeUpdate();
 
             try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -155,6 +181,15 @@ public class ReclamationService {
         r.setDescription(rs.getString("description"));
         r.setDateReclamation(rs.getTimestamp("date_reclamation"));
         r.setStatut(rs.getString("statut"));
+
+        // Nouveaux champs
+        r.setChauffeurNom(rs.getString("chauffeur_nom"));
+        r.setChauffeurPrenom(rs.getString("chauffeur_prenom"));
+        r.setBusMatricule(rs.getString("bus_matricule"));
+        r.setCantineType(rs.getString("cantine_type"));
+        r.setEcoleNom(rs.getString("ecole_nom"));
+        r.setAutrePrecision(rs.getString("autre_precision"));
+
         return r;
     }
 }
