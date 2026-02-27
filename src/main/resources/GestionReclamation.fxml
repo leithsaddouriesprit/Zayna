@@ -2,7 +2,10 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
+<?import javafx.collections.FXCollections?>
 <?import javafx.scene.layout.*?>
+<?import java.lang.String?>  <!-- AJOUTER CET IMPORT -->
+
 
 <AnchorPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
@@ -65,6 +68,67 @@
                               wrapText="true"
                               promptText="Décrivez votre réclamation en détails..."
                               style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e0e0e0; -fx-background-color: white; -fx-padding: 10;"/>
+
+                    <!-- Détails spécifiques selon le type -->
+                    <Label text="Détails :"
+                           GridPane.rowIndex="2"
+                           GridPane.columnIndex="0"
+                           style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
+
+                    <StackPane GridPane.rowIndex="2"
+                               GridPane.columnIndex="1"
+                               prefHeight="120">
+
+                        <!-- Panel Chauffeur -->
+                        <VBox fx:id="panelChauffeur" spacing="8" managed="false" visible="false">
+                            <Label text="Nom du chauffeur :" style="-fx-font-size: 12px; -fx-text-fill: #7f8c8d;"/>
+                            <TextField fx:id="chauffeurNomField" promptText="Ex: DUPONT"
+                                       style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e0e0e0; -fx-background-color: white; -fx-padding: 8;"/>
+                            <Label text="Prénom du chauffeur :" style="-fx-font-size: 12px; -fx-text-fill: #7f8c8d;"/>
+                            <TextField fx:id="chauffeurPrenomField" promptText="Ex: Jean"
+                                       style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e0e0e0; -fx-background-color: white; -fx-padding: 8;"/>
+                        </VBox>
+
+                        <!-- Panel Bus -->
+                        <VBox fx:id="panelBus" spacing="8" managed="false" visible="false">
+                            <Label text="Matricule du bus :" style="-fx-font-size: 12px; -fx-text-fill: #7f8c8d;"/>
+                            <TextField fx:id="busMatriculeField" promptText="Ex: 1234 TN 15"
+                                       style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e0e0e0; -fx-background-color: white; -fx-padding: 8;"/>
+                        </VBox>
+
+                        <!-- Panel Cantine (CORRIGÉ) -->
+                        <VBox fx:id="panelCantine" spacing="8" managed="false" visible="false">
+                            <Label text="Type de problème :" style="-fx-font-size: 12px; -fx-text-fill: #7f8c8d;"/>
+                            <ChoiceBox fx:id="cantineTypeChoice" prefWidth="300"
+                                       style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e0e0e0; -fx-background-color: white; -fx-padding: 5 10;">
+                                <String fx:value="Qualité des repas"/>
+                                <String fx:value="Quantité insuffisante"/>
+                                <String fx:value="Hygiène"/>
+                                <String fx:value="Service"/>
+                                <String fx:value="Autre"/>
+                            </ChoiceBox>
+                        </VBox>
+
+                        <!-- Panel École -->
+                        <VBox fx:id="panelEcole" spacing="8" managed="false" visible="false">
+                            <Label text="Nom de l'école :" style="-fx-font-size: 12px; -fx-text-fill: #7f8c8d;"/>
+                            <TextField fx:id="ecoleNomField" promptText="Ex: École Primaire Centre"
+                                       style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e0e0e0; -fx-background-color: white; -fx-padding: 8;"/>
+                        </VBox>
+
+                        <!-- Panel Autre -->
+                        <VBox fx:id="panelAutre" spacing="8" managed="false" visible="false">
+                            <Label text="Précision :" style="-fx-font-size: 12px; -fx-text-fill: #7f8c8d;"/>
+                            <TextField fx:id="autrePrecisionField" promptText="Ex: Problème administratif"
+                                       style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e0e0e0; -fx-background-color: white; -fx-padding: 8;"/>
+                        </VBox>
+
+                        <!-- Panel Trajet (aucun détail) -->
+                        <VBox fx:id="panelTrajet" spacing="8" managed="false" visible="false" alignment="CENTER">
+                            <Label text="✓ Aucun détail supplémentaire requis"
+                                   style="-fx-font-size: 12px; -fx-text-fill: #27ae60; -fx-font-style: italic; -fx-padding: 20 0;"/>
+                        </VBox>
+                    </StackPane>
                 </GridPane>
 
                 <!-- Barre d'outils avec boutons -->
@@ -121,9 +185,10 @@
                            prefHeight="250"
                            style="-fx-background-radius: 10;">
                     <columns>
-                        <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+                        <!-- La colonne ID reste mais n'affichera rien (modifié dans le controller) -->
                         <TableColumn fx:id="colType" text="Type" prefWidth="100"/>
                         <TableColumn fx:id="colDescription" text="Message" prefWidth="300"/>
+                        <TableColumn fx:id="colDetails" text="Détails" prefWidth="150"/>  <!-- NOUVELLE COLONNE -->
                         <TableColumn fx:id="colDate" text="Date" prefWidth="130"/>
                         <TableColumn fx:id="colStatut" text="Statut" prefWidth="100"/>
                     </columns>
@@ -133,7 +198,7 @@
                 </TableView>
             </VBox>
 
-            <!-- SECTION REPONSE ADMIN (corrigée) -->
+            <!-- SECTION REPONSE ADMIN -->
             <VBox spacing="10"
                   style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 15; -fx-border-color: #3498db; -fx-border-width: 0 0 0 5; -fx-border-radius: 15;">
 
@@ -154,7 +219,7 @@
                           promptText="Aucune réponse pour le moment..."
                           style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-padding: 10; -fx-font-size: 13px;"/>
 
-                <!-- Indicateur de statut de réponse - VERSION CORRIGÉE -->
+                <!-- Indicateur de statut de réponse -->
                 <HBox spacing="5" alignment="CENTER_LEFT">
                     <Label text="●"
                            style="-fx-text-fill: #f39c12; -fx-font-size: 12px;"/>
