@@ -15,7 +15,7 @@ public class ReponseService {
     public void insertOne(Reponse r) throws SQLException {
         String sql = "INSERT INTO reponse (reclamation_id, message, date_reponse) VALUES (?, ?, ?)";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
-            ps.setInt(1, r.getreclamation_id());
+            ps.setInt(1, r.getReclamationId());
             ps.setString(2, r.getMessage());
             ps.setTimestamp(3, Timestamp.valueOf(r.getDate()));
             ps.executeUpdate();
@@ -67,7 +67,7 @@ public class ReponseService {
                 if (rs.next()) {
                     Reponse r = new Reponse();
                     r.setId(rs.getInt("id"));
-                    r.setreclamation_id(rs.getInt("reclamation_id"));
+                    r.setReclamationId(rs.getInt("reclamation_id"));
                     r.setMessage(rs.getString("message"));
                     r.setDate(rs.getTimestamp("date_reponse").toLocalDateTime());
                     return r;
@@ -114,7 +114,7 @@ public class ReponseService {
     public void update(Reponse r) throws SQLException {
         String sql = "UPDATE reponse SET reclamation_id = ?, message = ?, date_reponse = ? WHERE id = ?";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
-            ps.setInt(1, r.getreclamation_id());
+            ps.setInt(1, r.getReclamationId());
             ps.setString(2, r.getMessage());
             ps.setTimestamp(3, Timestamp.valueOf(r.getDate()));
             ps.setInt(4, r.getId());

@@ -1,5 +1,5 @@
 package tn.esprit.workshop.model;
-
+import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 
 public class Reponse {
@@ -28,8 +28,8 @@ public class Reponse {
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
-    public int getreclamation_id() { return reclamation_id; }
-    public void setreclamation_id(int reclamation_id) { this.reclamation_id = reclamation_id; }
+    public int getReclamationId() { return reclamation_id; }
+    public void setReclamationId(int reclamation_id) { this.reclamation_id = reclamation_id; }
 
     public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }
@@ -37,13 +37,23 @@ public class Reponse {
     public LocalDateTime getDate() { return date; }
     public void setDate(LocalDateTime date) { this.date = date; }
 
+    // ✅ Méthode utilitaire pour formater la date de façon lisible
+    public String getDateFormatee() {
+        if (date == null) return "";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        return date.format(formatter);
+    }
+    // ✅ Méthode pour obtenir un aperçu court de la réponse (pour affichage)
+    public String getApercu() {
+        if (message == null || message.isEmpty()) return "";
+        if (message.length() <= 50) return message;
+        return message.substring(0, 47) + "...";
+    }
+
+
+    // ✅ toString sans ID
     @Override
     public String toString() {
-        return "Reponse{" +
-                "id=" + id +
-                ", reclamation_id=" + reclamation_id +
-                ", message='" + message + '\'' +
-                ", date=" + date +
-                '}';
+        return "Réponse du " + getDateFormatee() + " : " + getApercu();
     }
 }

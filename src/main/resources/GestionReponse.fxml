@@ -55,15 +55,17 @@
                     <VBox spacing="10"
                           style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);">
 
-                        <Label text="📌 Réclamations en attente"
+                        <Label text="📌 Liste des réclamations"
                                style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #2c3e50;"/>
 
                         <TableView fx:id="tableReclamation" VBox.vgrow="ALWAYS"
                                    style="-fx-background-radius: 10;">
                             <columns>
-                                <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+                                <!-- Colonne ID (sera masquée dans le controller) -->
+                                <TableColumn fx:id="colId" text="N°" prefWidth="50"/>
                                 <TableColumn fx:id="colType" text="Type" prefWidth="80"/>
-                                <TableColumn fx:id="colDescription" text="Message" prefWidth="200"/>
+                                <TableColumn fx:id="colDescription" text="Message" prefWidth="150"/>
+                                <TableColumn fx:id="colDetails" text="Détails" prefWidth="120"/>
                                 <TableColumn fx:id="colStatut" text="Statut" prefWidth="80"/>
                                 <TableColumn fx:id="colDate" text="Date" prefWidth="120"/>
                             </columns>
@@ -88,16 +90,19 @@
                                 <ColumnConstraints hgrow="ALWAYS"/>
                             </columnConstraints>
 
-                            <Label text="🆔 ID:" GridPane.rowIndex="0" GridPane.columnIndex="0"
+                            <!-- Utilisateur -->
+                            <Label text="👤 Utilisateur:" GridPane.rowIndex="0" GridPane.columnIndex="0"
                                    style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
-                            <Label fx:id="detailIdLabel" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                            <Label fx:id="detailUserLabel" GridPane.rowIndex="0" GridPane.columnIndex="1"
                                    style="-fx-text-fill: #2c3e50;"/>
 
+                            <!-- Type -->
                             <Label text="📌 Type:" GridPane.rowIndex="1" GridPane.columnIndex="0"
                                    style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
                             <Label fx:id="detailTypeLabel" GridPane.rowIndex="1" GridPane.columnIndex="1"
                                    style="-fx-text-fill: #2c3e50;"/>
 
+                            <!-- Message -->
                             <Label text="💬 Message:" GridPane.rowIndex="2" GridPane.columnIndex="0"
                                    style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
                             <TextArea fx:id="detailMessageArea"
@@ -107,9 +112,16 @@
                                       style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #e0e0e0; -fx-border-radius: 8;"
                                       GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-                            <Label text="📅 Date:" GridPane.rowIndex="3" GridPane.columnIndex="0"
+                            <!-- Détails spécifiques -->
+                            <Label text="🔍 Détails:" GridPane.rowIndex="3" GridPane.columnIndex="0"
                                    style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
-                            <Label fx:id="detailDateLabel" GridPane.rowIndex="3" GridPane.columnIndex="1"
+                            <Label fx:id="detailInfosLabel" GridPane.rowIndex="3" GridPane.columnIndex="1"
+                                   style="-fx-text-fill: #2c3e50; -fx-font-style: italic;"/>
+
+                            <!-- Date -->
+                            <Label text="📅 Date:" GridPane.rowIndex="4" GridPane.columnIndex="0"
+                                   style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
+                            <Label fx:id="detailDateLabel" GridPane.rowIndex="4" GridPane.columnIndex="1"
                                    style="-fx-text-fill: #2c3e50;"/>
                         </GridPane>
 
@@ -125,12 +137,20 @@
                                       prefRowCount="3"
                                       wrapText="true"
                                       style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #a5d6a7; -fx-border-radius: 8;"/>
+
+                            <!-- Auteur de la réponse -->
+                            <HBox spacing="5" alignment="CENTER_LEFT">
+                                <Label text="👤" style="-fx-font-size: 12px; -fx-text-fill: #2e7d32;"/>
+                                <Label fx:id="reponseAuteurLabel" text="Administrateur"
+                                       style="-fx-text-fill: #2e7d32; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+                            </HBox>
+
                             <Label fx:id="reponseDateLabel" style="-fx-text-fill: #2e7d32; -fx-font-size: 11px;"/>
                         </VBox>
 
                         <!-- Formulaire de réponse -->
                         <VBox spacing="10">
-                            <Label text="✏️ Nouvelle réponse"
+                            <Label text="✏️ Répondre"
                                    style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2c3e50;"/>
 
                             <TextArea fx:id="reponseField"
@@ -138,6 +158,11 @@
                                       wrapText="true"
                                       promptText="Écrivez votre réponse ici..."
                                       style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e0e0e0; -fx-padding: 10;"/>
+
+                            <!-- Compteur de caractères -->
+                            <Label fx:id="compteurCaracteres"
+                                   style="-fx-font-size: 11px; -fx-text-fill: #7f8c8d;"
+                                   text="0/500 caractères"/>
 
                             <HBox spacing="10" alignment="CENTER_RIGHT">
                                 <Button text="📤 Envoyer"
