@@ -130,6 +130,10 @@
 
                     <!-- Barre d'outils avec boutons -->
                     <HBox spacing="10" alignment="CENTER_RIGHT">
+                        <!-- Dans votre FXML, à côté des boutons existants -->
+                        <Button text="🌐 Traduire"
+                                onAction="#traduireMessage"
+                                style="-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-font-weight: bold; -fx-cursor: hand;"/>
                         <Button text="🗑️ Vider"
                                 onAction="#viderFormulaire"
                                 style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand; -fx-font-weight: bold;"/>
@@ -174,6 +178,7 @@
                                minHeight="200"
                                style="-fx-background-radius: 10;">
                         <columns>
+                            <TableColumn fx:id="colId" text="N°" prefWidth="50"/>
                             <TableColumn fx:id="colType" text="Type" prefWidth="100"/>
                             <TableColumn fx:id="colDescription" text="Message" prefWidth="250"/>
                             <TableColumn fx:id="colDetails" text="Détails" prefWidth="150"/>

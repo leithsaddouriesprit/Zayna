@@ -10,6 +10,7 @@ import tn.esprit.workshop.model.Reclamation;
 import tn.esprit.workshop.model.Reponse;
 import tn.esprit.workshop.services.ReclamationService;
 import tn.esprit.workshop.services.ReponseService;
+import tn.esprit.workshop.services.TraductionService;
 
 import java.net.URL;
 import java.sql.SQLException;
@@ -53,6 +54,7 @@ public class GestionReclamationController implements Initializable {
     private final ReclamationService service = new ReclamationService();
     private final ReponseService reponseService = new ReponseService();
     private final int currentUserId = 1;
+    private final TraductionService traductionService = new TraductionService();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -157,13 +159,13 @@ public class GestionReclamationController implements Initializable {
 
     private void configurerColonnes() {
         // Masquer l'ID
-        /*colId.setCellFactory(column -> new TableCell<Reclamation, Integer>() {
+        colId.setCellFactory(column -> new TableCell<Reclamation, Integer>() {
             @Override
             protected void updateItem(Integer item, boolean empty) {
                 super.updateItem(item, empty);
-                setText(""); // Ne rien afficher !
+                setText(""); // Ne rien afficher
             }
-        });*/
+        });
 
         colType.setCellValueFactory(new PropertyValueFactory<>("type"));
 
@@ -240,6 +242,7 @@ public class GestionReclamationController implements Initializable {
             }
         });
     }
+
     // Nouvelle méthode pour extraire les détails
     private String getDetailsFromReclamation(Reclamation r) {
         if (r.getType() == null) return "";
@@ -377,6 +380,20 @@ public class GestionReclamationController implements Initializable {
 
         if (confirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
             try {
+                // Traduction du message (optionnelle - ne bloque pas l'envoi)
+                String langueOriginale = "inconnue";
+                String messageTraduit = "";
+
+                try {
+                    langueOriginale = traductionService.detecterLangue(message);
+                    messageTraduit = traductionService.traduireVersFrancais(message);
+                    statusLabel.setText("✅ Langue détectée : " + langueOriginale);
+                } catch (Exception e) {
+                    System.out.println("Traduction non disponible: " + e.getMessage());
+                    // On continue sans traduction
+                }
+
+                // Appel au service (à adapter selon votre méthode)
                 service.ajouterReclamationEtRetournerId(
                         currentUserId,
                         type,
@@ -388,6 +405,7 @@ public class GestionReclamationController implements Initializable {
                         cantineType,
                         ecoleNom,
                         autrePrecision
+                        // Note: Vous devrez peut-être modifier votre méthode pour accepter langueOriginale et messageTraduit
                 );
 
                 showAlert("Succès", "✅ Réclamation envoyée avec succès !", Alert.AlertType.INFORMATION);
@@ -539,6 +557,42 @@ public class GestionReclamationController implements Initializable {
             );
         } catch (SQLException e) {
             statusLabel.setText("❌ Erreur chargement");
+            e.printStackTrace();
+        }
+    }
+
+    // ================= TRADUCTION =================
+
+    @FXML
+    private void traduireMessage() {
+        String message = messageField.getText();
+        if (message == null || message.trim().isEmpty()) {
+            showAlert("Information", "Veuillez écrire un message à traduire", Alert.AlertType.INFORMATION);
+            return;
+        }
+
+        statusLabel.setText("⏳ Traduction en cours...");
+
+        try {
+            // Essayer d'abord la traduction automatique
+            String traduit = traductionService.traduireVersFrancais(message);
+
+            // Si ça échoue, essayer français -> anglais
+            if (traduit.startsWith("[") && traduit.endsWith("]")) {
+                traduit = traductionService.traduireFrancaisVersAnglais(message);
+            }
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Traduction");
+            alert.setHeaderText("Message traduit");
+            alert.setContentText("📝 Original: " + message + "\n\n🌐 Traduit: " + traduit);
+            alert.showAndWait();
+
+            statusLabel.setText("✅ Traduction effectuée");
+
+        } catch (Exception e) {
+            showAlert("Erreur", "❌ Traduction impossible: " + e.getMessage(), Alert.AlertType.ERROR);
+            statusLabel.setText("❌ Erreur de traduction");
             e.printStackTrace();
         }
     }
