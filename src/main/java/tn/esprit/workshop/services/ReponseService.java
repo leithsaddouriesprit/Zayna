@@ -76,8 +76,7 @@ public class ReponseService {
         }
         return null;
     }
-
-    // Version simplifiée pour retourner juste le message (si vous préférez garder l'existant)
+ // Version simplifiée pour retourner juste le message (si vous préférez garder l'existant)
     public String getReponseMessageByReclamationId(int reclamationId) throws SQLException {
         Reponse r = getReponseByReclamationId(reclamationId);
         return r != null ? r.getMessage() : null;
