@@ -116,9 +116,9 @@
                             <Label text="🔍 Détails:" GridPane.rowIndex="3" GridPane.columnIndex="0"
                                    style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
                             <Label fx:id="detailInfosLabel" GridPane.rowIndex="3" GridPane.columnIndex="1"
-                                   style="-fx-text-fill: #2c3e50; -fx-font-style: italic;"/>
+                                   style="-fx-text-fill: #2c3e50; -fx-font-style: italic; -fx-wrap-text: true;"/>
 
-                            <!-- Date -->
+                            <!-- Date (décaler l'index de 1) -->
                             <Label text="📅 Date:" GridPane.rowIndex="4" GridPane.columnIndex="0"
                                    style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
                             <Label fx:id="detailDateLabel" GridPane.rowIndex="4" GridPane.columnIndex="1"
