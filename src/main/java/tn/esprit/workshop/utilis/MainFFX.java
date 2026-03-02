@@ -18,7 +18,7 @@ public class MainFFX extends Application {
     public void start(Stage primaryStage) {
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Agent.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ParentInterface.fxml"));
             Parent root = loader.load();
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);

@@ -15,7 +15,7 @@
           -fx-background-radius: 30px;
           -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 30, 0, 0, 15);
           -fx-padding: 25px;
-          -fx-max-width: 1100px;
+          -fx-max-width: 1200px;
           -fx-font-family: 'Segoe UI', 'Poppins', 'Arial', sans-serif;
       ">
 
@@ -54,6 +54,35 @@
         -fx-scale-y: 1.02;
         }
 
+        /* ===== STYLE DES ONGLETS ===== */
+        .tab-pane {
+        -fx-tab-min-height: 40px;
+        -fx-tab-max-height: 40px;
+        }
+
+        .tab {
+        -fx-background-color: transparent;
+        -fx-background-radius: 15px 15px 0 0;
+        -fx-padding: 8px 20px;
+        -fx-font-size: 14px;
+        -fx-font-weight: bold;
+        }
+
+        .tab:selected {
+        -fx-background-color: white;
+        -fx-border-color: #667eea;
+        -fx-border-width: 2px 2px 0 2px;
+        -fx-border-radius: 15px 15px 0 0;
+        }
+
+        .tab .tab-label {
+        -fx-text-fill: #2c3e50;
+        }
+
+        .tab:selected .tab-label {
+        -fx-text-fill: #667eea;
+        }
+
         /* ===== CARTE DE FORMULAIRE ===== */
         .form-card {
         -fx-background-color: #f8fafd;
@@ -87,16 +116,16 @@
         -fx-border-width: 2px;
         -fx-border-radius: 15px;
         -fx-background-radius: 15px;
-        -fx-padding: 14px 18px;
-        -fx-font-size: 15px;
+        -fx-padding: 12px 15px;
+        -fx-font-size: 14px;
         -fx-prompt-text-fill: #94a3b8;
         -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.02), 5, 0, 0, 2);
         }
 
         .custom-field {
-        -fx-min-width: 350px;
-        -fx-max-width: 350px;
-        -fx-pref-height: 45px;
+        -fx-min-width: 300px;
+        -fx-max-width: 300px;
+        -fx-pref-height: 40px;
         }
 
         .custom-field:hover, .custom-area:hover {
@@ -114,40 +143,35 @@
         }
 
         .custom-area {
-        -fx-min-height: 90px;
-        -fx-min-width: 720px;
-        -fx-max-width: 720px;
+        -fx-min-height: 70px;
+        -fx-min-width: 620px;
+        -fx-max-width: 620px;
         -fx-wrap-text: true;
-        }
-
-        /* ===== ICÔNES DANS LES CHAMPS ===== */
-        .field-icon {
-        -fx-padding: 0 5px 0 0;
         }
 
         /* ===== BOUTONS D'ACTION ===== */
         .boutons-container {
-        -fx-spacing: 18px;
+        -fx-spacing: 15px;
         -fx-alignment: center;
-        -fx-padding: 20px 0 15px 0;
+        -fx-padding: 15px 0 10px 0;
         }
 
         .button-action {
-        -fx-background-radius: 12px;
-        -fx-padding: 12px 25px;
-        -fx-font-size: 15px;
+        -fx-background-radius: 10px;
+        -fx-padding: 10px 20px;
+        -fx-font-size: 14px;
         -fx-font-weight: bold;
         -fx-cursor: hand;
-        -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 8, 0, 0, 3);
-        -fx-min-width: 120px;
+        -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 2);
+        -fx-min-width: 110px;
         -fx-alignment: center;
-        -fx-spacing: 10px;
+        -fx-spacing: 8px;
         }
 
         .button-action:hover {
         -fx-scale-x: 1.05;
         -fx-scale-y: 1.05;
-        -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 15, 0, 0, 5);
+        -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 10, 0, 0, 4);
         }
 
         .button-action:pressed {
@@ -177,44 +201,39 @@
 
         /* ===== TABLEAU AMÉLIORÉ ===== */
         .table-title {
-        -fx-font-size: 18px;
+        -fx-font-size: 16px;
         -fx-font-weight: bold;
         -fx-text-fill: #1a2639;
-        -fx-padding: 15px 0 10px 0;
-        -fx-graphic: url('https://img.icons8.com/color/48/table.png');
-        -fx-graphic-text-gap: 10px;
+        -fx-padding: 10px 0 5px 0;
         }
 
         .custom-table {
         -fx-background-color: transparent;
         -fx-border-color: rgba(226, 232, 240, 0.5);
         -fx-border-width: 1px;
-        -fx-border-radius: 18px;
-        -fx-background-radius: 18px;
-        -fx-padding: 8px;
-        -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 15, 0, 0, 3);
-        -fx-pref-height: 300px;
+        -fx-border-radius: 15px;
+        -fx-background-radius: 15px;
+        -fx-padding: 5px;
+        -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 12, 0, 0, 3);
         }
 
         .custom-table .column-header-background {
         -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #667eea 0%, #764ba2 100%);
-        -fx-background-radius: 15px 15px 0 0;
-        -fx-padding: 12px 0;
+        -fx-background-radius: 12px 12px 0 0;
+        -fx-padding: 8px 0;
         }
 
         .custom-table .column-header .label {
-        -fx-font-size: 14px;
+        -fx-font-size: 13px;
         -fx-font-weight: bold;
         -fx-text-fill: white;
         -fx-alignment: center;
-        -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 2, 0, 0, 1);
         }
 
         .custom-table .table-row-cell {
         -fx-background-color: white;
         -fx-border-color: transparent transparent #edf2f7 transparent;
         -fx-border-width: 0 0 1px 0;
-        -fx-padding: 5px 0;
         }
 
         .custom-table .table-row-cell:odd {
@@ -223,17 +242,11 @@
 
         .custom-table .table-row-cell:hover {
         -fx-background-color: #e8f0fe;
-        -fx-scale-x: 1.005;
-        -fx-scale-y: 1.005;
-        }
-
-        .custom-table .table-row-cell:selected {
-        -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #d5e6ff 0%, #e9d8fd 100%);
         }
 
         .custom-table .table-cell {
-        -fx-padding: 12px 10px;
-        -fx-font-size: 13.5px;
+        -fx-padding: 8px 6px;
+        -fx-font-size: 12px;
         -fx-text-fill: #2c3e50;
         -fx-alignment: center;
         }
@@ -242,22 +255,35 @@
         .table-button {
         -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #9b59b6 0%, #8e44ad 100%);
         -fx-text-fill: white;
-        -fx-background-radius: 20;
+        -fx-background-radius: 15;
         -fx-cursor: hand;
         -fx-font-weight: bold;
-        -fx-padding: 6 18;
-        -fx-font-size: 12px;
-        -fx-effect: dropshadow(gaussian, rgba(155, 89, 182, 0.3), 5, 0, 0, 2);
+        -fx-padding: 4 12;
+        -fx-font-size: 11px;
         }
 
         .table-button:hover {
         -fx-background-color: #8e44ad;
         -fx-scale-x: 1.05;
         -fx-scale-y: 1.05;
-        -fx-effect: dropshadow(gaussian, rgba(142, 68, 173, 0.4), 8, 0, 0, 3);
         }
 
-        /* ===== SCROLLBAR PERSONNALISÉE ===== */
+        /* ===== MESSAGE D'INFORMATION ===== */
+        .info-message {
+        -fx-background-color: #e8f5e9;
+        -fx-background-radius: 12px;
+        -fx-padding: 20px;
+        -fx-border-color: #a5d6a7;
+        -fx-border-width: 1px;
+        -fx-border-radius: 12px;
+        }
+
+        .info-message .label {
+        -fx-text-fill: #2e7d32;
+        -fx-font-size: 14px;
+        }
+
+        /* ===== SCROLLBAR ===== */
         .scroll-bar:vertical {
         -fx-background-color: transparent;
         -fx-background-radius: 10px;
@@ -280,120 +306,230 @@
     </style>
 
     <!-- Conteneur principal -->
-    <VBox spacing="20" alignment="TOP_CENTER" styleClass="main-container">
+    <VBox spacing="15" alignment="TOP_CENTER" styleClass="main-container">
 
         <!-- En-tête avec icône -->
         <HBox alignment="CENTER" styleClass="header">
             <HBox spacing="15" alignment="CENTER">
-                <ImageView fitHeight="50" fitWidth="50">
+                <ImageView fitHeight="45" fitWidth="45">
                     <Image url="https://img.icons8.com/fluency/48/school.png"/>
                 </ImageView>
-                <Label text="Interface Agent - Gestion des Écoles" styleClass="titre-principal"/>
+                <Label text="Interface Agent - Gestion complète" styleClass="titre-principal"/>
             </HBox>
         </HBox>
 
-        <!-- Carte de formulaire -->
-        <VBox styleClass="form-card" spacing="5">
-            <Label text="➕ Ajouter / Modifier une école"
-                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-padding: 0 0 10px 0;"/>
+        <!-- TabPane avec 3 onglets -->
+        <TabPane tabClosingPolicy="UNAVAILABLE" prefHeight="600">
+            <!-- Onglet 1: Écoles -->
+            <Tab text="🏫 Écoles">
+                <VBox spacing="15" style="-fx-padding: 15;">
+                    <!-- Carte de formulaire -->
+                    <VBox styleClass="form-card" spacing="5">
+                        <Label text="➕ Ajouter / Modifier une école"
+                               style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-padding: 0 0 10px 0;"/>
 
-            <!-- Grille des champs avec espacement amélioré -->
-            <GridPane styleClass="form-grid" alignment="CENTER">
-                <!-- Nom -->
-                <Label text="🏫 Nom:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="field-label"/>
-                <HBox spacing="10" alignment="CENTER_LEFT" GridPane.rowIndex="0" GridPane.columnIndex="1">
-                    <ImageView fitHeight="20" fitWidth="20">
-                        <Image url="https://img.icons8.com/color/48/school.png"/>
-                    </ImageView>
-                    <TextField fx:id="tfNom" promptText="Ex: ESPRIT, IHEC, FST..." styleClass="custom-field"/>
-                </HBox>
+                        <!-- Grille des champs -->
+                        <GridPane styleClass="form-grid" alignment="CENTER">
+                            <!-- Nom -->
+                            <Label text="🏫 Nom:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="field-label"/>
+                            <HBox spacing="10" alignment="CENTER_LEFT" GridPane.rowIndex="0" GridPane.columnIndex="1">
+                                <ImageView fitHeight="18" fitWidth="18">
+                                    <Image url="https://img.icons8.com/color/48/school.png"/>
+                                </ImageView>
+                                <TextField fx:id="tfNom" promptText="Ex: ESPRIT, IHEC, FST..." styleClass="custom-field"/>
+                            </HBox>
 
-                <!-- Position -->
-                <Label text="📍 Position:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="field-label"/>
-                <HBox spacing="10" alignment="CENTER_LEFT" GridPane.rowIndex="1" GridPane.columnIndex="1">
-                    <ImageView fitHeight="20" fitWidth="20">
-                        <Image url="https://img.icons8.com/color/48/place-marker--v1.png"/>
-                    </ImageView>
-                    <TextField fx:id="tfPosition" promptText="Ex: Ariana, Tunis, La Marsa..." styleClass="custom-field"/>
-                </HBox>
+                            <!-- Position -->
+                            <Label text="📍 Position:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="field-label"/>
+                            <HBox spacing="10" alignment="CENTER_LEFT" GridPane.rowIndex="1" GridPane.columnIndex="1">
+                                <ImageView fitHeight="18" fitWidth="18">
+                                    <Image url="https://img.icons8.com/color/48/place-marker--v1.png"/>
+                                </ImageView>
+                                <TextField fx:id="tfPosition" promptText="Ex: Ariana, Tunis, La Marsa..." styleClass="custom-field"/>
+                            </HBox>
 
-                <!-- Prix -->
-                <Label text="💰 Prix:" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="field-label"/>
-                <HBox spacing="10" alignment="CENTER_LEFT" GridPane.rowIndex="2" GridPane.columnIndex="1">
-                    <ImageView fitHeight="20" fitWidth="20">
-                        <Image url="https://img.icons8.com/color/48/price-tag.png"/>
-                    </ImageView>
-                    <TextField fx:id="tfPrix" promptText="Ex: 4500" styleClass="custom-field"/>
-                </HBox>
+                            <!-- Prix -->
+                            <Label text="💰 Prix:" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="field-label"/>
+                            <HBox spacing="10" alignment="CENTER_LEFT" GridPane.rowIndex="2" GridPane.columnIndex="1">
+                                <ImageView fitHeight="18" fitWidth="18">
+                                    <Image url="https://img.icons8.com/color/48/price-tag.png"/>
+                                </ImageView>
+                                <TextField fx:id="tfPrix" promptText="Ex: 4500" styleClass="custom-field"/>
+                            </HBox>
 
-                <!-- Description -->
-                <Label text="📝 Description:" GridPane.rowIndex="3" GridPane.columnIndex="0" styleClass="field-label"
-                       style="-fx-alignment: TOP_RIGHT; -fx-padding: 10 15 0 0;"/>
-                <HBox spacing="10" alignment="TOP_LEFT" GridPane.rowIndex="3" GridPane.columnIndex="1">
-                    <ImageView fitHeight="20" fitWidth="20" style="-fx-padding: 8 0 0 0;">
-                        <Image url="https://img.icons8.com/color/48/description.png"/>
-                    </ImageView>
-                    <TextArea fx:id="tfDescription" promptText="Description détaillée de l'école..." prefHeight="80" styleClass="custom-area"/>
-                </HBox>
+                            <!-- Description -->
+                            <Label text="📝 Description:" GridPane.rowIndex="3" GridPane.columnIndex="0" styleClass="field-label"
+                                   style="-fx-alignment: TOP_RIGHT; -fx-padding: 10 15 0 0;"/>
+                            <HBox spacing="10" alignment="TOP_LEFT" GridPane.rowIndex="3" GridPane.columnIndex="1">
+                                <ImageView fitHeight="18" fitWidth="18" style="-fx-padding: 5 0 0 0;">
+                                    <Image url="https://img.icons8.com/color/48/description.png"/>
+                                </ImageView>
+                                <TextArea fx:id="tfDescription" promptText="Description détaillée de l'école..." prefHeight="60" styleClass="custom-area"/>
+                            </HBox>
 
-                <!-- Informations -->
-                <Label text="ℹ️ Infos:" GridPane.rowIndex="4" GridPane.columnIndex="0" styleClass="field-label"
-                       style="-fx-alignment: TOP_RIGHT; -fx-padding: 10 15 0 0;"/>
-                <HBox spacing="10" alignment="TOP_LEFT" GridPane.rowIndex="4" GridPane.columnIndex="1">
-                    <ImageView fitHeight="20" fitWidth="20" style="-fx-padding: 8 0 0 0;">
-                        <Image url="https://img.icons8.com/color/48/info.png"/>
-                    </ImageView>
-                    <TextArea fx:id="tfInfos" promptText="Informations supplémentaires..." prefHeight="80" styleClass="custom-area"/>
-                </HBox>
-            </GridPane>
-        </VBox>
+                            <!-- Informations -->
+                            <Label text="ℹ️ Infos:" GridPane.rowIndex="4" GridPane.columnIndex="0" styleClass="field-label"
+                                   style="-fx-alignment: TOP_RIGHT; -fx-padding: 10 15 0 0;"/>
+                            <HBox spacing="10" alignment="TOP_LEFT" GridPane.rowIndex="4" GridPane.columnIndex="1">
+                                <ImageView fitHeight="18" fitWidth="18" style="-fx-padding: 5 0 0 0;">
+                                    <Image url="https://img.icons8.com/color/48/info.png"/>
+                                </ImageView>
+                                <TextArea fx:id="tfInfos" promptText="Informations supplémentaires..." prefHeight="60" styleClass="custom-area"/>
+                            </HBox>
+                        </GridPane>
+                    </VBox>
 
-        <!-- Boutons CRUD -->
-        <HBox styleClass="boutons-container">
-            <Button text="Ajouter" styleClass="button-action button-ajouter" onAction="#ajouterEcole">
-                <graphic>
-                    <ImageView fitHeight="18" fitWidth="18">
-                        <Image url="https://img.icons8.com/color/48/plus-math.png"/>
-                    </ImageView>
-                </graphic>
-            </Button>
+                    <!-- Boutons CRUD Écoles -->
+                    <HBox styleClass="boutons-container">
+                        <Button text="Ajouter" styleClass="button-action button-ajouter" onAction="#ajouterEcole">
+                            <graphic><ImageView fitHeight="16" fitWidth="16"><Image url="https://img.icons8.com/color/48/plus-math.png"/></ImageView></graphic>
+                        </Button>
+                        <Button text="Modifier" styleClass="button-action button-modifier" onAction="#modifierEcole">
+                            <graphic><ImageView fitHeight="16" fitWidth="16"><Image url="https://img.icons8.com/color/48/edit.png"/></ImageView></graphic>
+                        </Button>
+                        <Button text="Supprimer" styleClass="button-action button-supprimer" onAction="#supprimerEcole">
+                            <graphic><ImageView fitHeight="16" fitWidth="16"><Image url="https://img.icons8.com/color/48/delete-forever.png"/></ImageView></graphic>
+                        </Button>
+                        <Button text="Vider" styleClass="button-action button-vider" onAction="#clearEcoleFields">
+                            <graphic><ImageView fitHeight="16" fitWidth="16"><Image url="https://img.icons8.com/color/48/erase.png"/></ImageView></graphic>
+                        </Button>
+                    </HBox>
 
-            <Button text="Modifier" styleClass="button-action button-modifier" onAction="#modifierEcole">
-                <graphic>
-                    <ImageView fitHeight="18" fitWidth="18">
-                        <Image url="https://img.icons8.com/color/48/edit.png"/>
-                    </ImageView>
-                </graphic>
-            </Button>
+                    <!-- Table des écoles -->
+                    <Label text="📋 Liste des écoles" styleClass="table-title"/>
+                    <TableView fx:id="tableEcole" styleClass="custom-table" prefHeight="250">
+                        <columns>
+                            <TableColumn fx:id="colNom" text="Nom" prefWidth="120"/>
+                            <TableColumn fx:id="colPosition" text="Position" prefWidth="120"/>
+                            <TableColumn fx:id="colPrix" text="Prix" prefWidth="80"/>
+                            <TableColumn fx:id="colDescription" text="Description" prefWidth="150"/>
+                            <TableColumn fx:id="colInformations" text="Infos" prefWidth="120"/>
+                            <TableColumn fx:id="colAction" text="Programmes" prefWidth="90"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </Tab>
 
-            <Button text="Supprimer" styleClass="button-action button-supprimer" onAction="#supprimerEcole">
-                <graphic>
-                    <ImageView fitHeight="18" fitWidth="18">
-                        <Image url="https://img.icons8.com/color/48/delete-forever.png"/>
-                    </ImageView>
-                </graphic>
-            </Button>
+            <!-- Onglet 2: Programmes -->
+            <Tab text="📚 Programmes">
+                <VBox spacing="15" style="-fx-padding: 15;">
+                    <!-- Message si aucune école sélectionnée -->
+                    <VBox fx:id="programmeMessageContainer" visible="true" managed="true" styleClass="info-message" alignment="CENTER">
+                        <Label text="Sélectionnez d'abord une école dans l'onglet Écoles"/>
+                    </VBox>
 
-            <Button text="Vider" styleClass="button-action button-vider" onAction="#clearFields">
-                <graphic>
-                    <ImageView fitHeight="18" fitWidth="18">
-                        <Image url="https://img.icons8.com/color/48/erase.png"/>
-                    </ImageView>
-                </graphic>
-            </Button>
-        </HBox>
+                    <!-- Formulaire des programmes (caché par défaut) -->
+                    <VBox fx:id="programmeFormContainer" visible="false" managed="false" spacing="15">
+                        <Label text="➕ Ajouter / Modifier un programme" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
 
-        <!-- Table des écoles -->
-        <Label text="📋 Liste des écoles" styleClass="table-title"/>
-        <TableView fx:id="tableEcole" styleClass="custom-table">
-            <columns>
-                <TableColumn fx:id="colNom" text="Nom" prefWidth="140"/>
-                <TableColumn fx:id="colPosition" text="Position" prefWidth="140"/>
-                <TableColumn fx:id="colPrix" text="Prix (DT)" prefWidth="100"/>
-                <TableColumn fx:id="colDescription" text="Description" prefWidth="180"/>
-                <TableColumn fx:id="colInformations" text="Informations" prefWidth="140"/>
-                <TableColumn fx:id="colAction" text="Programmes" prefWidth="120"/>
-            </columns>
-        </TableView>
+                        <GridPane hgap="10" vgap="10">
+                            <Label text="École:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="field-label"/>
+                            <ComboBox fx:id="cbEcole" promptText="Sélectionnez une école" GridPane.rowIndex="0" GridPane.columnIndex="1" prefWidth="300"/>
+
+                            <Label text="Nom:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="field-label"/>
+                            <TextField fx:id="tfNomProgramme" promptText="Nom du programme" GridPane.rowIndex="1" GridPane.columnIndex="1" styleClass="custom-field"/>
+
+                            <Label text="Niveau:" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="field-label"/>
+                            <TextField fx:id="tfNiveau" promptText="Niveau" GridPane.rowIndex="2" GridPane.columnIndex="1" styleClass="custom-field"/>
+
+                            <Label text="Durée:" GridPane.rowIndex="3" GridPane.columnIndex="0" styleClass="field-label"/>
+                            <TextField fx:id="tfDuree" promptText="Durée (mois)" GridPane.rowIndex="3" GridPane.columnIndex="1" styleClass="custom-field"/>
+
+                            <Label text="Prix:" GridPane.rowIndex="4" GridPane.columnIndex="0" styleClass="field-label"/>
+                            <TextField fx:id="tfPrixProgramme" promptText="Prix (DT)" GridPane.rowIndex="4" GridPane.columnIndex="1" styleClass="custom-field"/>
+
+                            <Label text="Description:" GridPane.rowIndex="5" GridPane.columnIndex="0" styleClass="field-label" style="-fx-alignment: TOP_RIGHT;"/>
+                            <TextArea fx:id="tfDescriptionProgramme" promptText="Description" prefHeight="60" GridPane.rowIndex="5" GridPane.columnIndex="1" styleClass="custom-area"/>
+                        </GridPane>
+
+                        <HBox styleClass="boutons-container">
+                            <Button text="Ajouter" styleClass="button-action button-ajouter" onAction="#ajouterProgramme"/>
+                            <Button text="Modifier" styleClass="button-action button-modifier" onAction="#modifierProgramme"/>
+                            <Button text="Supprimer" styleClass="button-action button-supprimer" onAction="#supprimerProgramme"/>
+                            <Button text="Vider" styleClass="button-action button-vider" onAction="#clearProgrammeFields"/>
+                        </HBox>
+                    </VBox>
+
+                    <!-- Table des programmes -->
+                    <Label fx:id="programmeListLabel" text="Liste des programmes" visible="false" managed="false" styleClass="table-title"/>
+                    <TableView fx:id="tableProgramme" prefHeight="250" visible="false" managed="false" styleClass="custom-table">
+                        <columns>
+                            <TableColumn fx:id="colProgEcole" text="École" prefWidth="100"/>
+                            <TableColumn fx:id="colProgNom" text="Nom" prefWidth="120"/>
+                            <TableColumn fx:id="colProgNiveau" text="Niveau" prefWidth="80"/>
+                            <TableColumn fx:id="colProgDuree" text="Durée" prefWidth="70"/>
+                            <TableColumn fx:id="colProgPrix" text="Prix" prefWidth="80"/>
+                            <TableColumn fx:id="colProgDescription" text="Description" prefWidth="150"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </Tab>
+
+            <!-- Onglet 3: Trajets (NOUVEAU) -->
+            <Tab text="🚌 Trajets">
+                <VBox spacing="15" style="-fx-padding: 15;">
+                    <!-- Message si aucune école sélectionnée -->
+                    <VBox fx:id="trajetMessageContainer" visible="true" managed="true" styleClass="info-message" alignment="CENTER">
+                        <Label text="Sélectionnez d'abord une école dans l'onglet Écoles"/>
+                    </VBox>
+
+                    <!-- Formulaire des trajets (caché par défaut) -->
+                    <VBox fx:id="trajetFormContainer" visible="false" managed="false" spacing="15">
+                        <Label text="➕ Ajouter / Modifier un trajet" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+
+                        <GridPane hgap="10" vgap="10">
+                            <Label text="Nom du trajet:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="field-label"/>
+                            <TextField fx:id="tfNomTrajet" promptText="Ex: Ligne Nord, Bus A..." GridPane.rowIndex="0" GridPane.columnIndex="1" styleClass="custom-field"/>
+
+                            <Label text="Point départ:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="field-label"/>
+                            <TextField fx:id="tfPointDepart" promptText="Ex: Ariana, Tunis Centre..." GridPane.rowIndex="1" GridPane.columnIndex="1" styleClass="custom-field"/>
+
+                            <Label text="Point arrivée:" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="field-label"/>
+                            <TextField fx:id="tfPointArrivee" promptText="Ex: École" GridPane.rowIndex="2" GridPane.columnIndex="1" styleClass="custom-field"/>
+
+                            <Label text="Heure départ:" GridPane.rowIndex="3" GridPane.columnIndex="0" styleClass="field-label"/>
+                            <TextField fx:id="tfHeureDepart" promptText="Ex: 07:30" GridPane.rowIndex="3" GridPane.columnIndex="1" styleClass="custom-field"/>
+
+                            <Label text="Heure arrivée:" GridPane.rowIndex="4" GridPane.columnIndex="0" styleClass="field-label"/>
+                            <TextField fx:id="tfHeureArrivee" promptText="Ex: 08:15" GridPane.rowIndex="4" GridPane.columnIndex="1" styleClass="custom-field"/>
+
+                            <Label text="Jours:" GridPane.rowIndex="5" GridPane.columnIndex="0" styleClass="field-label"/>
+                            <TextField fx:id="tfJours" promptText="Ex: Lun-Mar-Mer-Jeu-Ven" GridPane.rowIndex="5" GridPane.columnIndex="1" styleClass="custom-field"/>
+
+                            <Label text="Prix mensuel:" GridPane.rowIndex="6" GridPane.columnIndex="0" styleClass="field-label"/>
+                            <TextField fx:id="tfPrixTrajet" promptText="Ex: 120" GridPane.rowIndex="6" GridPane.columnIndex="1" styleClass="custom-field"/>
+
+                            <Label text="Places:" GridPane.rowIndex="7" GridPane.columnIndex="0" styleClass="field-label"/>
+                            <TextField fx:id="tfPlaces" promptText="Ex: 30" GridPane.rowIndex="7" GridPane.columnIndex="1" styleClass="custom-field" text="30"/>
+
+                            <Label text="Description:" GridPane.rowIndex="8" GridPane.columnIndex="0" styleClass="field-label" style="-fx-alignment: TOP_RIGHT;"/>
+                            <TextArea fx:id="tfDescriptionTrajet" promptText="Description du trajet..." prefHeight="60" GridPane.rowIndex="8" GridPane.columnIndex="1" styleClass="custom-area"/>
+                        </GridPane>
+
+                        <HBox styleClass="boutons-container">
+                            <Button text="Ajouter" styleClass="button-action button-ajouter" onAction="#ajouterTrajet"/>
+                            <Button text="Modifier" styleClass="button-action button-modifier" onAction="#modifierTrajet"/>
+                            <Button text="Supprimer" styleClass="button-action button-supprimer" onAction="#supprimerTrajet"/>
+                            <Button text="Vider" styleClass="button-action button-vider" onAction="#clearTrajetFields"/>
+                        </HBox>
+                    </VBox>
+
+                    <!-- Liste des trajets -->
+                    <Label fx:id="trajetListLabel" text="Trajets disponibles" visible="false" managed="false" styleClass="table-title"/>
+                    <TableView fx:id="tableTrajets" prefHeight="250" visible="false" managed="false" styleClass="custom-table">
+                        <columns>
+                            <TableColumn fx:id="colTrajetNom" text="Nom" prefWidth="120"/>
+                            <TableColumn fx:id="colTrajetDepart" text="Départ" prefWidth="100"/>
+                            <TableColumn fx:id="colTrajetArrivee" text="Arrivée" prefWidth="100"/>
+                            <TableColumn fx:id="colTrajetHeureDepart" text="H départ" prefWidth="80"/>
+                            <TableColumn fx:id="colTrajetHeureArrivee" text="H arrivée" prefWidth="80"/>
+                            <TableColumn fx:id="colTrajetJours" text="Jours" prefWidth="120"/>
+                            <TableColumn fx:id="colTrajetPrix" text="Prix" prefWidth="70"/>
+                            <TableColumn fx:id="colTrajetPlaces" text="Places" prefWidth="60"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </Tab>
+        </TabPane>
     </VBox>
 </VBox>
