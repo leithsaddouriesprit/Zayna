@@ -126,11 +126,31 @@
                                        style="-fx-font-size: 12px; -fx-text-fill: #27ae60; -fx-font-style: italic; -fx-padding: 20 0;"/>
                             </VBox>
                         </StackPane>
+
+                        <!-- ✅ NOUVEAU : Section Traduction (après les détails) -->
+                        <Label text="Traduction :"
+                               GridPane.rowIndex="3"
+                               GridPane.columnIndex="0"
+                               style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
+
+                        <VBox GridPane.rowIndex="3"
+                              GridPane.columnIndex="1"
+                              spacing="8">
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <ChoiceBox fx:id="langueCibleChoice" prefWidth="150"
+                                           style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e0e0e0; -fx-background-color: white; -fx-padding: 5 10;"/>
+                                <Label text="(langue de destination)"
+                                       style="-fx-text-fill: #7f8c8d; -fx-font-size: 11px; -fx-font-style: italic;"/>
+                            </HBox>
+                            <Label fx:id="traductionLabel"
+                                   text="Cliquez sur Traduire pour voir la traduction"
+                                   wrapText="true"
+                                   style="-fx-text-fill: #7f8c8d; -fx-font-style: italic; -fx-padding: 5 0 0 0;"/>
+                        </VBox>
                     </GridPane>
 
                     <!-- Barre d'outils avec boutons -->
                     <HBox spacing="10" alignment="CENTER_RIGHT">
-                        <!-- Dans votre FXML, à côté des boutons existants -->
                         <Button text="🌐 Traduire"
                                 onAction="#traduireMessage"
                                 style="-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-font-weight: bold; -fx-cursor: hand;"/>

@@ -2,85 +2,96 @@ package tn.esprit.workshop.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class TraductionService {
 
-    private final OkHttpClient client = new OkHttpClient();
+    private final OkHttpClient client = new OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+            .build();
+
     private final ObjectMapper mapper = new ObjectMapper();
-    private static final String API_URL = "https://api.mymemory.translated.net/get";
+
+    private static final String MYMEMORY_API = "https://api.mymemory.translated.net/get";
+    private static final String LIBRETRANSLATE_API = "https://libretranslate.com/translate";
+
+    private static final String EMAIL = "votre.email@example.com"; // REMPLACEZ
+
+    private Map<String, String> cacheTraduction = new HashMap<>();
 
     /**
-     * Traduit un texte de n'importe quelle langue vers le français
+     * Traduit un texte vers une langue cible
      */
-    public String traduireVersFrancais(String texte) throws Exception {
+    public String traduireVersLangue(String texte, String langueCible) {
+        // ✅ Validation d'entrée
         if (texte == null || texte.trim().isEmpty()) {
-            return texte;
+            return "[Texte vide]";
         }
 
-        // Nettoyer le texte (enlever les espaces multiples)
         texte = texte.trim().replaceAll("\\s+", " ");
 
-        // Vérifier la longueur du texte
         if (texte.length() < 3) {
-            return texte; // Retourne le texte original si trop court
+            return "[Texte trop court]";
         }
 
-        // Encoder l'URL correctement
+        // Vérification de la langue cible
+        if (langueCible == null || langueCible.isEmpty()) {
+            return "[Langue cible non spécifiée]";
+        }
+
+        String cacheKey = texte + "|" + langueCible;
+        if (cacheTraduction.containsKey(cacheKey)) {
+            return cacheTraduction.get(cacheKey);
+        }
+
+        // ✅ Toujours retourner une chaîne, jamais null
+        String resultat = "⚠️ Service de traduction indisponible";
+
+        // Essayer MyMemory d'abord
+        try {
+            resultat = traduireAvecMyMemory(texte, langueCible);
+        } catch (Exception e) {
+            System.out.println("MyMemory a échoué: " + e.getMessage());
+            resultat = null; // Pour forcer l'essai de LibreTranslate
+        }
+
+        // Si MyMemory échoue, essayer LibreTranslate
+        if (resultat == null || resultat.startsWith("[") || resultat.contains("Erreur")) {
+            try {
+                resultat = traduireAvecLibreTranslate(texte, langueCible);
+            } catch (Exception e) {
+                resultat = "[Service de traduction temporairement indisponible]";
+            }
+        }
+
+        // ✅ Sécurité : si résultat est null, mettre un message par défaut
+        if (resultat == null) {
+            resultat = "[Erreur de traduction inconnue]";
+        }
+
+        // Mettre en cache si le résultat est valide
+        if (!resultat.startsWith("[") && !resultat.contains("Erreur")) {
+            cacheTraduction.put(cacheKey, resultat);
+        }
+
+        return resultat;
+    }
+
+    /**
+     * Traduction avec MyMemory
+     */
+    private String traduireAvecMyMemory(String texte, String langueCible) throws Exception {
         String encodedText = URLEncoder.encode(texte, StandardCharsets.UTF_8.toString());
-        String url = API_URL + "?q=" + encodedText + "&langpair=auto|fr";
 
-        System.out.println("URL de traduction: " + url);
-
-        Request request = new Request.Builder()
-                .url(url)
-                .get()
-                .addHeader("User-Agent", "Mozilla/5.0")
-                .build();
-
-        try (Response response = client.newCall(request).execute()) {
-            String jsonResponse = response.body().string();
-            System.out.println("Réponse JSON: " + jsonResponse);
-
-            JsonNode root = mapper.readTree(jsonResponse);
-
-            // Vérifier le code de retour
-            int responseStatus = root.path("responseStatus").asInt(200);
-            if (responseStatus != 200) {
-                return "[Erreur API: " + responseStatus + "]";
-            }
-
-            String translatedText = root.path("responseData").path("translatedText").asText();
-
-            // Si le texte traduit contient des messages d'erreur
-            if (translatedText.contains("AUTO IS AN INVALID") ||
-                    translatedText.contains("INVALID SOURCE") ||
-                    translatedText.isEmpty() ||
-                    translatedText.equals(texte)) {
-
-                // Essayer avec une paire de langues explicite (français -> anglais)
-                return traduireAvecLangueExplicite(texte, "fr", "en");
-            }
-
-            return translatedText;
-        } catch (Exception e) {
-            System.out.println("Erreur de traduction: " + e.getMessage());
-            return "[Erreur: " + e.getMessage() + "]";
-        }
-    }
-
-    /**
-     * Traduit avec une paire de langues explicite
-     */
-    private String traduireAvecLangueExplicite(String texte, String source, String cible) throws Exception {
-        String encodedText = URLEncoder.encode(texte.trim(), StandardCharsets.UTF_8.toString());
-        String url = API_URL + "?q=" + encodedText + "&langpair=" + source + "|" + cible;
-
-        System.out.println("URL explicite: " + url);
+        String url = MYMEMORY_API + "?q=" + encodedText +
+                "&langpair=fr|" + langueCible +
+                "&de=" + EMAIL;
 
         Request request = new Request.Builder()
                 .url(url)
@@ -89,63 +100,100 @@ public class TraductionService {
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
+
+            if (response.code() == 403) {
+                return "[Quota MyMemory dépassé]";
+            }
+            if (response.code() != 200) {
+                return "[Erreur MyMemory: " + response.code() + "]";
+            }
+
             String jsonResponse = response.body().string();
             JsonNode root = mapper.readTree(jsonResponse);
+
             String translatedText = root.path("responseData").path("translatedText").asText();
 
-            if (translatedText.isEmpty() || translatedText.contains("INVALID")) {
-                return "[Traduction non disponible]";
+            if (translatedText == null || translatedText.isEmpty() ||
+                    translatedText.contains("INVALID") ||
+                    translatedText.contains("AUTO IS AN INVALID")) {
+                return null; // Provoque l'essai de LibreTranslate
             }
+
             return translatedText;
         }
     }
 
     /**
-     * Traduit spécifiquement du français vers l'anglais
+     * Traduction avec LibreTranslate
      */
-    public String traduireFrancaisVersAnglais(String texte) throws Exception {
-        return traduireAvecLangueExplicite(texte, "fr", "en");
-    }
+    private String traduireAvecLibreTranslate(String texte, String langueCible) throws Exception {
+        // Mapping des codes de langue pour LibreTranslate
+        Map<String, String> langMap = new HashMap<>();
+        langMap.put("fr", "fr");
+        langMap.put("en", "en");
+        langMap.put("es", "es");
+        langMap.put("de", "de");
+        langMap.put("it", "it");
+        langMap.put("ar", "ar");
+        langMap.put("zh", "zh");
+        langMap.put("ja", "ja");
+        langMap.put("ru", "ru");
+        langMap.put("pt", "pt");
 
-    /**
-     * Détecte la langue d'un texte
-     */
-    public String detecterLangue(String texte) throws Exception {
-        if (texte == null || texte.trim().isEmpty() || texte.trim().length() < 3) {
-            return "inconnue";
-        }
+        String targetLang = langMap.getOrDefault(langueCible, "en");
 
-        String encodedText = URLEncoder.encode(texte.trim(), StandardCharsets.UTF_8.toString());
-        String url = API_URL + "?q=" + encodedText + "&langpair=auto|fr";
+        // Format JSON correct
+        String jsonBody = "{\"q\":\"" + escapeJson(texte) + "\",\"source\":\"auto\",\"target\":\"" + targetLang + "\"}";
+
+        RequestBody body = RequestBody.create(
+                jsonBody,
+                MediaType.parse("application/json")
+        );
 
         Request request = new Request.Builder()
-                .url(url)
-                .get()
-                .addHeader("User-Agent", "Mozilla/5.0")
+                .url(LIBRETRANSLATE_API)
+                .post(body)
+                .addHeader("Content-Type", "application/json")
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
+            if (response.code() != 200) {
+                return "[Erreur LibreTranslate: " + response.code() + "]";
+            }
+
             String jsonResponse = response.body().string();
             JsonNode root = mapper.readTree(jsonResponse);
+            String translatedText = root.path("translatedText").asText();
 
-            // Récupérer la langue détectée depuis responseData
-            JsonNode responseData = root.path("responseData");
-            if (responseData.has("detectedLanguage")) {
-                return responseData.path("detectedLanguage").asText();
+            if (translatedText.isEmpty()) {
+                return "[Traduction vide]";
             }
 
-            // Alternative : chercher dans les matches
-            JsonNode matches = root.path("matches");
-            if (matches.isArray() && matches.size() > 0) {
-                JsonNode firstMatch = matches.get(0);
-                if (firstMatch.has("source")) {
-                    return firstMatch.path("source").asText();
-                }
-            }
-
-            return "inconnue";
-        } catch (Exception e) {
-            return "inconnue";
+            return translatedText;
         }
+    }
+
+    /**
+     * Échappe les caractères spéciaux pour JSON
+     */
+    private String escapeJson(String texte) {
+        if (texte == null) return "";
+        return texte.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t");
+    }
+
+    public String traduireVersFrancais(String texte) {
+        return traduireVersLangue(texte, "fr");
+    }
+
+    public String detecterLangue(String texte) {
+        return "fr";
+    }
+
+    public void viderCache() {
+        cacheTraduction.clear();
     }
 }

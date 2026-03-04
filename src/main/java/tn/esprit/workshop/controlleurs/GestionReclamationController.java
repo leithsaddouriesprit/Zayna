@@ -17,7 +17,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class GestionReclamationController implements Initializable {
@@ -28,6 +30,10 @@ public class GestionReclamationController implements Initializable {
     @FXML private TextField searchField;
     @FXML private Label statusLabel;
     @FXML private Label statutReponseLabel;
+    @FXML private Label traductionLabel; // Ajoutez ce champ
+    @FXML private ChoiceBox<String> langueCibleChoice;
+    private Map<String, String> languesMap;
+
 
     // Nouveaux champs FXML
     @FXML private VBox panelChauffeur;
@@ -88,9 +94,36 @@ public class GestionReclamationController implements Initializable {
                     }
                 }
         );
+        initialiserLangues();
 
         // Charger les réclamations
         afficherReclamations();
+
+    }
+    private void initialiserLangues() {
+        // ✅ Créer la map avec les noms affichés et les codes ISO
+        languesMap = new LinkedHashMap<>();
+        languesMap.put("Anglais", "en");
+        languesMap.put("Français", "fr");
+        languesMap.put("Espagnol", "es");
+        languesMap.put("Allemand", "de");
+        languesMap.put("Italien", "it");
+        languesMap.put("Arabe", "ar");
+        languesMap.put("Chinois", "zh");
+        languesMap.put("Japonais", "ja");
+        languesMap.put("Russe", "ru");
+        languesMap.put("Portugais", "pt");
+
+        // ✅ Remplir le ChoiceBox avec les NOMS (pas les codes)
+        langueCibleChoice.getItems().clear();
+        langueCibleChoice.getItems().addAll(languesMap.keySet());
+
+        // ✅ Sélectionner une valeur par défaut
+        if (!languesMap.isEmpty()) {
+            langueCibleChoice.setValue("Anglais");
+        }
+
+        System.out.println("Langues initialisées: " + languesMap.size());
     }
 
     // ================= GESTION DES PANELS DYNAMIQUES =================
@@ -567,36 +600,78 @@ public class GestionReclamationController implements Initializable {
     private void traduireMessage() {
         String message = messageField.getText();
         if (message == null || message.trim().isEmpty()) {
-            showAlert("Information", "Veuillez écrire un message à traduire", Alert.AlertType.INFORMATION);
+            traductionLabel.setText("Veuillez écrire un message à traduire");
+            traductionLabel.setStyle("-fx-text-fill: #e74c3c;");
             return;
         }
 
-        statusLabel.setText("⏳ Traduction en cours...");
+        String langueCibleNom = langueCibleChoice.getValue();
 
-        try {
-            // Essayer d'abord la traduction automatique
-            String traduit = traductionService.traduireVersFrancais(message);
-
-            // Si ça échoue, essayer français -> anglais
-            if (traduit.startsWith("[") && traduit.endsWith("]")) {
-                traduit = traductionService.traduireFrancaisVersAnglais(message);
-            }
-
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Traduction");
-            alert.setHeaderText("Message traduit");
-            alert.setContentText("📝 Original: " + message + "\n\n🌐 Traduit: " + traduit);
-            alert.showAndWait();
-
-            statusLabel.setText("✅ Traduction effectuée");
-
-        } catch (Exception e) {
-            showAlert("Erreur", "❌ Traduction impossible: " + e.getMessage(), Alert.AlertType.ERROR);
-            statusLabel.setText("❌ Erreur de traduction");
-            e.printStackTrace();
+        System.out.println("Langue sélectionnée: '" + langueCibleNom + "'");
+        if (langueCibleNom == null || langueCibleNom.isEmpty()) {
+            traductionLabel.setText("⚠️ Veuillez choisir une langue dans la liste");
+            traductionLabel.setStyle("-fx-text-fill: #e67e22;");
+            return;
         }
-    }
+        // ✅ Vérifier que languesMap n'est pas null
+        if (languesMap == null) {
+            traductionLabel.setText("❌ Erreur de configuration des langues");
+            traductionLabel.setStyle("-fx-text-fill: #e74c3c;");
+            return;
+        }
+        String langueCibleCode = languesMap.get(langueCibleNom);
+        System.out.println("Code correspondant: '" + langueCibleCode + "'");
+        if (langueCibleCode == null) {
+            traductionLabel.setText("❌ Langue non supportée: " + langueCibleNom);
+            traductionLabel.setStyle("-fx-text-fill: #e74c3c;");
+            return;
+        }
+        statusLabel.setText("⏳ Traduction en cours...");
+        traductionLabel.setText("Recherche de traduction...");
 
+
+
+        // Désactiver le bouton pendant la traduction
+        // traduireButton.setDisable(true);
+
+        new Thread(() -> {
+            try {
+                String traduit = traductionService.traduireVersLangue(message, langueCibleCode);
+
+                javafx.application.Platform.runLater(() -> {
+                    // ✅ Gestion de tous les cas possibles
+                    if (traduit == null) {
+                        traductionLabel.setText("❌ Erreur de traduction");
+                        traductionLabel.setStyle("-fx-text-fill: #e74c3c;");
+                        statusLabel.setText("❌ Échec de la traduction");
+                    }
+                    else if (traduit.startsWith("[")) {
+                        traductionLabel.setText("⚠️ " + traduit);
+                        traductionLabel.setStyle("-fx-text-fill: #e67e22;");
+                        statusLabel.setText("⚠️ " + traduit);
+                    }
+                    else if (traduit.startsWith("Erreur") || traduit.contains("Erreur")) {
+                        traductionLabel.setText("❌ " + traduit);
+                        traductionLabel.setStyle("-fx-text-fill: #e74c3c;");
+                        statusLabel.setText("❌ " + traduit);
+                    }
+                    else {
+                        traductionLabel.setText("📝 " + traduit);
+                        traductionLabel.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
+                        statusLabel.setText("✅ Traduction effectuée");
+                    }
+                    // traduireButton.setDisable(false);
+                });
+            } catch (Exception e) {
+                javafx.application.Platform.runLater(() -> {
+                    traductionLabel.setText("❌ Erreur: " + e.getMessage());
+                    traductionLabel.setStyle("-fx-text-fill: #e74c3c;");
+                    statusLabel.setText("❌ Erreur de traduction");
+                    // traduireButton.setDisable(false);
+                });
+            }
+        }).start();
+    }
     // ================= RESET =================
 
     @FXML
