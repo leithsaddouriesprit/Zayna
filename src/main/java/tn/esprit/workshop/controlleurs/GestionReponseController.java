@@ -16,8 +16,12 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
+import tn.esprit.workshop.services.TraductionService;
+
 
 public class GestionReponseController implements Initializable {
 
@@ -47,12 +51,19 @@ public class GestionReponseController implements Initializable {
     @FXML private TextArea reponseField;
     @FXML private TextField searchField;
     @FXML private Label statusLabel;
+    // ✅ NOUVEAUX CHAMPS POUR LA TRADUCTION
+    @FXML private ChoiceBox<String> langueCibleChoice;
+    @FXML private Label traductionMessageLabel;
+    @FXML private Button traduireMessageButton;
 
+    // Map pour stocker les codes ISO des langues
+    private Map<String, String> languesMap;
     private final ReclamationService reclamationService = new ReclamationService();
     private final ReponseService reponseService = new ReponseService();
 
     private Reclamation reclamationSelectionnee;
     private Reponse reponseExistante;
+    private final TraductionService traductionService = new TraductionService();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -60,13 +71,32 @@ public class GestionReponseController implements Initializable {
         configurerStyleStatut();
         configurerListenerSelection();
         configurerCompteurCaracteres();
-
+        initialiserLangues();
         afficherToutesReclamations();
         statusLabel.setText("Affichage de toutes les réclamations");
     }
 
     // ================= CONFIGURATION =================
+    private void initialiserLangues() {
+        // Liste des langues disponibles (nom affiché -> code ISO)
+        languesMap = new LinkedHashMap<>();
+        languesMap.put("Anglais", "en");
+        languesMap.put("Français", "fr");
+        languesMap.put("Espagnol", "es");
+        languesMap.put("Allemand", "de");
+        languesMap.put("Italien", "it");
+        languesMap.put("Arabe", "ar");
+        languesMap.put("Chinois", "zh");
+        languesMap.put("Japonais", "ja");
+        languesMap.put("Russe", "ru");
+        languesMap.put("Portugais", "pt");
 
+        // Remplir le ChoiceBox avec les noms des langues
+        langueCibleChoice.getItems().addAll(languesMap.keySet());
+        langueCibleChoice.setValue("Anglais"); // Valeur par défaut
+
+        System.out.println("Langues initialisées: " + languesMap.size());
+    }
     private void configurerColonnes() {
         // Masquer l'ID
         colId.setCellFactory(column -> new TableCell<Reclamation, Integer>() {
@@ -132,6 +162,60 @@ public class GestionReponseController implements Initializable {
                 }
             }
         });
+    }
+    @FXML
+    private void traduireMessage() {
+        if (reclamationSelectionnee == null) {
+            showAlert("Information", "Veuillez sélectionner une réclamation", Alert.AlertType.INFORMATION);
+            return;
+        }
+
+        String message = reclamationSelectionnee.getDescription();
+        if (message == null || message.trim().isEmpty()) {
+            traductionMessageLabel.setText("Message vide");
+            traductionMessageLabel.setStyle("-fx-text-fill: #e74c3c;");
+            return;
+        }
+
+        String langueCibleNom = langueCibleChoice.getValue();
+        if (langueCibleNom == null) {
+            showAlert("Information", "Veuillez choisir une langue", Alert.AlertType.INFORMATION);
+            return;
+        }
+
+        String langueCibleCode = languesMap.get(langueCibleNom);
+        if (langueCibleCode == null) {
+            traductionMessageLabel.setText("Langue non supportée");
+            return;
+        }
+
+        statusLabel.setText("⏳ Traduction en cours...");
+        traductionMessageLabel.setText("Traduction en cours...");
+
+        // Traduction dans un thread séparé
+        new Thread(() -> {
+            try {
+                String traduit = traductionService.traduireVersLangue(message, langueCibleCode);
+
+                javafx.application.Platform.runLater(() -> {
+                    if (traduit == null || traduit.startsWith("[")) {
+                        traductionMessageLabel.setText("⚠️ " + (traduit != null ? traduit : "Erreur"));
+                        traductionMessageLabel.setStyle("-fx-text-fill: #e67e22;");
+                        statusLabel.setText("⚠️ Traduction non disponible");
+                    } else {
+                        traductionMessageLabel.setText("📝 " + traduit);
+                        traductionMessageLabel.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
+                        statusLabel.setText("✅ Message traduit");
+                    }
+                });
+            } catch (Exception e) {
+                javafx.application.Platform.runLater(() -> {
+                    traductionMessageLabel.setText("❌ Erreur: " + e.getMessage());
+                    traductionMessageLabel.setStyle("-fx-text-fill: #e74c3c;");
+                    statusLabel.setText("❌ Erreur de traduction");
+                });
+            }
+        }).start();
     }
 
     private void configurerStyleStatut() {
@@ -220,6 +304,10 @@ public class GestionReponseController implements Initializable {
         if (detailTypeLabel != null) detailTypeLabel.setText(r.getType());
         if (detailMessageArea != null) detailMessageArea.setText(r.getDescription());
 
+        // ✅ Réinitialiser le label de traduction
+        if (traductionMessageLabel != null) {
+            traductionMessageLabel.setText("");
+        }
         // ✅ AJOUT : Afficher les détails spécifiques
         if (detailInfosLabel != null) {
             String infos = getDetailsComplets(r);
