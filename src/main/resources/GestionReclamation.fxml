@@ -242,6 +242,17 @@
                                text="En attente de réponse"
                                style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;"/>
                     </HBox>
+                    <!-- Bouton pour traduire la réponse -->
+                    <Button fx:id="traduireReponseButton"
+                            text="🌐 Traduire la réponse"
+                            onAction="#traduireReponse"
+                            disable="true"
+                            style="-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 5 15; -fx-font-size: 11px; -fx-cursor: hand;"/>
+
+                    <!-- Label pour afficher la traduction de la réponse -->
+                    <Label fx:id="traductionReponseLabel"
+                           text=""
+                           style="-fx-text-fill: #7f8c8d; -fx-font-style: italic; -fx-font-size: 11px;"/>
                 </VBox>
             </VBox>
         </ScrollPane>
