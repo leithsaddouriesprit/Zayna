@@ -33,6 +33,7 @@ public class GestionReclamationController implements Initializable {
     @FXML private Label traductionLabel; // Ajoutez ce champ
     @FXML private ChoiceBox<String> langueCibleChoice;
     private Map<String, String> languesMap;
+    private Reponse reponseCourante;
 
 
     // Nouveaux champs FXML
@@ -56,7 +57,9 @@ public class GestionReclamationController implements Initializable {
     @FXML private TableColumn<Reclamation, String> colDetails;
     @FXML private TableColumn<Reclamation, String> colStatut;
     @FXML private TableColumn<Reclamation, Timestamp> colDate;
-
+    // ✅ AJOUTEZ CES DEUX LIGNES
+    @FXML private Button traduireReponseButton;
+    @FXML private Label traductionReponseLabel;
     private final ReclamationService service = new ReclamationService();
     private final ReponseService reponseService = new ReponseService();
     private final int currentUserId = 1;
@@ -306,14 +309,25 @@ public class GestionReclamationController implements Initializable {
     private void chargerReponse(int reclamationId) {
         try {
             Reponse reponse = reponseService.getReponseByReclamationId(reclamationId);
-
+            this.reponseCourante = reponse; // Stocker la réponse
             if (reponse != null) {
                 reponseArea.setText(reponse.getMessage());
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
                 statutReponseLabel.setText("Répondu le " + reponse.getDate().format(formatter));
+                // ✅ Activer le bouton de traduction
+                if (traduireReponseButton != null) {
+                    traduireReponseButton.setDisable(false);
+                }
             } else {
                 reponseArea.setText("Aucune réponse pour le moment...");
                 statutReponseLabel.setText("En attente de réponse");
+                // ✅ Désactiver le bouton de traduction
+                if (traduireReponseButton != null) {
+                    traduireReponseButton.setDisable(true);
+                }
+                if (traductionReponseLabel != null) {
+                    traductionReponseLabel.setText("");
+                }
             }
         } catch (SQLException e) {
             reponseArea.setText("Erreur chargement réponse");
@@ -595,7 +609,32 @@ public class GestionReclamationController implements Initializable {
     }
 
     // ================= TRADUCTION =================
+    @FXML
+    private void traduireReponse() {
+        String reponse = reponseArea.getText();
+        if (reponse == null || reponse.isEmpty() || reponse.equals("Aucune réponse pour le moment...")) {
+            showAlert("Information", "Aucune réponse à traduire", Alert.AlertType.INFORMATION);
+            return;
+        }
 
+        String langueCibleNom = langueCibleChoice.getValue();
+        if (langueCibleNom == null) return;
+
+        String langueCibleCode = languesMap.get(langueCibleNom);
+
+        // Afficher la traduction dans un label à côté
+        new Thread(() -> {
+            try {
+                String traduit = traductionService.traduireVersLangue(reponse, langueCibleCode);
+                javafx.application.Platform.runLater(() -> {
+                    // Afficher dans un petit label
+                    traductionReponseLabel.setText("📝 " + traduit);
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
     @FXML
     private void traduireMessage() {
         String message = messageField.getText();
