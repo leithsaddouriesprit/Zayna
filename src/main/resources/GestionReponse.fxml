@@ -126,7 +126,19 @@
                         </GridPane>
 
                         <Separator/>
-
+                        <!-- Section Traduction du message -->
+                        <HBox spacing="10" alignment="CENTER_LEFT" GridPane.rowIndex="5" GridPane.columnIndex="0" GridPane.columnSpan="2">
+                            <ChoiceBox fx:id="langueCibleChoice" prefWidth="150"
+                                       style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e0e0e0; -fx-background-color: white; -fx-padding: 5 10;"/>
+                            <Button fx:id="traduireMessageButton"
+                                    text="🌐 Traduire le message"
+                                    onAction="#traduireMessage"
+                                    style="-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 5 15; -fx-font-size: 11px; -fx-cursor: hand;"/>
+                        </HBox>
+                        <Label fx:id="traductionMessageLabel"
+                               wrapText="true"
+                               style="-fx-text-fill: #7f8c8d; -fx-font-style: italic; -fx-padding: 5 0 0 10;"
+                               GridPane.rowIndex="6" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
                         <!-- Réponse existante -->
                         <VBox spacing="10" fx:id="reponseExistanteBox" managed="false" visible="false"
                               style="-fx-background-color: #e8f5e9; -fx-background-radius: 10; -fx-padding: 15;">
