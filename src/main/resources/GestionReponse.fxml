@@ -10,193 +10,202 @@
             style="-fx-background-color: #f5f7fa;">
 
     <children>
-        <VBox spacing="14.0"
-              AnchorPane.topAnchor="20.0"
-              AnchorPane.bottomAnchor="20.0"
-              AnchorPane.leftAnchor="20.0"
-              AnchorPane.rightAnchor="20.0">
+        <!-- ✅ AJOUT D'UN SCROLLPANE AUTOUR DE TOUT LE CONTENU -->
+        <ScrollPane fitToWidth="true"
+                    fitToHeight="true"
+                    style="-fx-background-color: transparent; -fx-border-color: transparent;"
+                    AnchorPane.topAnchor="0"
+                    AnchorPane.bottomAnchor="0"
+                    AnchorPane.leftAnchor="0"
+                    AnchorPane.rightAnchor="0">
 
-            <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
-            </padding>
+            <VBox spacing="14.0"
+                  style="-fx-padding: 20;">
 
-            <!-- En-tête avec titre -->
-            <HBox alignment="CENTER_LEFT" spacing="10">
-                <Label text="📋" style="-fx-font-size: 28px;"/>
-                <VBox>
-                    <Label text="Gestion des Réponses"
-                           style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
-                    <Label text="Administration des réclamations"
-                           style="-fx-font-size: 12px; -fx-text-fill: #7f8c8d;"/>
-                </VBox>
-            </HBox>
-
-            <Separator/>
-
-            <!-- Barre de recherche -->
-            <HBox spacing="10" alignment="CENTER_LEFT">
-                <TextField fx:id="searchField"
-                           promptText="Rechercher par type ou message..."
-                           HBox.hgrow="ALWAYS"
-                           style="-fx-background-radius: 20; -fx-border-radius: 20; -fx-padding: 8 15; -fx-border-color: #e0e0e0; -fx-background-color: white;"/>
-                <Button text="🔍 Rechercher"
-                        onAction="#rechercherReponse"
-                        style="-fx-background-color: #2980b9; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-font-weight: bold; -fx-cursor: hand;"/>
-                <Button text="⟲ Réinitialiser"
-                        onAction="#reinitialiserRecherche"
-                        style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;"/>
-            </HBox>
-
-            <!-- SplitPane -->
-            <SplitPane dividerPositions="0.6" VBox.vgrow="ALWAYS"
-                       style="-fx-background-color: transparent;">
-                <items>
-                    <!-- Panneau gauche : Liste des réclamations -->
-                    <VBox spacing="10"
-                          style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);">
-
-                        <Label text="📌 Liste des réclamations"
-                               style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #2c3e50;"/>
-
-                        <TableView fx:id="tableReclamation" VBox.vgrow="ALWAYS"
-                                   style="-fx-background-radius: 10;">
-                            <columns>
-                                <!-- Colonne ID (sera masquée dans le controller) -->
-                                <TableColumn fx:id="colId" text="N°" prefWidth="50"/>
-                                <TableColumn fx:id="colType" text="Type" prefWidth="80"/>
-                                <TableColumn fx:id="colDescription" text="Message" prefWidth="150"/>
-                                <TableColumn fx:id="colDetails" text="Détails" prefWidth="120"/>
-                                <TableColumn fx:id="colStatut" text="Statut" prefWidth="80"/>
-                                <TableColumn fx:id="colDate" text="Date" prefWidth="120"/>
-                            </columns>
-                            <columnResizePolicy>
-                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
-                            </columnResizePolicy>
-                        </TableView>
+                <!-- En-tête avec titre -->
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label text="📋" style="-fx-font-size: 28px;"/>
+                    <VBox>
+                        <Label text="Gestion des Réponses"
+                               style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                        <Label text="Administration des réclamations"
+                               style="-fx-font-size: 12px; -fx-text-fill: #7f8c8d;"/>
                     </VBox>
+                </HBox>
 
-                    <!-- Panneau droit : Détails et réponse -->
-                    <VBox spacing="15"
-                          style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);">
+                <Separator/>
 
-                        <!-- Détails de la réclamation -->
-                        <Label text="📝 Détails de la réclamation"
-                               style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #2c3e50;"/>
+                <!-- Barre de recherche -->
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <TextField fx:id="searchField"
+                               promptText="Rechercher par type ou message..."
+                               HBox.hgrow="ALWAYS"
+                               style="-fx-background-radius: 20; -fx-border-radius: 20; -fx-padding: 8 15; -fx-border-color: #e0e0e0; -fx-background-color: white;"/>
+                    <Button text="🔍 Rechercher"
+                            onAction="#rechercherReponse"
+                            style="-fx-background-color: #2980b9; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                    <Button text="⟲ Réinitialiser"
+                            onAction="#reinitialiserRecherche"
+                            style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;"/>
+                </HBox>
 
-                        <GridPane hgap="10" vgap="8"
-                                  style="-fx-background-color: #f8f9fa; -fx-background-radius: 10; -fx-padding: 15;">
-                            <columnConstraints>
-                                <ColumnConstraints minWidth="100" prefWidth="100"/>
-                                <ColumnConstraints hgrow="ALWAYS"/>
-                            </columnConstraints>
+                <!-- SplitPane -->
+                <SplitPane dividerPositions="0.6" VBox.vgrow="ALWAYS"
+                           style="-fx-background-color: transparent;">
+                    <items>
+                        <!-- Panneau gauche : Liste des réclamations -->
+                        <VBox spacing="10"
+                              style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);">
 
-                            <!-- Utilisateur -->
-                            <Label text="👤 Utilisateur:" GridPane.rowIndex="0" GridPane.columnIndex="0"
-                                   style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
-                            <Label fx:id="detailUserLabel" GridPane.rowIndex="0" GridPane.columnIndex="1"
-                                   style="-fx-text-fill: #2c3e50;"/>
+                            <Label text="📌 Liste des réclamations"
+                                   style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #2c3e50;"/>
 
-                            <!-- Type -->
-                            <Label text="📌 Type:" GridPane.rowIndex="1" GridPane.columnIndex="0"
-                                   style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
-                            <Label fx:id="detailTypeLabel" GridPane.rowIndex="1" GridPane.columnIndex="1"
-                                   style="-fx-text-fill: #2c3e50;"/>
-
-                            <!-- Message -->
-                            <Label text="💬 Message:" GridPane.rowIndex="2" GridPane.columnIndex="0"
-                                   style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
-                            <TextArea fx:id="detailMessageArea"
-                                      editable="false"
-                                      prefRowCount="3"
-                                      wrapText="true"
-                                      style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #e0e0e0; -fx-border-radius: 8;"
-                                      GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-
-                            <!-- Détails spécifiques -->
-                            <Label text="🔍 Détails:" GridPane.rowIndex="3" GridPane.columnIndex="0"
-                                   style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
-                            <Label fx:id="detailInfosLabel" GridPane.rowIndex="3" GridPane.columnIndex="1"
-                                   style="-fx-text-fill: #2c3e50; -fx-font-style: italic; -fx-wrap-text: true;"/>
-
-                            <!-- Date (décaler l'index de 1) -->
-                            <Label text="📅 Date:" GridPane.rowIndex="4" GridPane.columnIndex="0"
-                                   style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
-                            <Label fx:id="detailDateLabel" GridPane.rowIndex="4" GridPane.columnIndex="1"
-                                   style="-fx-text-fill: #2c3e50;"/>
-                        </GridPane>
-
-                        <Separator/>
-                        <!-- Section Traduction du message -->
-                        <HBox spacing="10" alignment="CENTER_LEFT" GridPane.rowIndex="5" GridPane.columnIndex="0" GridPane.columnSpan="2">
-                            <ChoiceBox fx:id="langueCibleChoice" prefWidth="150"
-                                       style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e0e0e0; -fx-background-color: white; -fx-padding: 5 10;"/>
-                            <Button fx:id="traduireMessageButton"
-                                    text="🌐 Traduire le message"
-                                    onAction="#traduireMessage"
-                                    style="-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 5 15; -fx-font-size: 11px; -fx-cursor: hand;"/>
-                        </HBox>
-                        <Label fx:id="traductionMessageLabel"
-                               wrapText="true"
-                               style="-fx-text-fill: #7f8c8d; -fx-font-style: italic; -fx-padding: 5 0 0 10;"
-                               GridPane.rowIndex="6" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
-                        <!-- Réponse existante -->
-                        <VBox spacing="10" fx:id="reponseExistanteBox" managed="false" visible="false"
-                              style="-fx-background-color: #e8f5e9; -fx-background-radius: 10; -fx-padding: 15;">
-                            <Label text="✅ Réponse actuelle"
-                                   style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #27ae60;"/>
-                            <TextArea fx:id="reponseExistanteArea"
-                                      editable="false"
-                                      prefRowCount="3"
-                                      wrapText="true"
-                                      style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #a5d6a7; -fx-border-radius: 8;"/>
-
-                            <!-- Auteur de la réponse -->
-                            <HBox spacing="5" alignment="CENTER_LEFT">
-                                <Label text="👤" style="-fx-font-size: 12px; -fx-text-fill: #2e7d32;"/>
-                                <Label fx:id="reponseAuteurLabel" text="Administrateur"
-                                       style="-fx-text-fill: #2e7d32; -fx-font-size: 11px; -fx-font-weight: bold;"/>
-                            </HBox>
-
-                            <Label fx:id="reponseDateLabel" style="-fx-text-fill: #2e7d32; -fx-font-size: 11px;"/>
+                            <TableView fx:id="tableReclamation" VBox.vgrow="ALWAYS"
+                                       prefHeight="300"
+                                       minHeight="200"
+                                       style="-fx-background-radius: 10;">
+                                <columns>
+                                    <!-- Colonne ID (sera masquée dans le controller) -->
+                                    <TableColumn fx:id="colId" text="N°" prefWidth="50"/>
+                                    <TableColumn fx:id="colType" text="Type" prefWidth="80"/>
+                                    <TableColumn fx:id="colDescription" text="Message" prefWidth="150"/>
+                                    <TableColumn fx:id="colDetails" text="Détails" prefWidth="120"/>
+                                    <TableColumn fx:id="colStatut" text="Statut" prefWidth="80"/>
+                                    <TableColumn fx:id="colDate" text="Date" prefWidth="120"/>
+                                </columns>
+                                <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                </columnResizePolicy>
+                            </TableView>
                         </VBox>
 
-                        <!-- Formulaire de réponse -->
-                        <VBox spacing="10">
-                            <Label text="✏️ Répondre"
-                                   style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2c3e50;"/>
+                        <!-- Panneau droit : Détails et réponse -->
+                        <VBox spacing="15"
+                              style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);">
 
-                            <TextArea fx:id="reponseField"
-                                      prefRowCount="4"
-                                      wrapText="true"
-                                      promptText="Écrivez votre réponse ici..."
-                                      style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e0e0e0; -fx-padding: 10;"/>
+                            <!-- Détails de la réclamation -->
+                            <Label text="📝 Détails de la réclamation"
+                                   style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #2c3e50;"/>
 
-                            <!-- Compteur de caractères -->
-                            <Label fx:id="compteurCaracteres"
-                                   style="-fx-font-size: 11px; -fx-text-fill: #7f8c8d;"
-                                   text="0/500 caractères"/>
+                            <GridPane hgap="10" vgap="8"
+                                      style="-fx-background-color: #f8f9fa; -fx-background-radius: 10; -fx-padding: 15;">
+                                <columnConstraints>
+                                    <ColumnConstraints minWidth="100" prefWidth="100"/>
+                                    <ColumnConstraints hgrow="ALWAYS"/>
+                                </columnConstraints>
 
-                            <HBox spacing="10" alignment="CENTER_RIGHT">
-                                <Button text="📤 Envoyer"
-                                        onAction="#repondreReclamation"
-                                        style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-font-weight: bold; -fx-cursor: hand;"/>
-                                <Button text="✏️ Modifier"
-                                        onAction="#modifierReponse"
-                                        style="-fx-background-color: #2980b9; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-font-weight: bold; -fx-cursor: hand;"/>
-                                <Button text="🗑️ Supprimer"
-                                        onAction="#supprimerReponse"
-                                        style="-fx-background-color: #c0392b; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                                <!-- Utilisateur -->
+                                <Label text="👤 Utilisateur:" GridPane.rowIndex="0" GridPane.columnIndex="0"
+                                       style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
+                                <Label fx:id="detailUserLabel" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                                       style="-fx-text-fill: #2c3e50;"/>
+
+                                <!-- Type -->
+                                <Label text="📌 Type:" GridPane.rowIndex="1" GridPane.columnIndex="0"
+                                       style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
+                                <Label fx:id="detailTypeLabel" GridPane.rowIndex="1" GridPane.columnIndex="1"
+                                       style="-fx-text-fill: #2c3e50;"/>
+
+                                <!-- Message -->
+                                <Label text="💬 Message:" GridPane.rowIndex="2" GridPane.columnIndex="0"
+                                       style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
+                                <TextArea fx:id="detailMessageArea"
+                                          editable="false"
+                                          prefRowCount="3"
+                                          wrapText="true"
+                                          style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #e0e0e0; -fx-border-radius: 8;"
+                                          GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                                <!-- Détails spécifiques -->
+                                <Label text="🔍 Détails:" GridPane.rowIndex="3" GridPane.columnIndex="0"
+                                       style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
+                                <Label fx:id="detailInfosLabel" GridPane.rowIndex="3" GridPane.columnIndex="1"
+                                       style="-fx-text-fill: #2c3e50; -fx-font-style: italic; -fx-wrap-text: true;"/>
+
+                                <!-- Date -->
+                                <Label text="📅 Date:" GridPane.rowIndex="4" GridPane.columnIndex="0"
+                                       style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
+                                <Label fx:id="detailDateLabel" GridPane.rowIndex="4" GridPane.columnIndex="1"
+                                       style="-fx-text-fill: #2c3e50;"/>
+                            </GridPane>
+
+                            <!-- ✅ Section Traduction du message (bien placée dans le VBox) -->
+                            <Separator/>
+
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <ChoiceBox fx:id="langueCibleChoice" prefWidth="150"
+                                           style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e0e0e0; -fx-background-color: white; -fx-padding: 5 10;"/>
+                                <Button fx:id="traduireMessageButton"
+                                        text="🌐 Traduire le message"
+                                        onAction="#traduireMessage"
+                                        style="-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 5 15; -fx-font-size: 11px; -fx-cursor: hand;"/>
                             </HBox>
-                        </VBox>
 
-                        <!-- Message de statut -->
-                        <Label fx:id="statusLabel"
-                               text=""
-                               wrapText="true"
-                               style="-fx-font-size: 13px; -fx-padding: 10; -fx-background-color: #f0f0f0; -fx-background-radius: 8; -fx-text-fill: #2c3e50;"/>
-                    </VBox>
-                </items>
-            </SplitPane>
-        </VBox>
+                            <Label fx:id="traductionMessageLabel"
+                                   wrapText="true"
+                                   style="-fx-text-fill: #7f8c8d; -fx-font-style: italic; -fx-padding: 5 0 0 10;"/>
+
+                            <Separator/>
+
+                            <!-- Réponse existante -->
+                            <VBox spacing="10" fx:id="reponseExistanteBox" managed="false" visible="false"
+                                  style="-fx-background-color: #e8f5e9; -fx-background-radius: 10; -fx-padding: 15;">
+                                <Label text="✅ Réponse actuelle"
+                                       style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #27ae60;"/>
+                                <TextArea fx:id="reponseExistanteArea"
+                                          editable="false"
+                                          prefRowCount="3"
+                                          wrapText="true"
+                                          style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #a5d6a7; -fx-border-radius: 8;"/>
+
+                                <!-- Auteur de la réponse -->
+                                <HBox spacing="5" alignment="CENTER_LEFT">
+                                    <Label text="👤" style="-fx-font-size: 12px; -fx-text-fill: #2e7d32;"/>
+                                    <Label fx:id="reponseAuteurLabel" text="Administrateur"
+                                           style="-fx-text-fill: #2e7d32; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+                                </HBox>
+
+                                <Label fx:id="reponseDateLabel" style="-fx-text-fill: #2e7d32; -fx-font-size: 11px;"/>
+                            </VBox>
+
+                            <!-- Formulaire de réponse -->
+                            <VBox spacing="10">
+                                <Label text="✏️ Répondre"
+                                       style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2c3e50;"/>
+
+                                <TextArea fx:id="reponseField"
+                                          prefRowCount="4"
+                                          wrapText="true"
+                                          promptText="Écrivez votre réponse ici..."
+                                          style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e0e0e0; -fx-padding: 10;"/>
+
+                                <!-- Compteur de caractères -->
+                                <Label fx:id="compteurCaracteres"
+                                       style="-fx-font-size: 11px; -fx-text-fill: #7f8c8d;"
+                                       text="0/500 caractères"/>
+
+                                <HBox spacing="10" alignment="CENTER_RIGHT">
+                                    <Button text="📤 Envoyer"
+                                            onAction="#repondreReclamation"
+                                            style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                                    <Button text="✏️ Modifier"
+                                            onAction="#modifierReponse"
+                                            style="-fx-background-color: #2980b9; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                                    <Button text="🗑️ Supprimer"
+                                            onAction="#supprimerReponse"
+                                            style="-fx-background-color: #c0392b; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                                </HBox>
+                            </VBox>
+
+                            <!-- Message de statut -->
+                            <Label fx:id="statusLabel"
+                                   text=""
+                                   wrapText="true"
+                                   style="-fx-font-size: 13px; -fx-padding: 10; -fx-background-color: #f0f0f0; -fx-background-radius: 8; -fx-text-fill: #2c3e50;"/>
+                        </VBox>
+                    </items>
+                </SplitPane>
+            </VBox>
+        </ScrollPane>
     </children>
 </AnchorPane>

@@ -81,7 +81,7 @@ public class ReclamationService {
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setString(1, r.getType());
             ps.setString(2, r.getDescription());
-            ps.setString(3, r.getStatut());
+            ps.setString(3, r.getStatut());  // ✅ Le statut doit être mis à jour ici
             ps.setString(4, r.getChauffeurNom());
             ps.setString(5, r.getChauffeurPrenom());
             ps.setString(6, r.getBusMatricule());
@@ -89,7 +89,9 @@ public class ReclamationService {
             ps.setString(8, r.getEcoleNom());
             ps.setString(9, r.getAutrePrecision());
             ps.setInt(10, r.getId());
-            ps.executeUpdate();
+
+            int rowsAffected = ps.executeUpdate();
+            System.out.println("Lignes mises à jour: " + rowsAffected); // Pour déboguer
         }
     }
 

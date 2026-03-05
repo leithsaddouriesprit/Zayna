@@ -1,6 +1,7 @@
 package tn.esprit.workshop.controlleurs;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -74,6 +75,7 @@ public class GestionReponseController implements Initializable {
         initialiserLangues();
         afficherToutesReclamations();
         statusLabel.setText("Affichage de toutes les réclamations");
+
     }
 
     // ================= CONFIGURATION =================
@@ -446,35 +448,83 @@ public class GestionReponseController implements Initializable {
 
     @FXML
     private void supprimerReponse() {
-        if (reponseExistante == null) {
-            showAlert("Erreur", "❌ Aucune réponse à supprimer !", Alert.AlertType.WARNING);
-            return;
-        }
-
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Confirmation de suppression");
-        confirm.setHeaderText("Supprimer la réponse");
-        confirm.setContentText("Êtes-vous sûr de vouloir supprimer cette réponse ?\nCette action est irréversible.");
-
-        if (confirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
-            try {
-                reponseService.delete(reponseExistante.getId());
-
-                reclamationSelectionnee.setStatut("EN_ATTENTE");
-                reclamationService.updateOne(reclamationSelectionnee);
-
-                showAlert("Succès", "✅ Réponse supprimée !", Alert.AlertType.INFORMATION);
-
-                afficherToutesReclamations();
-                reponseExistante = null;
-                reponseExistanteBox.setManaged(false);
-                reponseExistanteBox.setVisible(false);
-                reponseField.clear();
-
-            } catch (SQLException e) {
-                showAlert("Erreur", "❌ Erreur : " + e.getMessage(), Alert.AlertType.ERROR);
-                e.printStackTrace();
+        try {
+            // Vérifications
+            if (reponseExistante == null) {
+                showAlert("Erreur", "❌ Aucune réponse à supprimer !", Alert.AlertType.WARNING);
+                return;
             }
+
+            if (reclamationSelectionnee == null) {
+                showAlert("Erreur", "❌ Aucune réclamation sélectionnée !", Alert.AlertType.WARNING);
+                return;
+            }
+
+            // Confirmation
+            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+            confirm.setTitle("Confirmation de suppression");
+            confirm.setHeaderText("Supprimer la réponse");
+            confirm.setContentText("Êtes-vous sûr de vouloir supprimer cette réponse ?");
+
+            if (confirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+                try {
+                    // ✅ 1. Supprimer la réponse
+                    reponseService.delete(reponseExistante.getId());
+
+                    // ✅ 2. FORCER le changement de statut de la réclamation
+                    reclamationSelectionnee.setStatut("EN_ATTENTE");
+
+                    // ✅ 3. Mettre à jour dans la base de données
+                    reclamationService.updateOne(reclamationSelectionnee);
+
+                    // ✅ 4. Rafraîchir l'affichage
+                    afficherToutesReclamations();
+
+                    // ✅ 5. Réinitialiser les variables
+                    reponseExistante = null;
+
+                    // ✅ 6. Mettre à jour l'interface
+                    if (reponseExistanteBox != null) {
+                        reponseExistanteBox.setManaged(false);
+                        reponseExistanteBox.setVisible(false);
+                    }
+                    if (reponseField != null) {
+                        reponseField.clear();
+                    }
+
+                    // ✅ 7. Afficher le nouveau statut dans la console (pour vérification)
+                    System.out.println("✅ Statut mis à jour: " + reclamationSelectionnee.getStatut());
+
+                    showAlert("Succès", "✅ Réponse supprimée et statut mis à jour !", Alert.AlertType.INFORMATION);
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    showAlert("Erreur", "❌ Erreur base de données: " + e.getMessage(), Alert.AlertType.ERROR);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Erreur", "❌ Erreur inattendue: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    @FXML
+    private void supprimerReponseDebug() {
+        try {
+            // Afficher des informations de débogage
+            System.out.println("=== DÉBOGAGE SUPPRESSION ===");
+            System.out.println("reponseExistante: " + (reponseExistante != null ?
+                    "ID=" + reponseExistante.getId() : "null"));
+            System.out.println("reclamationSelectionnee: " + (reclamationSelectionnee != null ?
+                    "ID=" + reclamationSelectionnee.getId() : "null"));
+            System.out.println("reponseExistanteBox: " + (reponseExistanteBox != null ?
+                    "visible=" + reponseExistanteBox.isVisible() : "null"));
+
+            // Appeler la méthode normale
+            supprimerReponse();
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -523,11 +573,20 @@ public class GestionReponseController implements Initializable {
     private void afficherToutesReclamations() {
         try {
             List<Reclamation> reclamations = reclamationService.selectAll();
-            tableReclamation.setItems(FXCollections.observableArrayList(reclamations));
+
+            // ✅ Forcer la mise à jour des données
+            ObservableList<Reclamation> data = FXCollections.observableArrayList(reclamations);
+            tableReclamation.setItems(data);
+
+            // ✅ Forcer le rafraîchissement visuel
+            tableReclamation.refresh();
 
             if (!reclamations.isEmpty()) {
                 tableReclamation.getSelectionModel().selectFirst();
             }
+
+            System.out.println("Tableau rafraîchi avec " + reclamations.size() + " réclamations");
+
         } catch (SQLException e) {
             statusLabel.setText("❌ Erreur chargement");
             e.printStackTrace();
@@ -573,4 +632,5 @@ public class GestionReponseController implements Initializable {
         alert.setContentText(content);
         alert.showAndWait();
     }
+
 }
