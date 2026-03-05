@@ -735,6 +735,7 @@ public class GestionReclamationController implements Initializable {
         cacherTousLesPanels();
     }
 
+
     // ================= UTILITAIRE =================
 
     private void showAlert(String title, String content, Alert.AlertType type) {
