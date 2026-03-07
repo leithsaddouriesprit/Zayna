@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 public class GestionReclamationController implements Initializable {
-
+    @FXML private Label compteurReclamations;
     @FXML private ChoiceBox<String> typeChoice;
     @FXML private TextArea messageField;
     @FXML private TextArea reponseArea;
@@ -34,7 +34,9 @@ public class GestionReclamationController implements Initializable {
     @FXML private ChoiceBox<String> langueCibleChoice;
     private Map<String, String> languesMap;
     private Reponse reponseCourante;
-
+    @FXML private Label totalReclamations;
+    @FXML private Label enAttenteCount;
+    @FXML private Label traiteesCount;
 
     // Nouveaux champs FXML
     @FXML private VBox panelChauffeur;
@@ -101,6 +103,11 @@ public class GestionReclamationController implements Initializable {
 
         // Charger les réclamations
         afficherReclamations();
+
+        // ✅ INITIALISER LES STATISTIQUES À 0 AU CAS OÙ
+        if (totalReclamations == null) totalReclamations.setText("0");
+        if (enAttenteCount == null) enAttenteCount.setText("0");
+        if (traiteesCount == null) traiteesCount.setText("0");
 
     }
     private void initialiserLangues() {
@@ -435,6 +442,10 @@ public class GestionReclamationController implements Initializable {
                     langueOriginale = traductionService.detecterLangue(message);
                     messageTraduit = traductionService.traduireVersFrancais(message);
                     statusLabel.setText("✅ Langue détectée : " + langueOriginale);
+
+                    showAlert("Succès", "✅ Réclamation envoyée !", Alert.AlertType.INFORMATION);
+                    viderFormulaire();
+                    afficherReclamations(); // ✅ Cette ligne mettra à jour les stats
                 } catch (Exception e) {
                     System.out.println("Traduction non disponible: " + e.getMessage());
                     // On continue sans traduction
@@ -596,42 +607,120 @@ public class GestionReclamationController implements Initializable {
     }
 
     // ================= AFFICHAGE =================
+    // ================= AFFICHAGE =================
 
     private void afficherReclamations() {
         try {
-            tableReclamation.setItems(
-                    FXCollections.observableArrayList(service.selectAll())
-            );
+            // Récupérer la liste des réclamations
+            List<Reclamation> liste = service.selectAll();
+
+            // Créer l'ObservableList avec le bon type
+            javafx.collections.ObservableList<Reclamation> data = FXCollections.observableArrayList(liste);
+
+            // Mettre à jour la table
+            tableReclamation.setItems(data);
+
+            // ✅ METTRE À JOUR LES STATISTIQUES DE LA BARRE LATÉRALE
+            mettreAJourStatistiques(liste);
+
+            // Mettre à jour le compteur de réclamations
+            if (compteurReclamations != null) {
+                int taille = liste.size();
+                if (taille == 0) {
+                    compteurReclamations.setText("Aucune réclamation");
+                } else if (taille == 1) {
+                    compteurReclamations.setText("1 réclamation");
+                } else {
+                    compteurReclamations.setText(taille + " réclamations");
+                }
+            }
+
         } catch (SQLException e) {
             statusLabel.setText("❌ Erreur chargement");
             e.printStackTrace();
         }
     }
 
-    // ================= TRADUCTION =================
+    // ✅ NOUVELLE MÉTHODE POUR METTRE À JOUR LES STATISTIQUES
+    private void mettreAJourStatistiques(List<Reclamation> liste) {
+        if (liste == null || liste.isEmpty()) {
+            // Si la liste est vide, mettre tous les compteurs à 0
+            if (totalReclamations != null) totalReclamations.setText("0");
+            if (enAttenteCount != null) enAttenteCount.setText("0");
+            if (traiteesCount != null) traiteesCount.setText("0");
+            return;
+        }
+
+        // Compter les réclamations par statut
+        int total = liste.size();
+        int enAttente = 0;
+        int traitees = 0;
+
+        for (Reclamation r : liste) {
+            if ("EN_ATTENTE".equals(r.getStatut())) {
+                enAttente++;
+            } else if ("TRAITEE".equals(r.getStatut())) {
+                traitees++;
+            }
+        }
+
+        // Mettre à jour les labels
+        if (totalReclamations != null) {
+            totalReclamations.setText(String.valueOf(total));
+        }
+
+        if (enAttenteCount != null) {
+            enAttenteCount.setText(String.valueOf(enAttente));
+        }
+
+        if (traiteesCount != null) {
+            traiteesCount.setText(String.valueOf(traitees));
+        }
+
+        System.out.println("📊 Statistiques mises à jour - Total: " + total +
+                ", En attente: " + enAttente +
+                ", Traitées: " + traitees);
+    }
+// ================= TRADUCTION REPONSE =================
+
     @FXML
     private void traduireReponse() {
-        String reponse = reponseArea.getText();
-        if (reponse == null || reponse.isEmpty() || reponse.equals("Aucune réponse pour le moment...")) {
+        if (reponseCourante == null) {
             showAlert("Information", "Aucune réponse à traduire", Alert.AlertType.INFORMATION);
             return;
         }
 
         String langueCibleNom = langueCibleChoice.getValue();
-        if (langueCibleNom == null) return;
+        if (langueCibleNom == null) {
+            showAlert("Information", "Veuillez choisir une langue", Alert.AlertType.INFORMATION);
+            return;
+        }
 
         String langueCibleCode = languesMap.get(langueCibleNom);
+        String message = reponseCourante.getMessage();
 
-        // Afficher la traduction dans un label à côté
+        statusLabel.setText("⏳ Traduction de la réponse...");
+
         new Thread(() -> {
             try {
-                String traduit = traductionService.traduireVersLangue(reponse, langueCibleCode);
+                String traduit = traductionService.traduireVersLangue(message, langueCibleCode);
+
                 javafx.application.Platform.runLater(() -> {
-                    // Afficher dans un petit label
-                    traductionReponseLabel.setText("📝 " + traduit);
+                    if (traduit == null || traduit.startsWith("[")) {
+                        traductionReponseLabel.setText("⚠️ " + (traduit != null ? traduit : "Erreur"));
+                        traductionReponseLabel.setStyle("-fx-text-fill: #e67e22;");
+                    } else {
+                        traductionReponseLabel.setText("📝 " + traduit);
+                        traductionReponseLabel.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
+                        statusLabel.setText("✅ Réponse traduite");
+                    }
                 });
             } catch (Exception e) {
-                e.printStackTrace();
+                javafx.application.Platform.runLater(() -> {
+                    traductionReponseLabel.setText("❌ Erreur: " + e.getMessage());
+                    traductionReponseLabel.setStyle("-fx-text-fill: #e74c3c;");
+                    statusLabel.setText("❌ Erreur de traduction");
+                });
             }
         }).start();
     }
