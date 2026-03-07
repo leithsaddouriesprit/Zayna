@@ -296,7 +296,6 @@
                                minHeight="200"
                                style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15;">
                         <columns>
-                            <TableColumn fx:id="colId" text="N°" prefWidth="50" style="-fx-alignment: CENTER;"/>
                             <TableColumn fx:id="colType" text="Type" prefWidth="100" style="-fx-alignment: CENTER;"/>
                             <TableColumn fx:id="colDescription" text="Message" prefWidth="250"/>
                             <TableColumn fx:id="colDetails" text="Détails" prefWidth="150"/>

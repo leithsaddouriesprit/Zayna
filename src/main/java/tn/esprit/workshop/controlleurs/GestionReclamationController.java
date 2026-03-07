@@ -53,7 +53,6 @@ public class GestionReclamationController implements Initializable {
     @FXML private TextField autrePrecisionField;
 
     @FXML private TableView<Reclamation> tableReclamation;
-    @FXML private TableColumn<Reclamation, Integer> colId;
     @FXML private TableColumn<Reclamation, String> colType;
     @FXML private TableColumn<Reclamation, String> colDescription;
     @FXML private TableColumn<Reclamation, String> colDetails;
@@ -201,14 +200,6 @@ public class GestionReclamationController implements Initializable {
     // ================= CONFIGURATION =================
 
     private void configurerColonnes() {
-        // Masquer l'ID
-        colId.setCellFactory(column -> new TableCell<Reclamation, Integer>() {
-            @Override
-            protected void updateItem(Integer item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(""); // Ne rien afficher
-            }
-        });
 
         colType.setCellValueFactory(new PropertyValueFactory<>("type"));
 
