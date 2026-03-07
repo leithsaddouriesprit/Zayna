@@ -28,7 +28,6 @@ public class GestionReponseController implements Initializable {
 
     // Table des réclamations
     @FXML private TableView<Reclamation> tableReclamation;
-    @FXML private TableColumn<Reclamation, Integer> colId;
     @FXML private TableColumn<Reclamation, String> colType;
     @FXML private TableColumn<Reclamation, String> colDescription;
     @FXML private TableColumn<Reclamation, String> colDetails;
@@ -105,15 +104,7 @@ public class GestionReponseController implements Initializable {
     }
     private void configurerColonnes() {
         // Masquer l'ID
-        colId.setCellFactory(column -> new TableCell<Reclamation, Integer>() {
-            @Override
-            protected void updateItem(Integer item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(""); // Ne rien afficher
-                // Optionnel : mettre une icône ou un symbole à la place
-                // if (!empty) setText("📌");
-            }
-        });
+
 
         colType.setCellValueFactory(new PropertyValueFactory<>("type"));
         colDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
