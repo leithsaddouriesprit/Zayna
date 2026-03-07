@@ -1,35 +1,32 @@
 package tn.esprit.workshop.model.talel;
-
 import java.util.Objects;
 
 public class User {
         private int id;
         private String nom;
         private String email;
-        private String motDePasse;
+        private String password;
         private CategorieUser categories;
     public User(){
     }
-        public User(int id, String nom, String email, String motDePasse, CategorieUser categorie) {
+        public User(int id, String nom, String email, String password, CategorieUser categorie) {
             this.id =id;
             this.nom = nom;
             this.email = email;
-            this.motDePasse = motDePasse;
+            this.password = password;
             this.categories = categorie;
         }
-
-
 
 
     public int getId() {return id;}
     public String getNom() { return nom; }
         public String getEmail() { return email; }
-        public String getMotDePasse() { return motDePasse; }
+        public String getpassword() { return password; }
         public CategorieUser getCategories() { return categories; }
 
     public void setId(int id) {this.id = id;}
     public void setNom(String nom) {this.nom = nom;}
-    public void setMotDePasse(String motDePasse) {this.motDePasse = motDePasse;}
+    public void setpassword(String password) {this.password = password;}
     public void setCategories(CategorieUser categories) {this.categories = categories;}
     public void setEmail(String email) {this.email = email;}
 

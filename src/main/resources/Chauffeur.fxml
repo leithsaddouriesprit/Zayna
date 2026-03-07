@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="640.0" spacing="15" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshop.controlleurs.talel.ControleurChauffeur">
+    <padding>
+        <Insets bottom="20" left="25" right="25" top="20" />
+    </padding>
+      <Button fx:id="logoutButton" alignment="TOP_RIGHT" onAction="#handleLogoutButton" style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-weight: bold;" text="Déconnexion" textAlignment="JUSTIFY">
+            </Button>
+
+    <!-- En-tête -->
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Label style="-fx-font-size: 30px;" text="🚌" />
+        <VBox>
+            <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="AJOUTER UN CHAUFFEUR" />
+            <Label style="-fx-text-fill: #7f8c8d;" text="Remplissez le formulaire pour ajouter un nouveau chauffeur" />
+        </VBox>
+    </HBox>
+
+    <Separator />
+
+    <!-- Message d'alerte -->
+    <Label fx:id="lblMessage" managed="false" style="-fx-padding: 10; -fx-background-radius: 5; -fx-background-color: #d4edda; -fx-text-fill: #155724;" visible="false">
+        <font>
+            <Font size="12" />
+        </font>
+    </Label>
+
+    <!-- Formulaire -->
+    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-border-color: transparent;">
+        <VBox spacing="15">
+            <!-- Section Informations personnelles -->
+            <TitledPane collapsible="false" expanded="true" text="Informations personnelles">
+                <content>
+                    <GridPane hgap="15" style="-fx-padding: 10;" vgap="12">
+                        <Label style="-fx-font-weight: bold;" text="Nom complet *" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                        <TextField fx:id="txtNom" prefWidth="350" promptText="ex: Mohamed Ali" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                        <Label style="-fx-font-weight: bold;" text="Email *" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                        <TextField fx:id="txtEmail" promptText="ex: mohamed@chauffeur.com" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                        <Label style="-fx-font-weight: bold;" text="Mot de passe *" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                        <PasswordField fx:id="txtMotDePasse" promptText="********" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                        <Label text="Téléphone" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                        <TextField fx:id="txtTelephone" promptText="12345678" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                        <Label text="Adresse" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                        <TextArea fx:id="txtAdresse" prefRowCount="2" promptText="ex: 15 Rue de Tunis" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+                        <columnConstraints>
+                            <ColumnConstraints minWidth="120" />
+                            <ColumnConstraints minWidth="350" />
+                        </columnConstraints>
+                  <rowConstraints>
+                     <RowConstraints />
+                     <RowConstraints />
+                     <RowConstraints />
+                     <RowConstraints />
+                     <RowConstraints />
+                  </rowConstraints>
+                    </GridPane>
+                </content>
+            </TitledPane>
+
+            <!-- Section Informations professionnelles -->
+            <TitledPane collapsible="false" expanded="true" text="Informations professionnelles">
+                <content>
+                    <GridPane hgap="15" style="-fx-padding: 10;" vgap="12">
+                        <Label style="-fx-font-weight: bold;" text="Type de permis *" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                        <TextField fx:id="txtPermis" promptText="B, C, D, etc." GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                        <Label text="Date d'obtention" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                        <DatePicker fx:id="dateObtentionPermis" prefWidth="350" promptText="JJ/MM/AAAA" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                        <Label text="Véhicule" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                        <TextField fx:id="txtVehicule" promptText="ex: Mercedes Sprinter" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                        <Label text="Salaire (DT)" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                        <TextField fx:id="txtSalaire" promptText="0.00" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <columnConstraints>
+                     <ColumnConstraints />
+                     <ColumnConstraints />
+                  </columnConstraints>
+                  <rowConstraints>
+                     <RowConstraints />
+                     <RowConstraints />
+                     <RowConstraints />
+                     <RowConstraints />
+                  </rowConstraints>
+                    </GridPane>
+                </content>
+            </TitledPane>
+
+            <!-- Section Lignes de bus -->
+            <TitledPane collapsible="false" expanded="true" text="Lignes de bus">
+                <content>
+                    <VBox spacing="10" style="-fx-padding: 10;">
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <TextField fx:id="txtLigne" promptText="ex: Ligne 15 - Tunis Centre" HBox.hgrow="ALWAYS" />
+                            <Button style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Ajouter" />
+                        </HBox>
+                        <ListView fx:id="listeLignes" prefHeight="80" />
+                    </VBox>
+                </content>
+            </TitledPane>
+
+            <Separator />
+
+            <!-- Boutons -->
+            <HBox alignment="CENTER" spacing="15">
+                <Button onAction="#ajouterChauffeur" prefHeight="40" prefWidth="200" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold;" text="Ajouter le chauffeur">
+                    <font>
+                        <Font size="14" />
+                    </font>
+                </Button>
+                <Button onAction="#viderFormulaire" prefHeight="40" prefWidth="100" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" text="Vider" />
+            </HBox>
+
+            <Label style="-fx-text-fill: #7f8c8d; -fx-font-style: italic;" text="* Champs obligatoires" />
+        </VBox>
+    </ScrollPane>
+</VBox>

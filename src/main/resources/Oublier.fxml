@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="tn.esprit.workshop.controlleurs.talel.OublierController"
+            prefHeight="500.0" prefWidth="600.0"
+            style="-fx-background-color: #f5f5f5;">
+
+    <VBox alignment="CENTER" spacing="20"
+          layoutX="150" layoutY="50"
+          prefWidth="300.0">
+
+        <!-- Titre -->
+        <Label text="Mot de passe oublié"
+               style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #333333;">
+            <font>
+                <Font name="System Bold" size="28.0"/>
+            </font>
+        </Label>
+
+        <!-- Sous-titre -->
+        <Label text="Réinitialisez votre mot de passe"
+               style="-fx-font-size: 14px; -fx-text-fill: #666666;"/>
+
+        <!-- Message d'information -->
+        <Label fx:id="lblMessage"
+               style="-fx-font-size: 12px;"
+               visible="false"/>
+
+        <!-- Champ Nom -->
+        <VBox spacing="5">
+            <Label text="Nom :" style="-fx-font-weight: bold;"/>
+            <TextField fx:id="txtNom"
+                       promptText="Entrez votre nom"
+                       style="-fx-pref-height: 35px; -fx-background-radius: 5px;"/>
+        </VBox>
+
+        <!-- Champ Téléphone -->
+        <VBox spacing="5">
+            <Label text="Téléphone :" style="-fx-font-weight: bold;"/>
+            <TextField fx:id="txtTelephone"
+                       promptText="Entrez votre numéro de téléphone (8 chiffres)"
+                       style="-fx-pref-height: 35px; -fx-background-radius: 5px;"/>
+        </VBox>
+
+        <!-- Champ Nouveau mot de passe -->
+        <VBox spacing="5">
+            <Label text="Nouveau mot de passe :" style="-fx-font-weight: bold;"/>
+            <PasswordField fx:id="txtNouveauMotDePasse"
+                           promptText="Minimum 6 caractères, maximum 30"
+                           style="-fx-pref-height: 35px; -fx-background-radius: 5px;"/>
+        </VBox>
+
+        <!-- Champ Confirmation -->
+        <VBox spacing="5">
+            <Label text="Confirmer le mot de passe :" style="-fx-font-weight: bold;"/>
+            <PasswordField fx:id="txtConfirmerMotDePasse"
+                           promptText="Retapez votre mot de passe"
+                           style="-fx-pref-height: 35px; -fx-background-radius: 5px;"/>
+        </VBox>
+
+        <!-- Boutons -->
+        <HBox spacing="10" alignment="CENTER">
+            <Button fx:id="btnReinitialiser"
+                    text="Réinitialiser"
+                    onAction="#handleResetPassword"
+                    style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-pref-width: 120px; -fx-pref-height: 35px; -fx-background-radius: 5px;"/>
+
+            <Button fx:id="btnEffacer"
+                    text="Effacer"
+                    onAction="#handleClearFields"
+                    style="-fx-background-color: #ff9800; -fx-text-fill: white; -fx-pref-width: 120px; -fx-pref-height: 35px; -fx-background-radius: 5px;"/>
+        </HBox>
+
+        <!-- Bouton Retour -->
+        <Button fx:id="btnRetour"
+                text="← Retour à la connexion"
+                onAction="#handleBackToLogin"
+                style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-pref-width: 200px; -fx-pref-height: 35px; -fx-background-radius: 5px; -fx-font-size: 14px;"/>
+
+        <!-- Instructions -->
+        <Label text="Vous recevrez une confirmation après la réinitialisation"
+               style="-fx-font-size: 11px; -fx-text-fill: #999999;"/>
+
+        <padding>
+            <Insets top="20" right="20" bottom="20" left="20"/>
+        </padding>
+
+    </VBox>
+
+</AnchorPane>  <!-- ✅ CORRIGÉ: Ajout du "Pane" manquant et du chevron fermant -->
