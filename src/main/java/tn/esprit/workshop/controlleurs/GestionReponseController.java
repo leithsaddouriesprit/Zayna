@@ -35,6 +35,10 @@ public class GestionReponseController implements Initializable {
     @FXML private TableColumn<Reclamation, String> colStatut;
     @FXML private TableColumn<Reclamation, Timestamp> colDate;
     @FXML private Label detailInfosLabel;
+    @FXML private Label totalReclamations;
+    @FXML private Label enAttenteCount;
+    @FXML private Label traiteesCount;
+
 
     // Détails de la réclamation (sans ID affiché)
     @FXML private Label detailTypeLabel;
@@ -164,6 +168,44 @@ public class GestionReponseController implements Initializable {
                 }
             }
         });
+    }
+    // ================= STATISTIQUES =================
+
+    private void mettreAJourStatistiques(List<Reclamation> liste) {
+        if (liste == null || liste.isEmpty()) {
+            if (totalReclamations != null) totalReclamations.setText("0");
+            if (enAttenteCount != null) enAttenteCount.setText("0");
+            if (traiteesCount != null) traiteesCount.setText("0");
+            return;
+        }
+
+        int total = liste.size();
+        int enAttente = 0;
+        int traitees = 0;
+
+        for (Reclamation r : liste) {
+            if ("EN_ATTENTE".equals(r.getStatut())) {
+                enAttente++;
+            } else if ("TRAITEE".equals(r.getStatut())) {
+                traitees++;
+            }
+        }
+
+        if (totalReclamations != null) {
+            totalReclamations.setText(String.valueOf(total));
+        }
+
+        if (enAttenteCount != null) {
+            enAttenteCount.setText(String.valueOf(enAttente));
+        }
+
+        if (traiteesCount != null) {
+            traiteesCount.setText(String.valueOf(traitees));
+        }
+
+        System.out.println("📊 Stats - Total: " + total +
+                ", En attente: " + enAttente +
+                ", Traitées: " + traitees);
     }
     @FXML
     private void traduireMessage() {
@@ -577,6 +619,8 @@ public class GestionReponseController implements Initializable {
             // ✅ Forcer la mise à jour des données
             ObservableList<Reclamation> data = FXCollections.observableArrayList(reclamations);
             tableReclamation.setItems(data);
+            mettreAJourStatistiques(reclamations);
+
 
             // ✅ Forcer le rafraîchissement visuel
             tableReclamation.refresh();
