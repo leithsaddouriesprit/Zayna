@@ -13,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import javafx.application.Platform;
 import tn.esprit.workshop.model.talel.CategorieUser;
 import tn.esprit.workshop.model.talel.User;
 import tn.esprit.workshop.services.ServiceAdmin;
@@ -130,6 +131,13 @@ public class AdminController implements Initializable {
         serviceAdmin = new ServiceAdmin();
 
         try {
+            // CORRECTION 1: Configuration du label status
+            if (statusLabel != null) {
+                statusLabel.setVisible(false);
+                statusLabel.setManaged(true);
+                statusLabel.setWrapText(true);
+            }
+
             setupTableColumns();
             setupComboBoxes();
             loadUserData();
@@ -337,31 +345,65 @@ public class AdminController implements Initializable {
             String passwordClair = txtMotDePasse.getText();
             CategorieUser categorie = categorieCombo.getValue();
 
-            // Validation des champs obligatoires
-            if (nom.isEmpty() || email.isEmpty() || categorie == null) {
-                afficherMessage("Veuillez remplir tous les champs obligatoires (Nom, Email, Catégorie)", "warning");
+            // CORRECTION 2: Validation CHAMP PAR CHAMP avec focus
+            // Validation du nom
+            if (nom.isEmpty()) {
+                afficherMessage("❌ Le nom est obligatoire", "error");
+                txtNom.requestFocus();
+                return;
+            }
+
+            // Validation de l'email
+            if (email.isEmpty()) {
+                afficherMessage("❌ L'email est obligatoire", "error");
+                txtEmail.requestFocus();
+                return;
+            }
+
+            // Validation de la catégorie
+            if (categorie == null) {
+                afficherMessage("❌ La catégorie est obligatoire", "error");
+                categorieCombo.requestFocus();
                 return;
             }
 
             // Validation email
             if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
-                afficherMessage("Format d'email invalide (ex: nom@domaine.com)", "error");
+                afficherMessage("❌ Format d'email invalide (ex: nom@domaine.com)", "error");
+                txtEmail.requestFocus();
                 return;
             }
 
             // Validation mot de passe pour nouvel utilisateur
             if (selectedUser == null) {
                 if (passwordClair.isEmpty()) {
-                    afficherMessage("Le mot de passe est obligatoire pour un nouvel utilisateur", "warning");
+                    afficherMessage("❌ Le mot de passe est obligatoire pour un nouvel utilisateur", "error");
+                    txtMotDePasse.requestFocus();
                     return;
                 }
                 if (passwordClair.length() < 6) {
-                    afficherMessage("Le mot de passe doit contenir au moins 6 caractères", "error");
+                    afficherMessage("❌ Le mot de passe doit contenir au moins 6 caractères", "error");
+                    txtMotDePasse.requestFocus();
                     return;
                 }
                 if (passwordClair.length() > 30) {
-                    afficherMessage("Le mot de passe ne doit pas dépasser 30 caractères", "error");
+                    afficherMessage("❌ Le mot de passe ne doit pas dépasser 30 caractères", "error");
+                    txtMotDePasse.requestFocus();
                     return;
+                }
+            } else {
+                // Validation mot de passe pour modification (si fourni)
+                if (!passwordClair.isEmpty()) {
+                    if (passwordClair.length() < 6) {
+                        afficherMessage("❌ Le mot de passe doit contenir au moins 6 caractères", "error");
+                        txtMotDePasse.requestFocus();
+                        return;
+                    }
+                    if (passwordClair.length() > 30) {
+                        afficherMessage("❌ Le mot de passe ne doit pas dépasser 30 caractères", "error");
+                        txtMotDePasse.requestFocus();
+                        return;
+                    }
                 }
             }
 
@@ -376,7 +418,7 @@ public class AdminController implements Initializable {
 
                 loadUserData();
                 afficherMessage("✅ Utilisateur ajouté avec succès", "success");
-                System.out.println("Ajout réussi - ID: " + user.getId());
+                System.out.println("Ajout réussi");
 
             } else {
                 // MODIFICATION d'un utilisateur existant
@@ -385,20 +427,6 @@ public class AdminController implements Initializable {
                 selectedUser.setCategories(categorie);
 
                 serviceAdmin.modifierUtilisateur(selectedUser);
-
-                // Changer le mot de passe si fourni
-                if (!passwordClair.isEmpty()) {
-                    if (passwordClair.length() < 6) {
-                        afficherMessage("Le mot de passe doit contenir au moins 6 caractères", "error");
-                        return;
-                    }
-                    if (passwordClair.length() > 30) {
-                        afficherMessage("Le mot de passe ne doit pas dépasser 30 caractères", "error");
-                        return;
-                    }
-                    // Note: Il faudrait une méthode dédiée pour changer le mot de passe
-                    // serviceAdmin.changerpassword(selectedUser.getId(), ancienPassword, passwordClair);
-                }
 
                 userTable.refresh();
                 afficherMessage("✅ Utilisateur modifié avec succès", "success");
@@ -563,25 +591,48 @@ public class AdminController implements Initializable {
         }
     }
 
+    // CORRECTION 3: Méthode afficherMessage avec setStyle() au lieu de getStyleClass()
     private void afficherMessage(String message, String type) {
-        statusLabel.setText(message);
-        statusLabel.getStyleClass().removeAll("success", "error", "warning", "info");
-        statusLabel.getStyleClass().add(type);
+        Platform.runLater(() -> {
+            if (statusLabel == null) {
+                System.err.println("statusLabel est null!");
+                return;
+            }
 
-        switch (type) {
-            case "success":
-                statusLabel.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
-                break;
-            case "error":
-                statusLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;");
-                break;
-            case "warning":
-                statusLabel.setStyle("-fx-text-fill: #f39c12; -fx-font-weight: bold;");
-                break;
-            case "info":
-                statusLabel.setStyle("-fx-text-fill: #3498db; -fx-font-weight: bold;");
-                break;
-        }
+            statusLabel.setText(message);
+            statusLabel.setVisible(true);
+
+            // Application des couleurs selon le type - CORRIGÉ
+            switch (type) {
+                case "success":
+                    statusLabel.setStyle("-fx-background-color: #d4edda; -fx-text-fill: #155724; -fx-border-color: #c3e6cb; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 10; -fx-font-weight: bold;");
+                    break;
+                case "error":
+                    statusLabel.setStyle("-fx-background-color: #f8d7da; -fx-text-fill: #721c24; -fx-border-color: #f5c6cb; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 10; -fx-font-weight: bold;");
+                    break;
+                case "warning":
+                    statusLabel.setStyle("-fx-background-color: #fff3cd; -fx-text-fill: #856404; -fx-border-color: #ffeeba; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 10; -fx-font-weight: bold;");
+                    break;
+                case "info":
+                default:
+                    statusLabel.setStyle("-fx-background-color: #d1ecf1; -fx-text-fill: #0c5460; -fx-border-color: #bee5eb; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 10; -fx-font-weight: bold;");
+                    break;
+            }
+
+            // Cache le message après 5 secondes
+            new Thread(() -> {
+                try {
+                    Thread.sleep(5000);
+                    Platform.runLater(() -> {
+                        if (statusLabel != null) {
+                            statusLabel.setVisible(false);
+                        }
+                    });
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        });
     }
 
     private void showAlert(Alert.AlertType type, String title, String header, String content) {

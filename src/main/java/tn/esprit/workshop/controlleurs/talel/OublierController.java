@@ -1,278 +1,403 @@
 package tn.esprit.workshop.controlleurs.talel;
 
-import javafx.event.ActionEvent;
+import javafx.animation.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
+import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+import tn.esprit.workshop.services.EmailService;
 import tn.esprit.workshop.services.talel.ServiceOublier;
+import tn.esprit.workshop.utilis.CodeGenerator;
 
 import java.io.IOException;
-import java.util.Optional;
+import java.net.URL;
+import java.util.ResourceBundle;
 
-public class OublierController {
+public class OublierController implements Initializable {
 
-    @FXML
-    private TextField txtNom;
-    @FXML
-    private TextField txtTelephone;
-    @FXML
-    private PasswordField txtNouveauMotDePasse;
-    @FXML
-    private PasswordField txtConfirmerMotDePasse;
-    @FXML
-    private Button btnReinitialiser;
-    @FXML
-    private Button btnRetour;
-    @FXML
-    private Button btnEffacer;
-    @FXML
-    private Label lblMessage;
+    // ==================== ÉLÉMENTS FXML ====================
+    @FXML private VBox emailStep;
+    @FXML private VBox codeStep;
+    @FXML private VBox newPasswordStep;
+    @FXML private VBox successStep;
 
-    private ServiceOublier serviceOublier;
-    private boolean isProcessing = false; // Protection anti-double clic
+    @FXML private TextField emailField;
+    @FXML private TextField codeField;
+    @FXML private PasswordField newPasswordField;
+    @FXML private PasswordField confirmPasswordField;
 
-    public OublierController() {
-        this.serviceOublier = new ServiceOublier();
+    @FXML private Label messageLabel;
+    @FXML private Label timerLabel;
+    @FXML private Label userTypeLabel;
+
+    @FXML private Button sendCodeButton;
+    @FXML private Button verifyCodeButton;
+    @FXML private Button resetPasswordButton;
+
+    @FXML private ProgressIndicator loadingIndicator;
+
+    // ==================== VARIABLES ====================
+    private String verificationCode;
+    private String userEmail;
+    private Timeline timeline;
+    private int timeSeconds = 300; // 5 minutes
+
+    // ✅ CORRECTION 1: Créer une instance du service (PAS STATIC)
+    private ServiceOublier serviceOublier = new ServiceOublier();
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        // Animation d'entrée
+        animateEntrance();
+
+        // Validation en temps réel
+        setupRealTimeValidation();
+
+        // Focus sur le premier champ
+        emailField.requestFocus();
+
+        System.out.println("=== OublierController initialisé avec ServiceOublier ===");
     }
 
-    @FXML
-    public void initialize() {
-        System.out.println("=== OublierController initialisé ===");
-
-        // Vérifier que tous les champs sont injectés
-        verifierChamps();
-
-        if (lblMessage != null) {
-            lblMessage.setVisible(false);
-        }
+    // ==================== ANIMATIONS ====================
+    private void animateEntrance() {
+        FadeTransition fade = new FadeTransition(Duration.seconds(0.5), emailStep);
+        fade.setFromValue(0);
+        fade.setToValue(1);
+        fade.play();
     }
 
-    private void verifierChamps() {
-        System.out.println("Vérification des champs FXML:");
-        System.out.println("   txtNom: " + (txtNom != null ? "✅ OK" : "❌ NULL"));
-        System.out.println("   txtTelephone: " + (txtTelephone != null ? "✅ OK" : "❌ NULL"));
-        System.out.println("   txtNouveauMotDePasse: " + (txtNouveauMotDePasse != null ? "✅ OK" : "❌ NULL"));
-        System.out.println("   txtConfirmerMotDePasse: " + (txtConfirmerMotDePasse != null ? "✅ OK" : "❌ NULL"));
-        System.out.println("   btnReinitialiser: " + (btnReinitialiser != null ? "✅ OK" : "❌ NULL"));
-        System.out.println("   btnRetour: " + (btnRetour != null ? "✅ OK" : "❌ NULL"));
-        System.out.println("   btnEffacer: " + (btnEffacer != null ? "✅ OK" : "❌ NULL"));
-        System.out.println("   lblMessage: " + (lblMessage != null ? "✅ OK" : "❌ NULL"));
+    private void setupRealTimeValidation() {
+        // Validation email
+        emailField.textProperty().addListener((obs, old, newVal) -> {
+            if (newVal != null && !newVal.isEmpty()) {
+                if (newVal.contains("@") && newVal.contains(".")) {
+                    emailField.setStyle("-fx-border-color: #48bb78;");
+                } else {
+                    emailField.setStyle("-fx-border-color: #f56565;");
+                }
+            } else {
+                emailField.setStyle("-fx-border-color: #e2e8f0;");
+            }
+        });
     }
 
+    // ==================== ÉTAPE 1: ENVOI DU CODE ====================
     @FXML
-    private void handleResetPassword(ActionEvent event) {
-        // Protection anti-double clic
-        if (isProcessing) {
-            System.out.println("⏳ Traitement en cours, clic ignoré");
+    private void handleSendCode() {
+        String email = emailField.getText().trim();
+
+        // Validation
+        if (email.isEmpty()) {
+            showError("Veuillez entrer votre email");
             return;
         }
 
-        try {
-            isProcessing = true;
-            desactiverBoutons(true);
+        if (!email.contains("@") || !email.contains(".")) {
+            showError("Format d'email invalide");
+            return;
+        }
 
-            System.out.println("=== OublierController.handleResetPassword ===");
+        // Afficher le chargement
+        showLoading(true);
 
-            // Vérification que les champs ne sont pas null (sécurité)
-            if (txtNom == null || txtTelephone == null ||
-                    txtNouveauMotDePasse == null || txtConfirmerMotDePasse == null) {
-                System.err.println("❌ Erreur: Champs FXML non initialisés");
-                afficherMessage("Erreur interne de l'application", "error");
+        // ✅ CORRECTION 2: Utiliser l'instance au lieu de la classe
+        PauseTransition pause = new PauseTransition(Duration.seconds(1));
+        pause.setOnFinished(event -> {
+
+            if (!serviceOublier.emailExists(email)) {  // ← CORRIGÉ
+                showLoading(false);
+                showError("Cet email n'est pas enregistré dans notre système");
                 return;
             }
 
-            // Récupération des données
-            String nom = txtNom.getText().trim();
-            String telephone = txtTelephone.getText().trim().replaceAll("\\s+", "");
-            String nouveauPassword = txtNouveauMotDePasse.getText();
-            String confirmPassword = txtConfirmerMotDePasse.getText();
+            // Générer le code
+            verificationCode = CodeGenerator.generateVerificationCode();
+            userEmail = email;
 
-            // AFFICHAGE POUR DÉBOGAGE
-            System.out.println("   Nom: '" + nom + "'");
-            System.out.println("   Téléphone: '" + telephone + "'");
-            System.out.println("   Mot de passe: [PROTÉGÉ]");
+            // ✅ CORRECTION 3: Utiliser l'instance pour saveResetCode
+            serviceOublier.saveResetCode(email, verificationCode);  // ← CORRIGÉ
 
-            // ÉTAPE 1: Validation des champs
-            if (nom.isEmpty() || telephone.isEmpty() || nouveauPassword.isEmpty() || confirmPassword.isEmpty()) {
-                afficherMessage("Tous les champs sont obligatoires", "error");
-                return;
-            }
+            // ✅ CORRECTION 4: Utiliser l'instance pour getUserType
+            String userType = serviceOublier.getUserType(email);  // ← CORRIGÉ
+            userTypeLabel.setText("Compte : " + userType);
 
-            // ÉTAPE 2: Validation téléphone
-            if (!telephone.matches("\\d{8}")) {
-                afficherMessage("Le téléphone doit contenir 8 chiffres", "error");
-                return;
-            }
+            boolean emailSent = EmailService.sendVerificationCode(email, verificationCode);
 
-            // ÉTAPE 3: Vérifier que les mots de passe correspondent
-            if (!nouveauPassword.equals(confirmPassword)) {
-                afficherMessage("Les mots de passe ne correspondent pas", "error");
-                return;
-            }
+            // NOUVEAU CODE (simulation) :
+           // boolean emailSent = true; // Simuler l'envoi
+           // System.out.println("🔐 CODE DE TEST (simulé) : " + verificationCode);
+           // showSuccess("✅ Code de test: " + verificationCode);
 
-            // ÉTAPE 4: Validation du nouveau mot de passe
-            if (nouveauPassword.length() < 6) {
-                afficherMessage("Le mot de passe doit contenir au moins 6 caractères", "error");
-                return;
-            }
-            if (nouveauPassword.length() > 30) {
-                afficherMessage("Le mot de passe ne doit pas dépasser 30 caractères", "error");
-                return;
-            }
 
-            System.out.println("🔍 Recherche de l'utilisateur: " + nom + " - " + telephone);
+            showLoading(false);
 
-            // ÉTAPE 5: Vérifier si l'utilisateur existe
-            if (!serviceOublier.utilisateurExiste(nom, telephone)) {
-                afficherMessage("Aucun utilisateur trouvé avec ces informations", "error");
-                return;
-            }
-
-            System.out.println("✅ Utilisateur trouvé, réinitialisation du mot de passe...");
-
-            // ÉTAPE 6: Réinitialiser le mot de passe
-            boolean success = serviceOublier.resetPassword(nom, telephone, nouveauPassword);
-
-            if (success) {
-                afficherMessage("✅ Mot de passe réinitialisé avec succès !", "success");
-                effacerChamps();
-
-                // Redirection automatique après 2 secondes
-                new Thread(() -> {
-                    try {
-                        Thread.sleep(2000);
-                        javafx.application.Platform.runLater(() -> {
-                            try {
-                                handleBackToLogin(event);
-                            } catch (Exception e) {
-                                System.err.println("❌ Erreur redirection: " + e.getMessage());
-                            }
-                        });
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }).start();
+            if (emailSent) {
+                showSuccess("✅ Code envoyé à " + maskEmail(email));
+                showCodeStep();
+                startTimer();
             } else {
-                afficherMessage("❌ Échec de la réinitialisation. Veuillez réessayer.", "error");
+                showError("❌ Erreur d'envoi. Vérifiez votre connexion internet.");
             }
-
-        } catch (Exception e) {
-            System.err.println("=== ERREUR DÉTAILLÉE ===");
-            System.err.println("Type: " + e.getClass().getName());
-            System.err.println("Message: " + e.getMessage());
-            e.printStackTrace();
-
-            String errorMsg = e.getMessage() != null ? e.getMessage() : "Erreur inconnue";
-            afficherMessage("❌ Erreur : " + errorMsg, "error");
-        } finally {
-            isProcessing = false;
-            desactiverBoutons(false);
-        }
+        });
+        pause.play();
     }
 
-    private void desactiverBoutons(boolean desactiver) {
-        if (btnReinitialiser != null) {
-            btnReinitialiser.setDisable(desactiver);
-            btnReinitialiser.setText(desactiver ? "⏳ Traitement..." : "Réinitialiser");
-        }
-        if (btnRetour != null) {
-            btnRetour.setDisable(desactiver);
-        }
-        if (btnEffacer != null) {
-            btnEffacer.setDisable(desactiver);
-        }
-    }
-
+    // ==================== ÉTAPE 2: VÉRIFICATION DU CODE ====================
     @FXML
-    private void handleBackToLogin(ActionEvent event) {
-        System.out.println("=== Retour à la page de connexion ===");
+    private void handleVerifyCode() {
+        String enteredCode = codeField.getText().trim();
 
+        if (enteredCode.isEmpty()) {
+            showError("Veuillez entrer le code de vérification");
+            return;
+        }
+
+        showLoading(true);
+
+        PauseTransition pause = new PauseTransition(Duration.seconds(0.5));
+        pause.setOnFinished(event -> {
+            showLoading(false);
+
+            // ✅ CORRECTION 5: Utiliser l'instance pour isResetCodeValid
+            if (serviceOublier.isResetCodeValid(userEmail, enteredCode)) {  // ← CORRIGÉ
+                showSuccess("✅ Code valide !");
+                stopTimer();
+                showNewPasswordStep();
+            } else {
+                showError("❌ Code incorrect ou expiré");
+                shakeNode(codeField);
+            }
+        });
+        pause.play();
+    }
+
+    // ==================== ÉTAPE 3: NOUVEAU MOT DE PASSE ====================
+    @FXML
+    private void handleResetPassword() {
+        String newPassword = newPasswordField.getText();
+        String confirmPassword = confirmPasswordField.getText();
+
+        // Validations
+        if (newPassword.isEmpty() || confirmPassword.isEmpty()) {
+            showError("Veuillez remplir tous les champs");
+            return;
+        }
+
+        if (!newPassword.equals(confirmPassword)) {
+            showError("Les mots de passe ne correspondent pas");
+            shakeNode(confirmPasswordField);
+            return;
+        }
+
+        if (newPassword.length() < 6) {
+            showError("Le mot de passe doit contenir au moins 6 caractères");
+            return;
+        }
+
+        // Vérifier la force du mot de passe
+        if (!isPasswordStrong(newPassword)) {
+            showError("Le mot de passe doit contenir au moins une majuscule et un chiffre");
+            return;
+        }
+
+        showLoading(true);
+
+        PauseTransition pause = new PauseTransition(Duration.seconds(1));
+        pause.setOnFinished(event -> {
+            // ✅ CORRECTION 6: Utiliser l'instance pour updatePassword
+            boolean updated = serviceOublier.updatePassword(userEmail, newPassword);  // ← CORRIGÉ
+            showLoading(false);
+
+            if (updated) {
+                showSuccessStep();
+            } else {
+                showError("❌ Erreur lors de la réinitialisation");
+            }
+        });
+        pause.play();
+    }
+
+    // ==================== NAVIGATION ====================
+    @FXML
+    private void handleBackToLogin() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ConnecterUser.fxml"));
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/ConnecterUser.fxml"));
             Parent root = loader.load();
 
-            Scene currentScene = ((Node) event.getSource()).getScene();
-            Stage stage = (Stage) currentScene.getWindow();
+            Stage stage = (Stage) emailField.getScene().getWindow();
 
-            stage.setScene(new Scene(root));
-            stage.setTitle("Connexion - Système de Gestion");
-            stage.centerOnScreen();
+            // Animation de transition
+            Scene currentScene = stage.getScene();
+            root.setOpacity(0);
+            currentScene.setRoot(root);
 
-            System.out.println("✅ Retour à la connexion réussi");
+            FadeTransition fade = new FadeTransition(Duration.seconds(0.5), root);
+            fade.setFromValue(0);
+            fade.setToValue(1);
+            fade.play();
+
         } catch (IOException e) {
-            System.err.println("❌ Erreur lors du retour:");
             e.printStackTrace();
-            afficherMessage("Erreur lors du retour à la page de connexion", "error");
+            showError("Erreur de navigation");
         }
     }
 
     @FXML
-    private void handleClearFields() {
-        effacerChamps();
+    private void handleResendCode() {
+        handleSendCode(); // Réutilise la même logique
     }
 
-    private void effacerChamps() {
-        if (txtNom != null) txtNom.clear();
-        if (txtTelephone != null) txtTelephone.clear();
-        if (txtNouveauMotDePasse != null) txtNouveauMotDePasse.clear();
-        if (txtConfirmerMotDePasse != null) txtConfirmerMotDePasse.clear();
-        afficherMessage("Champs effacés", "info");
+    // ==================== MÉTHODES UTILITAIRES ====================
+
+    private void showCodeStep() {
+        emailStep.setVisible(false);
+        emailStep.setManaged(false);
+        codeStep.setVisible(true);
+        codeStep.setManaged(true);
+
+        // Animation
+        FadeTransition fade = new FadeTransition(Duration.seconds(0.5), codeStep);
+        fade.setFromValue(0);
+        fade.setToValue(1);
+        fade.play();
+
+        codeField.requestFocus();
     }
 
-    private void afficherMessage(String message, String type) {
-        if (lblMessage == null) {
-            System.err.println("lblMessage est null, impossible d'afficher: " + message);
-            return;
-        }
+    private void showNewPasswordStep() {
+        codeStep.setVisible(false);
+        codeStep.setManaged(false);
+        newPasswordStep.setVisible(true);
+        newPasswordStep.setManaged(true);
 
-        lblMessage.setText(message);
-        lblMessage.getStyleClass().removeAll("success", "error", "warning", "info");
-        lblMessage.getStyleClass().add(type);
-        lblMessage.setVisible(true);
+        FadeTransition fade = new FadeTransition(Duration.seconds(0.5), newPasswordStep);
+        fade.setFromValue(0);
+        fade.setToValue(1);
+        fade.play();
 
-        // Configuration des couleurs
-        switch (type) {
-            case "success":
-                lblMessage.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
-                break;
-            case "error":
-                lblMessage.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;");
-                break;
-            case "warning":
-                lblMessage.setStyle("-fx-text-fill: #f39c12; -fx-font-weight: bold;");
-                break;
-            case "info":
-                lblMessage.setStyle("-fx-text-fill: #3498db; -fx-font-weight: bold;");
-                break;
-        }
+        newPasswordField.requestFocus();
+    }
 
-        // Cache le message après 5 secondes
-        new Thread(() -> {
-            try {
-                Thread.sleep(5000);
-                javafx.application.Platform.runLater(() -> {
-                    if (lblMessage != null) {
-                        lblMessage.setVisible(false);
-                    }
-                });
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+    private void showSuccessStep() {
+        newPasswordStep.setVisible(false);
+        newPasswordStep.setManaged(false);
+        successStep.setVisible(true);
+        successStep.setManaged(true);
+
+        // Animation de succès
+        ScaleTransition scale = new ScaleTransition(Duration.seconds(0.5), successStep);
+        scale.setFromX(0.8);
+        scale.setFromY(0.8);
+        scale.setToX(1);
+        scale.setToY(1);
+        scale.play();
+
+        // Redirection automatique après 3 secondes
+        PauseTransition pause = new PauseTransition(Duration.seconds(3));
+        pause.setOnFinished(e -> handleBackToLogin());
+        pause.play();
+    }
+
+    private void startTimer() {
+        timeSeconds = 300;
+        timeline = new Timeline();
+        timeline.setCycleCount(Timeline.INDEFINITE);
+
+        KeyFrame frame = new KeyFrame(Duration.seconds(1), event -> {
+            timeSeconds--;
+            int minutes = timeSeconds / 60;
+            int seconds = timeSeconds % 60;
+            timerLabel.setText(String.format("⏱️ Code valable : %d:%02d", minutes, seconds));
+
+            if (timeSeconds <= 0) {
+                stopTimer();
+                showError("⌛ Code expiré. Veuillez recommencer.");
+                resetToEmailStep();
             }
-        }).start();
+        });
+
+        timeline.getKeyFrames().add(frame);
+        timeline.play();
     }
 
-    /**
-     * Méthode utilitaire pour afficher une alerte
-     */
-    private void showAlert(Alert.AlertType type, String title, String header, String content) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(header);
-        alert.setContentText(content);
-        alert.showAndWait();
+    private void stopTimer() {
+        if (timeline != null) {
+            timeline.stop();
+        }
+    }
+
+    private void resetToEmailStep() {
+        emailStep.setVisible(true);
+        emailStep.setManaged(true);
+        codeStep.setVisible(false);
+        codeStep.setManaged(false);
+        newPasswordStep.setVisible(false);
+        newPasswordStep.setManaged(false);
+        successStep.setVisible(false);
+        successStep.setManaged(false);
+
+        verificationCode = null;
+        emailField.clear();
+    }
+
+    private void showLoading(boolean show) {
+        loadingIndicator.setVisible(show);
+        sendCodeButton.setDisable(show);
+        verifyCodeButton.setDisable(show);
+        resetPasswordButton.setDisable(show);
+    }
+
+    private void showError(String message) {
+        messageLabel.setText("❌ " + message);
+        messageLabel.setStyle("-fx-background-color: #fed7d7; -fx-text-fill: #c53030; " +
+                "-fx-padding: 10; -fx-background-radius: 5;");
+        messageLabel.setVisible(true);
+
+        // Cache après 5 secondes
+        PauseTransition pause = new PauseTransition(Duration.seconds(5));
+        pause.setOnFinished(e -> messageLabel.setVisible(false));
+        pause.play();
+    }
+
+    private void showSuccess(String message) {
+        messageLabel.setText("✅ " + message);
+        messageLabel.setStyle("-fx-background-color: #c6f6d5; -fx-text-fill: #22543d; " +
+                "-fx-padding: 10; -fx-background-radius: 5;");
+        messageLabel.setVisible(true);
+
+        PauseTransition pause = new PauseTransition(Duration.seconds(3));
+        pause.setOnFinished(e -> messageLabel.setVisible(false));
+        pause.play();
+    }
+
+    private void shakeNode(javafx.scene.Node node) {
+        TranslateTransition tt = new TranslateTransition(Duration.millis(100), node);
+        tt.setFromX(0);
+        tt.setByX(10);
+        tt.setCycleCount(6);
+        tt.setAutoReverse(true);
+        tt.play();
+    }
+
+    private String maskEmail(String email) {
+        int atIndex = email.indexOf('@');
+        if (atIndex > 1) {
+            return email.substring(0, 1) + "****" +
+                    email.substring(atIndex - 1);
+        }
+        return email;
+    }
+
+    private boolean isPasswordStrong(String password) {
+        // Au moins une majuscule, un chiffre
+        return password.matches(".*[A-Z].*") &&
+                password.matches(".*[0-9].*");
     }
 }

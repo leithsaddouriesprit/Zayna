@@ -1,6 +1,10 @@
 package tn.esprit.workshop.controlleurs.talel;
+
+import javafx.animation.FadeTransition;
+import javafx.animation.PauseTransition;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
+import javafx.util.Duration;
 import tn.esprit.workshop.model.talel.CategorieUser;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -9,6 +13,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import javafx.application.Platform;
 import tn.esprit.workshop.model.talel.User;
 import tn.esprit.workshop.services.ServiceAdmin;
 import tn.esprit.workshop.model.validation.UserValidation;
@@ -18,6 +23,8 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class ConnecterController implements Initializable {
+    @FXML
+    private Label messageLabel;
 
     @FXML
     private TextField emailField;
@@ -39,23 +46,53 @@ public class ConnecterController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         serviceUser = new ServiceAdmin();
-        loginErrorLabel.setVisible(false);
-        loadingIndicator.setVisible(false);
+
+        // CORRECTION 1: Configuration du label d'erreur
+        if (loginErrorLabel != null) {
+            loginErrorLabel.setVisible(false);
+            loginErrorLabel.setManaged(true);
+            loginErrorLabel.setWrapText(true);
+        }
+
+        if (loadingIndicator != null) {
+            loadingIndicator.setVisible(false);
+        }
+
+        System.out.println("=== ConnecterController initialisé ===");
     }
 
     @FXML
     private void handleLogin() {
+        // Cacher les erreurs précédentes
         loginErrorLabel.setVisible(false);
+
+        // Afficher l'indicateur de chargement
         loadingIndicator.setVisible(true);
         loginButton.setDisable(true);
 
         String email = emailField.getText().trim();
         String password = passwordField.getText();
 
-        // Validation
-        UserValidation.ValidationResult result = UserValidation.validateLogin(email, password);
-        if (!result.isValid()) {
-            showLoginErrors(result.getErrors());
+        // CORRECTION 2: Validation CHAMP PAR CHAMP avec focus
+        if (email.isEmpty()) {
+            afficherErreur("❌ L'email est obligatoire");
+            emailField.requestFocus();
+            loadingIndicator.setVisible(false);
+            loginButton.setDisable(false);
+            return;
+        }
+
+        if (password.isEmpty()) {
+            afficherErreur("❌ Le mot de passe est obligatoire");
+            passwordField.requestFocus();
+            loadingIndicator.setVisible(false);
+            loginButton.setDisable(false);
+            return;
+        }
+
+        if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
+            afficherErreur("❌ Format d'email invalide (ex: nom@domaine.com)");
+            emailField.requestFocus();
             loadingIndicator.setVisible(false);
             loginButton.setDisable(false);
             return;
@@ -68,23 +105,38 @@ public class ConnecterController implements Initializable {
 
                 User user = serviceUser.login(email, password);
 
-                javafx.application.Platform.runLater(() -> {
+                Platform.runLater(() -> {
                     loadingIndicator.setVisible(false);
                     loginButton.setDisable(false);
 
-                    // Rediriger vers la scène appropriée selon le rôle
-                    redirectToRoleScene(user);
+                    if (user != null) {
+                        // Rediriger vers la scène appropriée selon le rôle
+                        redirectToRoleScene(user);
+                    } else {
+                        afficherErreur("❌ Email ou mot de passe incorrect");
+                    }
                 });
 
             } catch (Exception e) {
-                javafx.application.Platform.runLater(() -> {
+                Platform.runLater(() -> {
                     loadingIndicator.setVisible(false);
                     loginButton.setDisable(false);
-                    loginErrorLabel.setText("❌ " + e.getMessage());
-                    loginErrorLabel.setVisible(true);
+                    afficherErreur("❌ " + e.getMessage());
+                    e.printStackTrace();
                 });
             }
         }).start();
+    }
+
+    // CORRECTION 3: Méthode utilitaire pour afficher les erreurs
+    private void afficherErreur(String message) {
+        Platform.runLater(() -> {
+            loginErrorLabel.setText(message);
+            loginErrorLabel.setVisible(true);
+
+            // Style pour les erreurs
+            loginErrorLabel.setStyle("-fx-background-color: #f8d7da; -fx-text-fill: #721c24; -fx-border-color: #f5c6cb; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 10; -fx-font-weight: bold;");
+        });
     }
 
     // ==================== MÉTHODES D'INSCRIPTION ====================
@@ -94,8 +146,7 @@ public class ConnecterController implements Initializable {
      */
     @FXML
     private void handleInscriptionParent() {
-        ouvrirInscription("/Parent.fxml",
-                "Inscription Parent");
+        ouvrirInscription("/Parent.fxml", "Inscription Parent");
     }
 
     /**
@@ -103,8 +154,7 @@ public class ConnecterController implements Initializable {
      */
     @FXML
     private void handleInscriptionChauffeur() {
-        ouvrirInscription("/Chauffeur.fxml",
-                "Inscription Chauffeur");
+        ouvrirInscription("/Chauffeur.fxml", "Inscription Chauffeur");
     }
 
     /**
@@ -112,8 +162,7 @@ public class ConnecterController implements Initializable {
      */
     @FXML
     private void handleInscriptionMaitresse() {
-        ouvrirInscription("/Maitresse.fxml",
-                "Inscription Enseignant");
+        ouvrirInscription("/Maitresse.fxml", "Inscription Enseignant");
     }
 
     /**
@@ -121,8 +170,7 @@ public class ConnecterController implements Initializable {
      */
     @FXML
     private void handleInscriptionResponsable() {
-        ouvrirInscription("/ResponsableEcole.fxml",
-                "Inscription Responsable");
+        ouvrirInscription("/ResponsableEcole.fxml", "Inscription Responsable");
     }
 
     /**
@@ -164,12 +212,64 @@ public class ConnecterController implements Initializable {
 
     // ==================== GESTION DU MOT DE PASSE OUBLIÉ ====================
 
+    // Ajoutez cette méthode pour afficher les erreurs
+    private void showError(String message) {
+        if (messageLabel != null) {
+            messageLabel.setText("❌ " + message);
+            messageLabel.setStyle("-fx-background-color: #fed7d7; " +
+                    "-fx-text-fill: #c53030; " +
+                    "-fx-padding: 10; " +
+                    "-fx-background-radius: 5;");
+            messageLabel.setVisible(true);
+
+            // Cache le message après 5 secondes
+            PauseTransition pause = new PauseTransition(Duration.seconds(5));
+            pause.setOnFinished(e -> messageLabel.setVisible(false));
+            pause.play();
+        } else {
+            System.out.println("Erreur: " + message);
+        }
+    }
+
+    // Ajoutez aussi cette méthode pour les succès (optionnel)
+    private void showSuccess(String message) {
+        if (messageLabel != null) {
+            messageLabel.setText("✅ " + message);
+            messageLabel.setStyle("-fx-background-color: #c6f6d5; " +
+                    "-fx-text-fill: #22543d; " +
+                    "-fx-padding: 10; " +
+                    "-fx-background-radius: 5;");
+            messageLabel.setVisible(true);
+
+            PauseTransition pause = new PauseTransition(Duration.seconds(3));
+            pause.setOnFinished(e -> messageLabel.setVisible(false));
+            pause.play();
+        }
+    }
     @FXML
     private void handleForgotPassword() {
-        showAlert("Mot de passe oublié",
-                "Veuillez contacter l'administrateur pour réinitialiser votre mot de passe.\n\n" +
-                        "Email: admin@zayna.com\n" +
-                        "Téléphone: +216 00 000 000");
+        try {
+            // Animation de transition
+            Stage stage = (Stage) emailField.getScene().getWindow();
+
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/Oublier.fxml"));
+            Parent root = loader.load();
+
+            Scene currentScene = stage.getScene();
+            root.setOpacity(0);
+            currentScene.setRoot(root);
+
+            // Animation de fondu
+            FadeTransition fade = new FadeTransition(Duration.seconds(0.5), root);
+            fade.setFromValue(0);
+            fade.setToValue(1);
+            fade.play();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            showError("Erreur lors de la navigation");
+        }
     }
 
     // ==================== REDIRECTION APRÈS CONNEXION ====================
@@ -219,15 +319,15 @@ public class ConnecterController implements Initializable {
 
         switch (role) {
             case ADMIN:
-                return "/Admin.fxml";     // À créer si nécessaire
+                return "/Admin.fxml";
             case CHAUFFEUR:
-                return "/Chauffeur.fxml";          // ✅ Chemin correct
+                return "/Chauffeur.fxml";
             case MAITRESSE:
-                return "/Maitresse.fxml";          // ✅ Chemin correct
+                return "/Maitresse.fxml";
             case PARENT:
-                return "/Parent.fxml";              // ✅ Chemin correct
+                return "/Parent.fxml";
             case RESPONSABLEECOLE:
-                return "/ResponsableEcole.fxml";    // ✅ Chemin correct
+                return "/ResponsableEcole.fxml";
             default:
                 return "/ConnecterUser.fxml";
         }
@@ -262,50 +362,15 @@ public class ConnecterController implements Initializable {
         try {
             // Essayer d'appeler setUser par réflexion
             controller.getClass().getMethod("setUser", User.class).invoke(controller, user);
+            System.out.println("✅ Utilisateur injecté dans " + controller.getClass().getSimpleName());
         } catch (Exception e) {
             // Ignorer si la méthode n'existe pas
-            System.out.println("Le contrôleur " + controller.getClass().getSimpleName() +
+            System.out.println("ℹ️ Le contrôleur " + controller.getClass().getSimpleName() +
                     " n'a pas de méthode setUser");
         }
     }
 
-    @FXML
-    private void handleForgotPassword(ActionEvent event) {
-        try {
-            System.out.println("Navigation vers la page mot de passe oublié...");
-
-            // Vérification préalable
-            java.net.URL fxmlUrl = getClass().getResource("/Oublier.fxml");
-            if (fxmlUrl == null) {
-                throw new NullPointerException("Fichier Oublier.fxml non trouvé dans /resources/");
-            }
-
-            // Chargement et navigation
-            Parent root = FXMLLoader.load(fxmlUrl);
-            Scene scene = new Scene(root);
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-            stage.setScene(scene);
-            stage.setTitle("Réinitialisation du mot de passe");
-            stage.show();
-
-        } catch (IOException | NullPointerException e) {
-            System.err.println("Erreur de navigation: " + e.getMessage());
-            e.printStackTrace();
-
-        }
-    }
-
     // ==================== MÉTHODES UTILITAIRES ====================
-
-    private void showLoginErrors(java.util.List<String> errors) {
-        StringBuilder sb = new StringBuilder();
-        for (String error : errors) {
-            sb.append("• ").append(error).append("\n");
-        }
-        loginErrorLabel.setText(sb.toString());
-        loginErrorLabel.setVisible(true);
-    }
 
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

@@ -34,6 +34,8 @@ public class ControleurResponsableEcole {
     private Label lblMessage;
     @FXML
     private Button logoutButton;
+    @FXML
+    private Button btnAjouter;
 
     private ServiceResponsableEcole serviceResponsable;
     private User connectedUser;
@@ -42,6 +44,10 @@ public class ControleurResponsableEcole {
     public void initialize() {
         serviceResponsable = new ServiceResponsableEcole();
         System.out.println("=== ControleurResponsableEcole initialisé ===");
+
+        // S'assurer que le label message est bien configuré
+        lblMessage.setVisible(false);
+        lblMessage.setManaged(true);
     }
 
     @FXML
@@ -60,35 +66,63 @@ public class ControleurResponsableEcole {
             String salaireText = txtSalaire.getText().trim();
 
             // Validation des champs obligatoires
-            if (nom.isEmpty() || email.isEmpty() || passwordClair.isEmpty() ||
-                    titre.isEmpty() || ecole.isEmpty()) {
-                afficherMessage("Veuillez remplir tous les champs obligatoires (Nom, Email, Mot de passe, Titre, École)", "warning");
+            if (nom.isEmpty()) {
+                afficherMessage("❌ Le nom est obligatoire", "error");
+                txtNom.requestFocus();
                 return;
             }
 
-            // Validation email (améliorée)
+            if (email.isEmpty()) {
+                afficherMessage("❌ L'email est obligatoire", "error");
+                txtEmail.requestFocus();
+                return;
+            }
+
+            if (passwordClair.isEmpty()) {
+                afficherMessage("❌ Le mot de passe est obligatoire", "error");
+                txtMotDePasse.requestFocus();
+                return;
+            }
+
+            if (titre.isEmpty()) {
+                afficherMessage("❌ Le titre est obligatoire", "error");
+                txtTitre.requestFocus();
+                return;
+            }
+
+            if (ecole.isEmpty()) {
+                afficherMessage("❌ Le nom de l'école est obligatoire", "error");
+                txtEcole.requestFocus();
+                return;
+            }
+
+            // Validation email
             if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
-                afficherMessage("Format d'email invalide (ex: nom@domaine.com)", "error");
+                afficherMessage("❌ Format d'email invalide (ex: nom@domaine.com)", "error");
+                txtEmail.requestFocus();
                 return;
             }
 
             // Validation téléphone (optionnel mais doit être valide si présent)
             if (!telephone.isEmpty() && !telephone.matches("\\d{8}")) {
-                afficherMessage("Le téléphone doit contenir 8 chiffres", "error");
+                afficherMessage("❌ Le téléphone doit contenir 8 chiffres", "error");
+                txtTelephone.requestFocus();
                 return;
             }
 
             // Validation mot de passe
             if (passwordClair.length() < 6) {
-                afficherMessage("Le mot de passe doit contenir au moins 6 caractères", "error");
+                afficherMessage("❌ Le mot de passe doit contenir au moins 6 caractères", "error");
+                txtMotDePasse.requestFocus();
                 return;
             }
             if (passwordClair.length() > 30) {
-                afficherMessage("Le mot de passe ne doit pas dépasser 30 caractères", "error");
+                afficherMessage("❌ Le mot de passe ne doit pas dépasser 30 caractères", "error");
+                txtMotDePasse.requestFocus();
                 return;
             }
 
-            // Création de l'objet ResponsableEcole (sans mot de passe)
+            // Création de l'objet ResponsableEcole
             ResponsableEcole responsable = new ResponsableEcole();
             responsable.setNom(nom);
             responsable.setEmail(email);
@@ -102,22 +136,24 @@ public class ControleurResponsableEcole {
                 try {
                     double salaire = Double.parseDouble(salaireText);
                     if (salaire < 0) {
-                        afficherMessage("Le salaire ne peut pas être négatif", "error");
+                        afficherMessage("❌ Le salaire ne peut pas être négatif", "error");
+                        txtSalaire.requestFocus();
                         return;
                     }
                     responsable.setSalaire(salaire);
                 } catch (NumberFormatException e) {
-                    afficherMessage("Le salaire doit être un nombre valide", "error");
+                    afficherMessage("❌ Le salaire doit être un nombre valide", "error");
+                    txtSalaire.requestFocus();
                     return;
                 }
             }
 
             System.out.println("Appel du service avec email: " + email);
 
-            // Appel au service avec le mot de passe en clair (CORRECTION IMPORTANTE)
-            serviceResponsable.ajouterResponsable(responsable, passwordClair); // PAS connectedUser.getpassword()
+            // Appel au service avec le mot de passe en clair
+            serviceResponsable.ajouterResponsable(responsable, passwordClair);
 
-            afficherMessage("✅ Responsable d'école ajouté avec succès ! ID: " + responsable.getId(), "success");
+            afficherMessage("✅ Responsable d'école ajouté avec succès !", "success");
             viderFormulaire();
 
         } catch (Exception e) {
@@ -141,16 +177,37 @@ public class ControleurResponsableEcole {
         txtTelephone.clear();
         txtAdresse.clear();
         txtSalaire.clear();
-        afficherMessage("Formulaire vidé", "info");
+
+        //afficherMessage("📋 Formulaire vidé", "info");
     }
 
+    /**
+     * Affiche un message dans le label lblMessage
+     * @param message Le texte à afficher
+     * @param type Le type de message (success, error, warning, info)
+     */
     private void afficherMessage(String message, String type) {
         lblMessage.setText(message);
-        lblMessage.getStyleClass().removeAll("success", "error", "warning", "info");
-        lblMessage.getStyleClass().add(type);
         lblMessage.setVisible(true);
 
-        // Cache le message après 5 secondes
+        // Appliquer le style en fonction du type
+        switch(type) {
+            case "success":
+                lblMessage.setStyle("-fx-background-color: #d4edda; -fx-text-fill: #155724; -fx-border-color: #c3e6cb;");
+                break;
+            case "error":
+                lblMessage.setStyle("-fx-background-color: #f8d7da; -fx-text-fill: #721c24; -fx-border-color: #f5c6cb;");
+                break;
+            case "warning":
+                lblMessage.setStyle("-fx-background-color: #fff3cd; -fx-text-fill: #856404; -fx-border-color: #ffeeba;");
+                break;
+            case "info":
+            default:
+                lblMessage.setStyle("-fx-background-color: #d1ecf1; -fx-text-fill: #0c5460; -fx-border-color: #bee5eb;");
+                break;
+        }
+
+        // Créer un thread pour cacher le message après 5 secondes
         new Thread(() -> {
             try {
                 Thread.sleep(5000);

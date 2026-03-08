@@ -9,6 +9,7 @@ import tn.esprit.workshop.model.talel.User;
 import tn.esprit.workshop.services.talel.ServiceChauffeur;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.application.Platform;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -38,6 +39,8 @@ public class ControleurChauffeur {
     private Label lblMessage;
     @FXML
     private Button logoutButton;
+    @FXML
+    private Button btnAjouter; // À ajouter dans le FXML
 
     private ServiceChauffeur serviceChauffeur;
     private User connectedUser;
@@ -45,6 +48,14 @@ public class ControleurChauffeur {
     @FXML
     public void initialize() {
         serviceChauffeur = new ServiceChauffeur();
+
+        // CORRECTION 1: Configuration du label message
+        if (lblMessage != null) {
+            lblMessage.setVisible(false);
+            lblMessage.setManaged(true);  // ← CORRIGÉ (était false par défaut)
+            lblMessage.setWrapText(true); // ← CORRIGÉ
+        }
+
         System.out.println("=== ControleurChauffeur initialisé ===");
     }
 
@@ -64,68 +75,92 @@ public class ControleurChauffeur {
             String vehicule = txtVehicule.getText().trim();
             String salaireText = txtSalaire.getText().trim();
 
-            // AFFICHAGE DES VALEURS POUR DÉBOGAGE
-            System.out.println("=== VALEURS SAISIES ===");
-            System.out.println("   Nom: '" + nom + "'");
-            System.out.println("   Email: '" + email + "'");
-            System.out.println("   Permis: '" + permis + "'");
-            System.out.println("   Date permis: " + datePermis);
-            System.out.println("   Salaire: '" + salaireText + "'");
-            System.out.println("   Téléphone: '" + telephone + "'");
-
-            // Validation des champs obligatoires
-            if (nom.isEmpty() || email.isEmpty() || passwordClair.isEmpty() || permis.isEmpty()) {
-                afficherMessage("Veuillez remplir tous les champs obligatoires (Nom, Email, Mot de passe, Permis)", "warning");
+            // CORRECTION 2: Validation CHAMP PAR CHAMP avec focus
+            // 1. Validation du nom
+            if (nom.isEmpty()) {
+                afficherMessage("❌ Le nom est obligatoire", "error");
+                txtNom.requestFocus();  // ← CORRIGÉ
                 return;
             }
 
-            // Validation de la date d'obtention du permis
+            // 2. Validation de l'email
+            if (email.isEmpty()) {
+                afficherMessage("❌ L'email est obligatoire", "error");
+                txtEmail.requestFocus();
+                return;
+            }
+
+            // 3. Validation du mot de passe
+            if (passwordClair.isEmpty()) {
+                afficherMessage("❌ Le mot de passe est obligatoire", "error");
+                txtMotDePasse.requestFocus();
+                return;
+            }
+
+            // 4. Validation du permis
+            if (permis.isEmpty()) {
+                afficherMessage("❌ Le numéro de permis est obligatoire", "error");
+                txtPermis.requestFocus();
+                return;
+            }
+
+            // 5. Validation de la date d'obtention du permis
             if (datePermis == null) {
-                afficherMessage("La date d'obtention du permis est obligatoire", "warning");
+                afficherMessage("❌ La date d'obtention du permis est obligatoire", "error");
+                dateObtentionPermis.requestFocus();
                 return;
             }
             if (datePermis.isAfter(LocalDate.now())) {
-                afficherMessage("La date d'obtention du permis ne peut pas être dans le futur", "error");
+                afficherMessage("❌ La date d'obtention du permis ne peut pas être dans le futur", "error");
+                dateObtentionPermis.requestFocus();
                 return;
             }
 
-            // Validation email
+            // 6. Validation du format email
             if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
-                afficherMessage("Format d'email invalide (ex: nom@domaine.com)", "error");
+                afficherMessage("❌ Format d'email invalide (ex: nom@domaine.com)", "error");
+                txtEmail.requestFocus();
                 return;
             }
 
-            // Validation téléphone (optionnel)
+            // 7. Validation du téléphone (optionnel)
             if (!telephone.isEmpty() && !telephone.matches("\\d{8}")) {
-                afficherMessage("Le téléphone doit contenir 8 chiffres", "error");
+                afficherMessage("❌ Le téléphone doit contenir 8 chiffres", "error");
+                txtTelephone.requestFocus();
                 return;
             }
 
-            // Validation mot de passe
+            // 8. Validation du mot de passe
             if (passwordClair.length() < 6) {
-                afficherMessage("Le mot de passe doit contenir au moins 6 caractères", "error");
+                afficherMessage("❌ Le mot de passe doit contenir au moins 6 caractères", "error");
+                txtMotDePasse.requestFocus();
                 return;
             }
             if (passwordClair.length() > 30) {
-                afficherMessage("Le mot de passe ne doit pas dépasser 30 caractères", "error");
+                afficherMessage("❌ Le mot de passe ne doit pas dépasser 30 caractères", "error");
+                txtMotDePasse.requestFocus();
                 return;
             }
 
-            // VALIDATION DU SALAIRE - MAINTENANT OBLIGATOIRE
+            // 9. Validation du salaire
             if (salaireText.isEmpty()) {
-                afficherMessage("Le salaire est obligatoire", "warning");
+                afficherMessage("❌ Le salaire est obligatoire", "error");
+                txtSalaire.requestFocus();
                 return;
             }
 
+            // 10. Parsing du salaire
             double salaire;
             try {
                 salaire = Double.parseDouble(salaireText);
                 if (salaire < 0) {
-                    afficherMessage("Le salaire ne peut pas être négatif", "error");
+                    afficherMessage("❌ Le salaire ne peut pas être négatif", "error");
+                    txtSalaire.requestFocus();
                     return;
                 }
             } catch (NumberFormatException e) {
-                afficherMessage("Le salaire doit être un nombre valide (ex: 1500.00)", "error");
+                afficherMessage("❌ Le salaire doit être un nombre valide (ex: 1500.00)", "error");
+                txtSalaire.requestFocus();
                 return;
             }
 
@@ -135,7 +170,7 @@ public class ControleurChauffeur {
             chauffeur.setEmail(email);
             chauffeur.setPermis(permis);
             chauffeur.setDateObtentionPermis(datePermis);
-            chauffeur.setSalaire(salaire);  // SALAIRE TOUJOURS DÉFINI
+            chauffeur.setSalaire(salaire);
 
             // Champs optionnels
             if (!telephone.isEmpty()) {
@@ -149,12 +184,11 @@ public class ControleurChauffeur {
             }
 
             System.out.println("✅ Données validées, appel du service...");
-            System.out.println("   Salaire défini: " + chauffeur.getSalaire());
 
             // Appel au service
             serviceChauffeur.ajouterChauffeur(chauffeur, passwordClair);
 
-            afficherMessage("✅ Chauffeur ajouté avec succès ! ID: " + chauffeur.getId(), "success");
+            afficherMessage("✅ Chauffeur ajouté avec succès !", "success");
             viderFormulaire();
 
         } catch (Exception e) {
@@ -163,7 +197,7 @@ public class ControleurChauffeur {
             System.err.println("Message: " + e.getMessage());
             e.printStackTrace();
 
-            String errorMsg = e.getMessage() != null ? e.getMessage() : "Erreur inconnue (voir console)";
+            String errorMsg = e.getMessage() != null ? e.getMessage() : "Erreur inconnue";
             afficherMessage("❌ Erreur : " + errorMsg, "error");
         }
     }
@@ -180,32 +214,52 @@ public class ControleurChauffeur {
         txtVehicule.clear();
         txtSalaire.clear();
         txtLigne.clear();
-        afficherMessage("Formulaire vidé", "info");
+
+        //afficherMessage("📋 Formulaire vidé", "info");
     }
 
+    // CORRECTION 3: Méthode afficherMessage avec setStyle() au lieu de getStyleClass()
     private void afficherMessage(String message, String type) {
-        if (lblMessage == null) {
-            System.err.println("lblMessage est null!");
-            return;
-        }
-        lblMessage.setText(message);
-        lblMessage.getStyleClass().removeAll("success", "error", "warning", "info");
-        lblMessage.getStyleClass().add(type);
-        lblMessage.setVisible(true);
-
-        // Cache le message après 5 secondes
-        new Thread(() -> {
-            try {
-                Thread.sleep(5000);
-                javafx.application.Platform.runLater(() -> {
-                    if (lblMessage != null) {
-                        lblMessage.setVisible(false);
-                    }
-                });
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        Platform.runLater(() -> {
+            if (lblMessage == null) {
+                System.err.println("lblMessage est null!");
+                return;
             }
-        }).start();
+
+            lblMessage.setText(message);
+            lblMessage.setVisible(true);
+
+            // Application des couleurs selon le type - CORRIGÉ
+            switch(type) {
+                case "success":
+                    lblMessage.setStyle("-fx-background-color: #d4edda; -fx-text-fill: #155724; -fx-border-color: #c3e6cb; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 10;");
+                    break;
+                case "error":
+                    lblMessage.setStyle("-fx-background-color: #f8d7da; -fx-text-fill: #721c24; -fx-border-color: #f5c6cb; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 10;");
+                    break;
+                case "warning":
+                    lblMessage.setStyle("-fx-background-color: #fff3cd; -fx-text-fill: #856404; -fx-border-color: #ffeeba; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 10;");
+                    break;
+                case "info":
+                default:
+                    lblMessage.setStyle("-fx-background-color: #d1ecf1; -fx-text-fill: #0c5460; -fx-border-color: #bee5eb; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 10;");
+                    break;
+            }
+
+            // Cache le message après 5 secondes
+            new Thread(() -> {
+                try {
+                    Thread.sleep(5000);
+                    Platform.runLater(() -> {
+                        if (lblMessage != null) {
+                            lblMessage.setVisible(false);
+                        }
+                    });
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        });
     }
 
     public void setUser(User user) {

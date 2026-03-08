@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="640.0" spacing="10" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshop.controlleurs.talel.AdminController">
+<VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="520.0" prefWidth="680.0" spacing="10" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshop.controlleurs.talel.AdminController">
     <padding>
         <Insets bottom="15" left="15" right="15" top="15" />
     </padding>
@@ -25,7 +25,8 @@
     <!-- En-tête avec titre et bouton de déconnexion -->
     <HBox alignment="CENTER_LEFT" spacing="10">
         <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Gestion des Utilisateurs" HBox.hgrow="ALWAYS" />
-        <Button fx:id="logoutButton" onAction="#handleLogoutButton" style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-weight: bold;" text="Déconnexion">
+        <!-- CORRECTION 1: Bouton de déconnexion avec bon format -->
+        <Button fx:id="logoutButton" onAction="#handleLogoutButton" style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-weight: bold;" text="   Déconnexion   ">
             <graphic>
                 <Label text="🚪" />
             </graphic>
@@ -35,23 +36,23 @@
     <!-- Barre d'outils -->
     <ToolBar>
         <items>
-            <Button fx:id="addButton" onAction="#handleAddButton" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" text="Ajouter">
+            <Button fx:id="addButton" onAction="#handleAddButton" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" text="   Ajouter   ">
                 <graphic>
                     <Label text="➕" />
                 </graphic>
             </Button>
-            <Button fx:id="editButton" onAction="#handleEditButton" style="-fx-background-color: #2196F3; -fx-text-fill: white;" text="Modifier">
+            <Button fx:id="editButton" onAction="#handleEditButton" style="-fx-background-color: #2196F3; -fx-text-fill: white;" text="   Modifier   ">
                 <graphic>
                     <Label text="✏️" />
                 </graphic>
             </Button>
-            <Button fx:id="deleteButton" onAction="#handleDeleteButton" style="-fx-background-color: #f44336; -fx-text-fill: white;" text="Supprimer">
+            <Button fx:id="deleteButton" onAction="#handleDeleteButton" style="-fx-background-color: #f44336; -fx-text-fill: white;" text="   Supprimer   ">
                 <graphic>
                     <Label text="🗑️" />
                 </graphic>
             </Button>
             <Separator orientation="VERTICAL" />
-            <Button fx:id="refreshButton" onAction="#handleRefreshButton" text="Actualiser">
+            <Button fx:id="refreshButton" onAction="#handleRefreshButton" text="   Actualiser   ">
                 <graphic>
                     <Label text="🔄" />
                 </graphic>
@@ -71,7 +72,7 @@
         <Label text="Catégorie:" GridPane.columnIndex="2" GridPane.rowIndex="0" />
         <ComboBox fx:id="categoryFilterCombo" onAction="#handleCategoryFilter" promptText="Toutes" GridPane.columnIndex="3" GridPane.rowIndex="0" />
 
-        <Button fx:id="clearSearchButton" onAction="#handleClearSearchButton" text="Effacer les filtres" GridPane.columnIndex="4" GridPane.rowIndex="0">
+        <Button fx:id="clearSearchButton" onAction="#handleClearSearchButton" text="   Effacer les filtres   " GridPane.columnIndex="4" GridPane.rowIndex="0">
             <graphic>
                 <Label text="❌" />
             </graphic>
@@ -113,20 +114,20 @@
         <Label fx:id="chauffeurCountLabel" style="-fx-text-fill: #F44336; -fx-font-weight: bold;" text="Chauffeurs: 0" />
     </FlowPane>
 
-    <!-- Formulaire d'ajout/modification -->
-    <GridPane fx:id="userForm" hgap="10" managed="false" style="-fx-border-color: #ddd; -fx-border-radius: 5; -fx-padding: 10; -fx-background-color: #f9f9f9;" vgap="10" visible="false">
+    <!-- CORRECTION 2: Formulaire d'ajout/modification avec managed="true" -->
+    <GridPane fx:id="userForm" hgap="10" managed="true" style="-fx-border-color: #ddd; -fx-border-radius: 5; -fx-padding: 10; -fx-background-color: #f9f9f9;" vgap="10" visible="false">
 
         <Label text="ID:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
         <TextField fx:id="idField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
         <Label text="Nom:*" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-        <TextField fx:id="txtNom" promptText="Nom complet" GridPane.columnIndex="1" GridPane.rowIndex="1" />  <!-- CHANGÉ: nomField → txtNom -->
+        <TextField fx:id="txtNom" promptText="Nom complet" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
         <Label text="Email:*" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-        <TextField fx:id="txtEmail" promptText="exemple@Zayna.com" GridPane.columnIndex="1" GridPane.rowIndex="2" />  <!-- CHANGÉ: emailField → txtEmail -->
+        <TextField fx:id="txtEmail" promptText="exemple@domaine.com" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
         <Label text="Mot de passe:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-        <PasswordField fx:id="txtMotDePasse" promptText="Mot de passe (min. 6 caractères, max. 30)" GridPane.columnIndex="1" GridPane.rowIndex="3" />  <!-- CHANGÉ: passwordField → txtMotDePasse -->
+        <PasswordField fx:id="txtMotDePasse" promptText="Mot de passe (min. 6 caractères)" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
         <Label text="Catégorie:*" GridPane.columnIndex="0" GridPane.rowIndex="4" />
         <ComboBox fx:id="categorieCombo" promptText="Sélectionner une catégorie" GridPane.columnIndex="1" GridPane.rowIndex="4" />
@@ -153,6 +154,6 @@
         </rowConstraints>
     </GridPane>
 
-    <!-- Barre de statut -->
-    <Label fx:id="statusLabel" style="-fx-font-style: italic;" />
+    <!-- CORRECTION 3: Barre de statut avec wrapText="true" -->
+    <Label fx:id="statusLabel" wrapText="true" style="-fx-padding: 10; -fx-background-radius: 5;" />
 </VBox>
