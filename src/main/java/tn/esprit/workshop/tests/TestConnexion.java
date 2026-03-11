@@ -1,5 +1,5 @@
 package tn.esprit.workshop.tests;
-import tn.esprit.workshop.utilis.MyBDConnexion;
+import tn.esprit.workshop.utilis.Talel.MyBDConnexion;
 import java.sql.SQLException;
 
 public class TestConnexion {

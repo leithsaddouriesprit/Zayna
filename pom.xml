@@ -112,7 +112,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>tn.esprit.workshop.utilis.Main</mainClass>
+                    <mainClass>tn.esprit.workshop.utilis.Talel.Main</mainClass>
                 </configuration>
             </plugin>
         </plugins>
