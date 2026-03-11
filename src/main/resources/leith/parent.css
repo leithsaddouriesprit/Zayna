@@ -1,0 +1,55 @@
+/* ===== Parent – thème clair moderne (JavaFX 21) ===== */
+
+.root {
+    -fx-font-family: "Segoe UI", "Inter", "Arial";
+    -fx-font-size: 14px;
+    -fx-background-color: #f1f5f9;
+}
+
+.title, .label.title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0f172a;
+}
+
+.label {
+    -fx-text-fill: #334155;
+}
+
+/* Boutons principaux */
+.button {
+    -fx-background-radius: 8;
+    -fx-padding: 12 24;
+    -fx-font-weight: 600;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}
+.button:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 8, 0, 0, 2);
+}
+
+.btn-primary, .button.primary {
+    -fx-background-color: #3b82f6;
+    -fx-text-fill: white;
+}
+.btn-primary:hover, .button.primary:hover {
+    -fx-background-color: #2563eb;
+}
+
+.btn-secondary, .button.secondary {
+    -fx-background-color: #64748b;
+    -fx-text-fill: white;
+}
+.btn-secondary:hover, .button.secondary:hover {
+    -fx-background-color: #475569;
+}
+
+/* Conteneur */
+.vbox {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #e2e8f0;
+    -fx-padding: 32;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 12, 0, 0, 2);
+}

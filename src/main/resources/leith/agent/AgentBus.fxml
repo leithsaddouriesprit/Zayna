@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.workshop.controlleurs.leith.agent.AgentBusController"
+      styleClass="card" spacing="12">
+    <stylesheets><URL value="@../app.css"/></stylesheets>
+    <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+
+    <Label text="Gestion Bus" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+    <HBox spacing="8">
+        <Button text="Ajouter" onAction="#ajouter"/>
+        <Button text="Modifier" onAction="#modifier" fx:id="btnModifier" disable="true"/>
+        <Button text="Supprimer" onAction="#supprimer" fx:id="btnSupprimer" disable="true"/>
+    </HBox>
+
+    <TableView fx:id="table" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+            <TableColumn fx:id="colNumero" text="Numéro" prefWidth="80"/>
+            <TableColumn fx:id="colMatricule" text="Matricule" prefWidth="100"/>
+            <TableColumn fx:id="colCapacite" text="Capacité" prefWidth="70"/>
+            <TableColumn fx:id="colChauffeur" text="Id Chauffeur" prefWidth="90"/>
+            <TableColumn fx:id="colActif" text="Actif" prefWidth="60"/>
+        </columns>
+    </TableView>
+    <Label fx:id="lblMessage" text=""/>
+</VBox>

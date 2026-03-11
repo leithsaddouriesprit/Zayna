@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.workshop.controlleurs.leith.agent.AgentAffecterBusTrajetController"
+      styleClass="card" spacing="12">
+    <stylesheets><URL value="@../app.css"/></stylesheets>
+    <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+
+    <Label text="Affecter Bus → Trajet" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+    <HBox spacing="12" alignment="CENTER_LEFT">
+        <Label text="Trajet:"/>
+        <ComboBox fx:id="comboTrajet" prefWidth="250" promptText="Choisir un trajet"/>
+        <Label text="Bus:"/>
+        <ComboBox fx:id="comboBus" prefWidth="250" promptText="Choisir un bus"/>
+    </HBox>
+    <Button text="Enregistrer" onAction="#enregistrer"/>
+    <Label fx:id="lblMessage" text="" wrapText="true"/>
+</VBox>

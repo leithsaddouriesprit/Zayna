@@ -1,0 +1,231 @@
+/* ===== Module Chauffeur (ChauffeurHome, SuiviCandidature, EspaceChauffeur) ===== */
+/* À utiliser avec Parent-home.css pour le thème de base */
+
+.root {
+    -fx-font-family: "Inter", "Segoe UI", "Arial";
+    -fx-background-color: #0f172a;
+}
+
+/* ---------- ChauffeurHome ---------- */
+.chauffeur-home .title-label {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.chauffeur-home .subtitle-label {
+    -fx-text-fill: rgba(255,255,255,0.85);
+    -fx-font-size: 13px;
+}
+
+.chauffeur-home .action-buttons {
+    -fx-spacing: 14;
+}
+
+.chauffeur-home .button {
+    -fx-min-width: 220px;
+    -fx-alignment: center-left;
+}
+
+.chauffeur-home #btnPostuler {
+    -fx-background-color: rgba(59,130,246,0.85);
+    -fx-border-color: rgba(59,130,246,0.95);
+}
+.chauffeur-home #btnPostuler:hover {
+    -fx-background-color: rgba(59,130,246,0.95);
+}
+
+.chauffeur-home #btnSuivi {
+    -fx-background-color: rgba(34,197,94,0.75);
+    -fx-border-color: rgba(34,197,94,0.9);
+}
+.chauffeur-home #btnSuivi:hover:disabled {
+    -fx-background-color: rgba(255,255,255,0.12);
+}
+
+.chauffeur-home #btnEspace {
+    -fx-background-color: rgba(168,85,247,0.75);
+    -fx-border-color: rgba(168,85,247,0.9);
+}
+.chauffeur-home #btnEspace:hover {
+    -fx-background-color: rgba(168,85,247,0.95);
+}
+
+/* ---------- SuiviCandidature ---------- */
+.suivi-candidature .title-label {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.suivi-candidature .field-label {
+    -fx-text-fill: rgba(255,255,255,0.9);
+    -fx-font-size: 13px;
+}
+
+.suivi-candidature .permis-preview {
+    -fx-background-color: rgba(255,255,255,0.08);
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(255,255,255,0.12);
+    -fx-border-radius: 12;
+    -fx-padding: 8;
+}
+
+.suivi-candidature .button-bar {
+    -fx-spacing: 12;
+}
+
+.suivi-candidature #btnAnnuler {
+    -fx-background-color: rgba(239,68,68,0.85);
+    -fx-border-color: rgba(239,68,68,0.95);
+}
+.suivi-candidature #btnAnnuler:hover {
+    -fx-background-color: rgba(239,68,68,0.95);
+}
+
+.suivi-candidature #btnPostulerAnouveau {
+    -fx-background-color: rgba(59,130,246,0.85);
+    -fx-border-color: rgba(59,130,246,0.95);
+}
+.suivi-candidature #btnPostulerAnouveau:hover {
+    -fx-background-color: rgba(59,130,246,0.95);
+}
+
+.suivi-candidature #btnAllerEspace {
+    -fx-background-color: rgba(34,197,94,0.85);
+    -fx-border-color: rgba(34,197,94,0.95);
+}
+.suivi-candidature #btnAllerEspace:hover {
+    -fx-background-color: rgba(34,197,94,0.95);
+}
+
+.suivi-candidature #lblMessage {
+    -fx-text-fill: rgba(255,255,255,0.8);
+    -fx-font-size: 12px;
+    -fx-wrap-text: true;
+}
+
+/* ---------- EspaceChauffeur ---------- */
+/* Root (StackPane) fills window with dark background */
+.espace-chauffeur.root {
+    -fx-background-color: #0f172a;
+}
+
+/* ScrollPane transparent so root shows through */
+.espace-chauffeur .espace-scroll,
+.espace-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+.espace-scroll .viewport {
+    -fx-background-color: transparent;
+}
+.espace-scroll .corner {
+    -fx-background-color: transparent;
+}
+
+/* Content card */
+.espace-chauffeur .espace-card {
+    -fx-background-color: rgba(255, 255, 255, 0.06);
+    -fx-background-radius: 18;
+    -fx-border-color: rgba(255, 255, 255, 0.12);
+    -fx-border-radius: 18;
+    -fx-border-width: 1;
+    -fx-padding: 24;
+}
+
+.espace-chauffeur .title-label {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.espace-chauffeur .section-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: rgba(255,255,255,0.95);
+}
+
+.espace-chauffeur .info-label {
+    -fx-text-fill: rgba(255,255,255,0.88);
+    -fx-font-size: 13px;
+}
+
+.espace-chauffeur .separator {
+    -fx-padding: 8 0;
+}
+.espace-chauffeur .separator .line {
+    -fx-border-color: rgba(255,255,255,0.15);
+    -fx-border-width: 1 0 0 0;
+    -fx-background-color: rgba(255,255,255,0.15);
+}
+
+/* TableView dark theme */
+.espace-chauffeur .table-view {
+    -fx-background-color: rgba(15, 23, 42, 0.95);
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(255,255,255,0.15);
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+}
+
+.espace-chauffeur .table-view .filler {
+    -fx-background-color: rgba(15, 23, 42, 0.95);
+}
+
+.espace-chauffeur .table-view .column-header-background {
+    -fx-background-color: rgba(255,255,255,0.12);
+}
+
+.espace-chauffeur .table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent rgba(255,255,255,0.2) transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 10 8;
+}
+
+.espace-chauffeur .table-view .column-header .label {
+    -fx-text-fill: #F9FAFB;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+.espace-chauffeur .table-view .table-row-cell {
+    -fx-background-color: transparent;
+}
+
+.espace-chauffeur .table-view .table-row-cell:odd {
+    -fx-background-color: rgba(255,255,255,0.04);
+}
+
+.espace-chauffeur .table-view .table-row-cell:hover {
+    -fx-background-color: rgba(255,255,255,0.1);
+}
+
+.espace-chauffeur .table-view .table-row-cell:selected {
+    -fx-background-color: rgba(59, 130, 246, 0.35);
+}
+
+.espace-chauffeur .table-view .table-row-cell:selected .table-cell {
+    -fx-text-fill: #F9FAFB;
+}
+
+.espace-chauffeur .table-view .table-cell {
+    -fx-text-fill: rgba(249, 250, 251, 0.92);
+    -fx-font-size: 12px;
+    -fx-padding: 8 10;
+    -fx-background-color: transparent;
+}
+
+.espace-chauffeur .table-view .table-row-cell:empty .table-cell {
+    -fx-border-color: transparent;
+    -fx-background-color: transparent;
+}
+
+.espace-chauffeur #btnReclamer {
+    -fx-background-color: rgba(245,158,11,0.85);
+    -fx-border-color: rgba(245,158,11,0.95);
+}
+.espace-chauffeur #btnReclamer:hover {
+    -fx-background-color: rgba(245,158,11,0.95);
+}

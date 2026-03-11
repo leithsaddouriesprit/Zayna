@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.workshop.controlleurs.leith.parent.ParentDemandeTransportController"
+      styleClass="card" spacing="12">
+    <stylesheets><URL value="@../app.css"/></stylesheets>
+    <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+
+    <Label text="Demande de transport scolaire" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+    <HBox spacing="8" alignment="CENTER_LEFT">
+        <Label text="École:"/>
+        <ComboBox fx:id="comboEcole" prefWidth="280" promptText="Choisir une école"/>
+    </HBox>
+
+    <Label text="Enfant"/>
+    <GridPane hgap="8" vgap="8">
+        <Label text="Nom:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+        <TextField fx:id="tfNom" GridPane.columnIndex="1" GridPane.rowIndex="0" prefWidth="200"/>
+        <Label text="Prénom:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+        <TextField fx:id="tfPrenom" GridPane.columnIndex="1" GridPane.rowIndex="1" prefWidth="200"/>
+        <Label text="Âge:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+        <Spinner fx:id="spAge" GridPane.columnIndex="1" GridPane.rowIndex="2" prefWidth="80"/>
+    </GridPane>
+
+    <Label text="Adresse (coordonnées)"/>
+    <HBox spacing="8">
+        <Label text="Latitude:"/>
+        <TextField fx:id="tfLat" prefWidth="120"/>
+        <Label text="Longitude:"/>
+        <TextField fx:id="tfLng" prefWidth="120"/>
+    </HBox>
+
+    <Button text="Envoyer la demande" onAction="#envoyer"/>
+    <Label fx:id="lblMessage" text="" wrapText="true"/>
+</VBox>

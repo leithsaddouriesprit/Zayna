@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.workshop.controlleurs.leith.parent.ParentSuiviCandidaturesEnfantController"
+      styleClass="card" spacing="12">
+    <stylesheets><URL value="@../app.css"/></stylesheets>
+    <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+
+    <Label text="Suivi des candidatures transport enfant" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+    <TableView fx:id="table" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colNom" text="Nom" prefWidth="100"/>
+            <TableColumn fx:id="colPrenom" text="Prénom" prefWidth="100"/>
+            <TableColumn fx:id="colAge" text="Âge" prefWidth="50"/>
+            <TableColumn fx:id="colStatut" text="Statut" prefWidth="100"/>
+            <TableColumn fx:id="colDate" text="Date demande" prefWidth="140"/>
+        </columns>
+    </TableView>
+    <Label fx:id="lblMessage" text=""/>
+</VBox>

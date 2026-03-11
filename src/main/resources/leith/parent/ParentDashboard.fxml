@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import java.net.URL?>
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.workshop.controlleurs.leith.parent.ParentDashboardController"
+      spacing="24" alignment="CENTER">
+    <stylesheets>
+        <URL value="@../app.css"/>
+    </stylesheets>
+    <padding><Insets top="32" right="32" bottom="32" left="32"/></padding>
+
+    <Label text="Espace Parent" style="-fx-font-size: 22px; -fx-font-weight: bold;" styleClass="title"/>
+
+    <Label text="Choisissez une action :" style="-fx-font-size: 14px;"/>
+
+    <VBox spacing="12" alignment="CENTER">
+        <Button text="Mes enfants" onAction="#openMesEnfants" styleClass="btn-primary" maxWidth="Infinity"/>
+        <Button text="Demande transport scolaire" onAction="#openDemandeTransport" styleClass="btn-primary" maxWidth="Infinity"/>
+        <Button text="Suivi candidatures" onAction="#openSuiviCandidatures" styleClass="btn-secondary" maxWidth="Infinity"/>
+    </VBox>
+</VBox>

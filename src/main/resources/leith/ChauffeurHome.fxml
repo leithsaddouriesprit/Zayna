@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import java.net.URL?>
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.workshop.controlleurs.leith.ChauffeurHomeController"
+      styleClass="chauffeur-home"
+      spacing="20" alignment="CENTER_LEFT">
+    <stylesheets>
+        <URL value="@/leith/app.css"/>
+        <URL value="@/leith/chauffeur-module.css"/>
+    </stylesheets>
+
+    <padding>
+        <Insets top="24" right="24" bottom="24" left="24"/>
+    </padding>
+
+    <Label text="Espace Chauffeur" styleClass="title-label"/>
+    <Label text="Choisissez une action :" styleClass="subtitle-label"/>
+    <VBox styleClass="action-buttons" spacing="12">
+        <Button fx:id="btnPostuler" text="Postuler" onAction="#onPostuler"/>
+        <Button fx:id="btnSuivi" text="Suivi Candidature" onAction="#onSuiviCandidature" disable="true"/>
+        <Button fx:id="btnEspace" text="Espace Chauffeur" onAction="#onEspaceChauffeur" disable="true"/>
+    </VBox>
+
+</VBox>
