@@ -127,7 +127,7 @@ public class ArretService implements CRUD<Arret> {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Arret a = new Arret();
-                    a.setIdTrajet(rs.getInt("id"));
+                    a.setArretId(rs.getInt("id"));
                     a.setIdTrajet(rs.getInt("id_trajet"));
                     a.setNom(rs.getString("nom"));
                     a.setLatitude(rs.getDouble("latitude"));
@@ -160,6 +160,16 @@ public class ArretService implements CRUD<Arret> {
         }
         return null;
     }
+    /** Met à jour l'ordre d'un arrêt. */
+    public void updateOrdre(int arretId, int ordre) throws SQLException {
+        String sql = "UPDATE arret SET ordre_arret = ? WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, ordre);
+            ps.setInt(2, arretId);
+            ps.executeUpdate();
+        }
+    }
+
     public Arret getLastArret(int trajetId) throws SQLException {
 
         String req =

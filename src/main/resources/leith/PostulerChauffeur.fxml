@@ -3,84 +3,127 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+<?import java.net.URL?>
 
-<?import java.lang.String?>
 <StackPane xmlns="http://javafx.com/javafx/21"
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="tn.esprit.workshop.controlleurs.leith.PostulerChauffeurController"
            styleClass="root">
 
-    <!-- Charger CSS -->
     <stylesheets>
-        <String fx:value="chauffeur.css"/>
+        <URL value="@/leith/app.css"/>
     </stylesheets>
 
-    <children>
+    <!-- ✅ Scroll pour que tout s'affiche même si la fenêtre est petite -->
+    <ScrollPane fitToWidth="true"
+                fitToHeight="true"
+                pannable="true"
+                hbarPolicy="NEVER"
+                vbarPolicy="AS_NEEDED"
+                styleClass="root-scroll">
 
-        <!-- Carte centrée (effet "beigne dans l'écran") -->
-        <VBox spacing="16.0" styleClass="card" maxWidth="720">
-            <padding>
-                <Insets top="26" right="26" bottom="22" left="26"/>
-            </padding>
+        <content>
+            <!-- ✅ Wrapper pour centrer la card -->
+            <VBox alignment="TOP_CENTER" styleClass="page-wrap">
+                <VBox spacing="16.0" styleClass="card" maxWidth="720">
+                    <padding>
+                        <Insets top="26" right="26" bottom="22" left="26"/>
+                    </padding>
 
-            <!-- Header -->
-            <VBox spacing="6">
-                <Label text="Candidature Chauffeur" styleClass="title"/>
-                <Label text="Merci de remplir les informations ci-dessous. Nous vous répondrons rapidement."
-                       styleClass="subtitle" wrapText="true"/>
+                    <!-- Header -->
+                    <VBox spacing="6">
+                        <Label text="Candidature Chauffeur" styleClass="title"/>
+                        <Label text="Merci de remplir les informations ci-dessous. Nous vous répondrons rapidement."
+                               styleClass="subtitle" wrapText="true"/>
+                    </VBox>
+
+                    <Separator styleClass="sep"/>
+
+                    <!-- Form -->
+                    <GridPane hgap="14" vgap="14" styleClass="form-grid">
+                        <columnConstraints>
+                            <ColumnConstraints minWidth="170" prefWidth="190"/>
+                            <ColumnConstraints hgrow="ALWAYS"/>
+                        </columnConstraints>
+
+                        <!-- Nom -->
+                        <Label text="Nom" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="field-label"/>
+                        <TextField fx:id="tfNom" promptText="Entrez votre nom"
+                                   GridPane.rowIndex="0" GridPane.columnIndex="1"
+                                   styleClass="field"/>
+
+                        <!-- Prénom -->
+                        <Label text="Prénom" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="field-label"/>
+                        <TextField fx:id="tfPrenom" promptText="Entrez votre prénom"
+                                   GridPane.rowIndex="1" GridPane.columnIndex="1"
+                                   styleClass="field"/>
+
+                        <!-- Age -->
+                        <Label text="Âge" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="field-label"/>
+                        <Spinner fx:id="spAge" editable="true"
+                                 GridPane.rowIndex="2" GridPane.columnIndex="1"
+                                 styleClass="spinner"/>
+
+                        <!-- Expérience -->
+                        <Label text="Années d'expérience" GridPane.rowIndex="3" GridPane.columnIndex="0" styleClass="field-label"/>
+                        <Spinner fx:id="spExperience" editable="true"
+                                 GridPane.rowIndex="3" GridPane.columnIndex="1"
+                                 styleClass="spinner"/>
+
+                        <!-- Maladie -->
+                        <Label text="Maladie ?" GridPane.rowIndex="4" GridPane.columnIndex="0" styleClass="field-label"/>
+                        <ChoiceBox fx:id="cbMaladie" GridPane.rowIndex="4" GridPane.columnIndex="1" styleClass="choice"/>
+
+                        <Label text="Si oui, précisez :" fx:id="lblMaladieDetails"
+                               GridPane.rowIndex="5" GridPane.columnIndex="0" styleClass="field-label"/>
+
+                        <TextField fx:id="tfMaladieDetails"
+                                   promptText="Ex: Diabète"
+                                   GridPane.rowIndex="5" GridPane.columnIndex="1"
+                                   styleClass="field"/>
+                    </GridPane>
+
+                    <!-- Upload permis -->
+                    <VBox spacing="12" styleClass="upload-card">
+                        <Label text="Permis de conduite (Recto / Verso)" styleClass="field-label"/>
+
+                        <!-- ✅ 2 colonnes: Recto / Verso -->
+                        <HBox spacing="16">
+                            <!-- Recto -->
+                            <VBox spacing="8" HBox.hgrow="ALWAYS" styleClass="upload-side">
+                                <HBox spacing="10" alignment="CENTER_LEFT">
+                                    <Button text="Importer Recto" onAction="#onUploadPermisRecto" styleClass="primary-btn"/>
+                                    <Label fx:id="lblPermisRectoStatus" text="Recto: aucun" styleClass="subtitle"/>
+                                </HBox>
+                                <ImageView fx:id="imgPermisRecto" fitWidth="320" fitHeight="180" preserveRatio="true" styleClass="preview-img"/>
+                            </VBox>
+
+                            <!-- Verso -->
+                            <VBox spacing="8" HBox.hgrow="ALWAYS" styleClass="upload-side">
+                                <HBox spacing="10" alignment="CENTER_LEFT">
+                                    <Button text="Importer Verso" onAction="#onUploadPermisVerso" styleClass="primary-btn"/>
+                                    <Label fx:id="lblPermisVersoStatus" text="Verso: aucun" styleClass="subtitle"/>
+                                </HBox>
+                                <ImageView fx:id="imgPermisVerso" fitWidth="320" fitHeight="180" preserveRatio="true" styleClass="preview-img"/>
+                            </VBox>
+                        </HBox>
+                    </VBox>
+
+                    <!-- Actions -->
+                    <HBox spacing="10" alignment="CENTER_RIGHT">
+                        <Button fx:id="btnEnvoyer"
+                                text="Envoyer candidature"
+                                onAction="#envoyerCandidature"
+                                styleClass="primary-btn"/>
+                    </HBox>
+
+                    <!-- Message -->
+                    <Label fx:id="lblMessage" text="" wrapText="true" styleClass="message"/>
+
+                </VBox>
             </VBox>
+        </content>
+    </ScrollPane>
 
-            <Separator styleClass="sep"/>
-
-            <!-- Form -->
-            <GridPane hgap="14" vgap="14" styleClass="form-grid">
-                <columnConstraints>
-                    <ColumnConstraints minWidth="170" prefWidth="190"/>
-                    <ColumnConstraints hgrow="ALWAYS"/>
-                </columnConstraints>
-
-                <!-- Nom -->
-                <Label text="Nom" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="field-label"/>
-                <TextField fx:id="tfNom" promptText="Entrez votre nom"
-                           GridPane.rowIndex="0" GridPane.columnIndex="1"
-                           styleClass="field"/>
-
-                <!-- Prénom -->
-                <Label text="Prénom" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="field-label"/>
-                <TextField fx:id="tfPrenom" promptText="Entrez votre prénom"
-                           GridPane.rowIndex="1" GridPane.columnIndex="1"
-                           styleClass="field"/>
-
-                <!-- Age -->
-                <Label text="Âge" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="field-label"/>
-                <Spinner fx:id="spAge" editable="true"
-                         GridPane.rowIndex="2" GridPane.columnIndex="1"
-                         styleClass="spinner"/>
-
-                <!-- Expérience -->
-                <Label text="Années d'expérience" GridPane.rowIndex="3" GridPane.columnIndex="0" styleClass="field-label"/>
-                <Spinner fx:id="spExperience" editable="true"
-                         GridPane.rowIndex="3" GridPane.columnIndex="1"
-                         styleClass="spinner"/>
-
-                <!-- Maladie -->
-                <Label text="Maladie affectant le travail ?" GridPane.rowIndex="4" GridPane.columnIndex="0" styleClass="field-label"/>
-                <ChoiceBox fx:id="cbMaladie"
-                           GridPane.rowIndex="4" GridPane.columnIndex="1"
-                           styleClass="choice"/>
-            </GridPane>
-
-            <!-- Actions -->
-            <HBox spacing="10" alignment="CENTER_RIGHT">
-                <Button fx:id="btnEnvoyer"
-                        text="Envoyer candidature"
-                        onAction="#envoyerCandidature"
-                        styleClass="primary-btn"/>
-            </HBox>
-
-            <!-- Message -->
-            <Label fx:id="lblMessage" text="" wrapText="true" styleClass="message"/>
-
-        </VBox>
-    </children>
 </StackPane>

@@ -6,9 +6,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import tn.esprit.workshop.controlleurs.leith.SceneNavigator;
 import tn.esprit.workshop.controlleurs.leith.MapTrackingController;
 import tn.esprit.workshop.controlleurs.leith.PostulerChauffeurController;
 import tn.esprit.workshop.controlleurs.leith.TrackingMode;
+import tn.esprit.workshop.utilis.AppSession;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -86,7 +88,7 @@ public class MainFFX extends Application {
   }
 
 */
-   /*
+/*
     /// chauffeur scene
 @Override
 public void start(Stage primaryStage) {
@@ -114,6 +116,33 @@ public void start(Stage primaryStage) {
     }
 }
 */
+
+
+/*
+    /// Chauffeur module (hub + suivi + espace). Set session chauffeur_id then open ChauffeurHome.
+    @Override
+    public void start(Stage primaryStage) {
+        AppSession.getInstance().setChauffeurId(5); // or from login
+        SceneNavigator.openChauffeurHome();
+    }
+*/
+
+
+    // DEMO START AGENT: ouvre AgentDashboard (avec id école de test en session)
+    @Override
+    public void start(Stage primaryStage) {
+        AppSession.getInstance().setEcoleId(1);
+        SceneNavigator.openAgentDashboard();
+    }
+
+/*
+    // DEMO START PARENT: ouvre ParentDashboard (Mes enfants, Demande transport, Suivi candidatures)
+    @Override
+    public void start(Stage primaryStage) {
+        AppSession.getInstance().setParentId(1); // parent_id de test
+        SceneNavigator.openParentDashboard();
+    }
+*/
 /*
 /// AI chat
 @Override
@@ -136,7 +165,7 @@ public void start(Stage primaryStage) {
     }
 }
 */
-
+/*
     /// parent flux
     @Override
     public void start(Stage primaryStage) {
@@ -160,5 +189,5 @@ public void start(Stage primaryStage) {
             System.out.println("Erreur lancement ParentHome: " + e.getMessage());
         }
     }
-
+*/
 }

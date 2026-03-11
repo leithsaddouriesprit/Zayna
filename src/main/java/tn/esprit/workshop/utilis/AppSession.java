@@ -9,6 +9,9 @@ public final class AppSession {
 
     private int parentId;
     private Integer selectedEnfantId;
+    private Integer chauffeurId;
+    /** id de la table ecole (filtrage écrans Agent). */
+    private Integer ecoleId;
 
     private AppSession() {
     }
@@ -31,5 +34,21 @@ public final class AppSession {
 
     public void setSelectedEnfantId(Integer selectedEnfantId) {
         this.selectedEnfantId = selectedEnfantId;
+    }
+
+    public Integer getChauffeurId() {
+        return chauffeurId;
+    }
+
+    public void setChauffeurId(Integer chauffeurId) {
+        this.chauffeurId = chauffeurId;
+    }
+
+    public Integer getEcoleId() {
+        return ecoleId;
+    }
+
+    public void setEcoleId(Integer ecoleId) {
+        this.ecoleId = ecoleId;
     }
 }

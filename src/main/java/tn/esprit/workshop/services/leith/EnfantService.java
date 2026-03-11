@@ -19,15 +19,28 @@ public class EnfantService implements CRUD<Enfant> {
     @Override
     public void insertOne(Enfant e) throws SQLException {
         String req =
-                "INSERT INTO enfant (nom, prenom, parent_id, trajet_id, actif) VALUES (" +
+                "INSERT INTO enfant (nom, prenom, parent_id, trajet_id, actif, on_board) VALUES (" +
                         "'" + e.getNom() + "', " +
                         "'" + e.getPrenom() + "', " +
                         e.getParentId() + ", " +
                         e.getTrajetId() + ", " +
-                        e.isActif() +
+                        e.isActif() + ", " +
+                        (e.isOnBoard() ? 1 : 0) +
                         ")";
         Statement st = connection.createStatement();
         st.executeUpdate(req);
+    }
+
+    /** Insère un enfant depuis une candidature acceptée (actif=1, on_board=0). */
+    public void insertFromCandidature(String nom, String prenom, int parentId, int trajetId) throws SQLException {
+        String sql = "INSERT INTO enfant (nom, prenom, parent_id, trajet_id, actif, on_board) VALUES (?, ?, ?, ?, 1, 0)";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, nom);
+            ps.setString(2, prenom);
+            ps.setInt(3, parentId);
+            ps.setInt(4, trajetId);
+            ps.executeUpdate();
+        }
     }
 
     @Override

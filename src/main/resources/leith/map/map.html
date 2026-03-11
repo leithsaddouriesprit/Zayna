@@ -58,10 +58,13 @@
     function panToBus(lat, lng) { map.panTo([lat, lng]); }
 
     function fixMapSize() {
-        setTimeout(() => map.invalidateSize(true), 100);
-        setTimeout(() => map.invalidateSize(true), 400);
-        setTimeout(() => map.invalidateSize(true), 900);
+        if (typeof map !== 'undefined' && map && typeof map.invalidateSize === 'function') {
+            setTimeout(function() { map.invalidateSize(true); }, 100);
+            setTimeout(function() { map.invalidateSize(true); }, 400);
+            setTimeout(function() { map.invalidateSize(true); }, 900);
+        }
     }
+    window.fixMapSize = fixMapSize;
 
     let routeLayer = null;
     let stopMarkers = [];

@@ -1,7 +1,9 @@
 package tn.esprit.workshop.controlleurs.leith;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import tn.esprit.workshop.model.leith.Enfant;
 import tn.esprit.workshop.services.leith.EnfantService;
@@ -27,7 +29,18 @@ public class ParentHomeController {
     public void initialize() {
         int parentId = AppSession.getInstance().getParentId();
         loadEnfants(parentId);
-
+        if (listEnfants.getItems().isEmpty()) {
+            javafx.application.Platform.runLater(() -> {
+                Alert a = new Alert(Alert.AlertType.INFORMATION);
+                a.setTitle("Mes enfants");
+                a.setHeaderText("Aucun enfant");
+                a.setContentText("Vous n'avez pas encore d'enfant enregistré. Souhaitez-vous faire une demande de transport scolaire ?");
+                a.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
+                if (a.showAndWait().orElse(ButtonType.NO) == ButtonType.YES) {
+                    SceneNavigator.openParentDemandeTransport();
+                }
+            });
+        }
         listEnfants.setCellFactory(lv -> new javafx.scene.control.ListCell<>() {
             @Override
             protected void updateItem(Enfant item, boolean empty) {
@@ -69,5 +82,15 @@ public class ParentHomeController {
     void openChatAI() {
         if (selectedEnfantId == null) return;
         SceneNavigator.openChatAI(selectedEnfantId);
+    }
+
+    @FXML
+    void openDemandeTransport() {
+        SceneNavigator.openParentDemandeTransport();
+    }
+
+    @FXML
+    void openSuiviCandidaturesEnfant() {
+        SceneNavigator.openParentSuiviCandidaturesEnfant();
     }
 }

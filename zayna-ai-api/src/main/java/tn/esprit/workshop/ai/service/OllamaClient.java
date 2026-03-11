@@ -19,17 +19,30 @@ public class OllamaClient {
     @Value("${ai.ollama.url}")
     private String ollamaUrl;
 
+    @Value("${ai.temperature:0.2}")
+    private double temperature;
+
+    @Value("${ai.top_p:0.9}")
+    private double topP;
+
+    @Value("${ai.max_tokens:512}")
+    private int maxTokens;
+
     private final HttpClient http = HttpClient.newHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
 
     public String generate(String prompt) {
         try {
-
-            String body = mapper.writeValueAsString(java.util.Map.of(
-                    "model", model,
-                    "prompt", prompt,
-                    "stream", false
-            ));
+            java.util.Map<String, Object> payload = new java.util.HashMap<>();
+            payload.put("model", model);
+            payload.put("prompt", prompt);
+            payload.put("stream", false);
+            java.util.Map<String, Object> options = new java.util.HashMap<>();
+            options.put("temperature", temperature);
+            options.put("top_p", topP);
+            options.put("num_predict", maxTokens);
+            payload.put("options", options);
+            String body = mapper.writeValueAsString(payload);
 
             HttpRequest req = HttpRequest.newBuilder()
                     .uri(URI.create(ollamaUrl))

@@ -2,8 +2,10 @@ package tn.esprit.workshop.controlleurs.leith;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
+import javafx.stage.Window;
 import javafx.scene.control.Label;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -38,11 +40,12 @@ public class MapTrackingController {
     @FXML private Label lblEtaValue;
     @FXML private Label lblEnfantNom;
     @FXML private Label lblEnfantStatus;
-    @FXML private Label LblEtaValue;
-
 
     private WebEngine engine;
     private Timeline timeline;
+    private boolean mapInitDone;
+    private boolean refreshLogDone;
+    private volatile boolean trackingStopped;
 
     // paramètres injectés
     private int busId;
@@ -68,6 +71,14 @@ public class MapTrackingController {
      */
     @FXML
     public void initialize() {
+        int id = System.identityHashCode(this);
+        LOG.info("MapTrackingController.initialize this=" + id
+            + " lblEtaValue=" + (lblEtaValue != null)
+            + " lblVitesse=" + (lblVitesse != null)
+            + " lblChauffeur=" + (lblChauffeur != null)
+            + " lblBus=" + (lblBus != null)
+            + " lblDistance=" + (lblDistance != null));
+
         engine = mapView.getEngine();
 
         // chemin réel chez toi : /resources/leith/map/map.html
@@ -78,59 +89,70 @@ public class MapTrackingController {
         engine.load(url.toExternalForm());
 
 
-        // IMPORTANT : on lance le refresh quand la page est prête
         engine.getLoadWorker().stateProperty().addListener((obs, o, n) -> {
             if (n == Worker.State.SUCCEEDED) {
-                System.out.println(engine.executeScript("typeof fixMapSize"));
-                engine.executeScript("fixMapSize()");
-                try {
-                    double lat;
-                    double lng;
-
-                    // Toujours démarrer à la position de départ (premier arrêt) pour que le bus soit sur le tracé
-                    if (trajetId > 0) {
-                        Arret depart = arretService.getDepart(trajetId);
-                        if (depart != null) {
-                            lat = depart.getLatitude();
-                            lng = depart.getLongitude();
-                        } else {
-                            PositionBus p = positionBusService.getLastPosition(busId);
-                            if (p != null) {
-                                lat = p.getLatitude();
-                                lng = p.getLongitude();
-                            } else {
-                                lat = 36.8065;
-                                lng = 10.1815;
-                            }
-                        }
-                    } else {
-                        PositionBus p = positionBusService.getLastPosition(busId);
-                        if (p != null) {
-                            lat = p.getLatitude();
-                            lng = p.getLongitude();
-                        } else {
-                            lat = 36.8065;
-                            lng = 10.1815;
-                        }
-                    }
-
-                    engine.executeScript("initBus(" + lat + "," + lng + ",14)");
-                } catch (Exception e) {
-                    System.out.println("Erreur initBus: " + e.getMessage());
-                }
-
-                // 👇 TES LIGNES EXISTANTES RESTENT
-                try {
-                    pushRouteToMap();
-                } catch (Exception e) {
-                    System.out.println("Erreur pushRouteTomap: " + e.getMessage());
-                }
-
-
-                // Si init(...) a déjà été appelé, on démarre
-                if (busId != 0) startAutoRefresh();
+                Platform.runLater(this::runMapInitWhenReady);
             }
         });
+
+        if (mapView != null) {
+            mapView.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (newScene != null) {
+                    Window w = newScene.getWindow();
+                    if (w != null) {
+                        w.showingProperty().addListener((o, wasShowing, nowShowing) -> {
+                            if (Boolean.FALSE.equals(nowShowing)) stopTracking();
+                        });
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * S'exécute une seule fois quand la carte est chargée ET que init() a fourni busId.
+     * Démarre le timeline (refresh ETA/vitesse/distance) et fait un premier refresh pour afficher le panneau.
+     */
+    private void runMapInitWhenReady() {
+        if (engine == null || engine.getLoadWorker().getState() != Worker.State.SUCCEEDED) return;
+        if (mapInitDone) return;
+        if (busId == 0) return;
+        mapInitDone = true;
+
+        try {
+            engine.executeScript("typeof window.fixMapSize === 'function' && window.fixMapSize();");
+        } catch (Exception e) {
+            LOG.log(Level.FINE, "fixMapSize", e);
+        }
+
+        try {
+            double lat = 36.8065, lng = 10.1815;
+            if (trajetId > 0) {
+                Arret depart = arretService.getDepart(trajetId);
+                if (depart != null) {
+                    lat = depart.getLatitude();
+                    lng = depart.getLongitude();
+                } else {
+                    PositionBus p = positionBusService.getLastPosition(busId);
+                    if (p != null) { lat = p.getLatitude(); lng = p.getLongitude(); }
+                }
+            } else {
+                PositionBus p = positionBusService.getLastPosition(busId);
+                if (p != null) { lat = p.getLatitude(); lng = p.getLongitude(); }
+            }
+            engine.executeScript("initBus(" + lat + "," + lng + ",14)");
+        } catch (Exception e) {
+            LOG.log(Level.WARNING, "initBus", e);
+        }
+
+        try {
+            pushRouteToMap();
+        } catch (Exception e) {
+            LOG.log(Level.WARNING, "pushRouteToMap", e);
+        }
+
+        startAutoRefresh();
+        Platform.runLater(this::refresh);
     }
 
     private static final double DEFAULT_SIMULATION_SPEED_KMH = 40;
@@ -190,8 +212,9 @@ public class MapTrackingController {
         init(t.getIdBus(), TrackingMode.PARENT, eid, t.getTrajetId());
     }
 
-    /** Injecte le contexte (busId + mode + enfantId + trajetId). */
+    /** Injecte le contexte (busId + mode + enfantId + trajetId). Must be called on loader.getController() instance. */
     public void init(int busId, TrackingMode mode, Integer enfantId, Integer trajetId) throws SQLException {
+        LOG.info("MapTrackingController.init this=" + System.identityHashCode(this) + " busId=" + busId);
         this.busId = busId;
         this.mode = mode;
         this.enfantId = enfantId;
@@ -231,30 +254,25 @@ public class MapTrackingController {
 */
 
 
-        /// Texte UI selon le mode
-        if (mode == TrackingMode.PARENT) {
-            lblTitle.setText("Suivi du bus de votre enfant");
-            lblEtaTitle.setText("Arrivée estimée :");
-        } else {
-            lblTitle.setText("Suivi du bus (École)");
-            lblEtaTitle.setText("Prochain point :");
+        if (lblTitle != null) {
+            if (mode == TrackingMode.PARENT) {
+                lblTitle.setText("Suivi du bus de votre enfant");
+                if (lblEtaTitle != null) lblEtaTitle.setText("Arrivée estimée :");
+            } else {
+                lblTitle.setText("Suivi du bus (École)");
+                if (lblEtaTitle != null) lblEtaTitle.setText("Prochain point :");
+            }
         }
         Bus bus = busService.getById(busId);
 
         if (bus != null) {
-
-            lblBus.setText(bus.getMatricule());
-
+            if (lblBus != null) lblBus.setText(bus.getMatricule());
             Chauffeur chauffeur = chauffeurService.getById(bus.getIdChauffeur());
-
-            if (chauffeur != null) {
-                lblChauffeur.setText(
-                        chauffeur.getNom() + " " + chauffeur.getPrenom()
-                );
-            } else {
-                lblChauffeur.setText("Non assigné");
+            if (lblChauffeur != null) {
+                lblChauffeur.setText(chauffeur != null
+                    ? (chauffeur.getNom() + " " + chauffeur.getPrenom())
+                    : "Non assigné");
             }
-
         }
 
 
@@ -287,39 +305,24 @@ public class MapTrackingController {
         }
 */
 
-        /// Si map déjà chargée, repositionner le bus au départ puis démarrer
-        if (engine != null && engine.getLoadWorker().getState() == Worker.State.SUCCEEDED) {
-            if (trajetId > 0) {
-                try {
-                    lastPos = positionBusService.getLastPosition(busId);
-                    Arret depart = arretService.getDepart(trajetId);
-                    if (depart != null) {
-                        engine.executeScript("initBus(" + depart.getLatitude() + "," + depart.getLongitude() + ",14)");
-                    } else {
-                        PositionBus p = positionBusService.getLastPosition(busId);
-                        if (p != null) {
-                            engine.executeScript("initBus(" + p.getLatitude() + "," + p.getLongitude() + ",14)");
-                        }
-                    }
-                    pushRouteToMap();
-                } catch (Exception e) {
-                    LOG.log(Level.WARNING, "Erreur repositionnement bus au départ", e);
-                }
-            }
-            startAutoRefresh();
-        }
-
-
+        Platform.runLater(this::runMapInitWhenReady);
     }
 
     private void startAutoRefresh() {
-        if (timeline != null) return; // éviter double start
+        if (trackingStopped || timeline != null) return;
         timeline = new Timeline(new KeyFrame(Duration.seconds(2), e -> refresh()));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
 
     private void refresh() {
+        if (trackingStopped || engine == null) return;
+        if (!refreshLogDone) {
+            refreshLogDone = true;
+            LOG.info("MapTrackingController.refresh first run this=" + System.identityHashCode(this)
+                + " lblEtaValue=" + (lblEtaValue != null) + " lblVitesse=" + (lblVitesse != null)
+                + " lblChauffeur=" + (lblChauffeur != null) + " lblBus=" + (lblBus != null));
+        }
         try {
             Boolean simActive = (Boolean) engine.executeScript("typeof isRouteSimulationActive === 'function' && isRouteSimulationActive()");
             if (Boolean.TRUE.equals(simActive)) {
@@ -332,9 +335,9 @@ public class MapTrackingController {
 
             lastPos = positionBusService.getLastPosition(busId);
             if (lastPos == null) {
-                lblEtaValue.setText("Aucune position");
-                lblVitesse.setText("—");
-                lblDistance.setText("—");
+                if (lblEtaValue != null) lblEtaValue.setText("Aucune position");
+                if (lblVitesse != null) lblVitesse.setText("—");
+                if (lblDistance != null) lblDistance.setText("—");
                 return;
             }
 
@@ -344,24 +347,26 @@ public class MapTrackingController {
             engine.executeScript("updateBusPosition(" + lat + "," + lng + ");");
 
             double speed = lastPos.getVitesse() > 5 ? lastPos.getVitesse() : 30;
-            lblVitesse.setText(String.format("%.0f km/h", speed));
+            if (lblVitesse != null) lblVitesse.setText(String.format("%.0f km/h", speed));
 
             // ETA minimal : calcul vers prochain arrêt (ECOLE) ou arrêt “cible” (PARENT)
             // Pour l’instant, on fait v1 : prochain arrêt du trajet (si on a trajetId)
             String etaText = computeEtaText(lat, lng);
-            lblEtaValue.setText(etaText);
+            if (lblEtaValue != null) lblEtaValue.setText(etaText);
 
             if (trajetId > 0) {
                 List<Arret> arretsList = arretService.getByTrajetId(trajetId);
                 Arret next = findClosest(arretsList, lat, lng);
-                if (next != null) {
-                    double distKm = distance(lat, lng, next.getLatitude(), next.getLongitude());
-                    lblDistance.setText(String.format("%.2f km", distKm));
-                } else {
-                    lblDistance.setText("—");
+                if (lblDistance != null) {
+                    if (next != null) {
+                        double distKm = distance(lat, lng, next.getLatitude(), next.getLongitude());
+                        lblDistance.setText(String.format("%.2f km", distKm));
+                    } else {
+                        lblDistance.setText("—");
+                    }
                 }
             } else {
-                lblDistance.setText("—");
+                if (lblDistance != null) lblDistance.setText("—");
             }
 
         } catch (Exception ex) {
@@ -376,9 +381,9 @@ public class MapTrackingController {
             int etaMin = (int) extractJsonDouble(json, "etaMinutes");
             String nextName = extractJsonString(json, "nextStopName");
 
-            lblVitesse.setText(String.format("%.0f km/h", speed));
-            lblDistance.setText(String.format("%.2f km", distNext));
-            lblEtaValue.setText(etaMin + " min" + (nextName != null && !nextName.isEmpty() ? " (next: " + nextName + ")" : ""));
+            if (lblVitesse != null) lblVitesse.setText(String.format("%.0f km/h", speed));
+            if (lblDistance != null) lblDistance.setText(String.format("%.2f km", distNext));
+            if (lblEtaValue != null) lblEtaValue.setText(etaMin + " min" + (nextName != null && !nextName.isEmpty() ? " (next: " + nextName + ")" : ""));
         } catch (Exception e) {
             LOG.log(Level.WARNING, "Erreur parse simulation status", e);
         }
@@ -572,13 +577,30 @@ public class MapTrackingController {
 
     @FXML
     private void close() {
-        stop();
-        // ferme la fenêtre si tu utilises un Stage dédié
-        mapView.getScene().getWindow().hide();
+        stopTracking();
+        if (mapView != null && mapView.getScene() != null && mapView.getScene().getWindow() != null) {
+            mapView.getScene().getWindow().hide();
+        }
     }
 
+    /**
+     * Stops the Timeline refresh loop. Safe to call multiple times.
+     * Call when the tracking window is closed (Stage close or Fermer button).
+     */
+    public void stopTracking() {
+        trackingStopped = true;
+        if (timeline != null) {
+            try {
+                timeline.stop();
+            } finally {
+                timeline = null;
+            }
+        }
+    }
+
+    /** Backward compatibility: delegates to stopTracking(). */
     public void stop() {
-        if (timeline != null) timeline.stop();
+        stopTracking();
     }
 
     public void forceMapResize() {
