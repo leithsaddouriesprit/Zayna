@@ -127,14 +127,14 @@ public void start(Stage primaryStage) {
     }
 
 */
-
+/*
     // DEMO START AGENT: ouvre AgentDashboard (avec id école de test en session)
     @Override
     public void start(Stage primaryStage) {
         AppSession.getInstance().setEcoleId(1);
         SceneNavigator.openAgentDashboard();
     }
-
+*/
 /*
     // DEMO START PARENT: ouvre ParentDashboard (Mes enfants, Demande transport, Suivi candidatures)
     @Override
@@ -190,4 +190,20 @@ public void start(Stage primaryStage) {
         }
     }
 */
+
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Talel/ConnecterUser.fxml"));
+        Parent root = loader.load();
+
+        primaryStage.setTitle("Zayna - Connexion");
+        primaryStage.setScene(new Scene(root));
+        primaryStage.setResizable(false);
+        primaryStage.show();
+    }
+/*
+    public static void main(String[] args) {
+        launch(args);
+    }
+  */
 }
