@@ -1,7 +1,7 @@
 package tn.esprit.workshop.model.Talel.validation;
 
 import tn.esprit.workshop.model.Talel.talel2.*;
-import tn.esprit.workshop.model.talel2.*;
+import tn.esprit.workshop.model.Talel.talel2.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
