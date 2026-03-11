@@ -125,8 +125,8 @@ public void start(Stage primaryStage) {
         AppSession.getInstance().setChauffeurId(5); // or from login
         SceneNavigator.openChauffeurHome();
     }
-*/
 
+*/
 
     // DEMO START AGENT: ouvre AgentDashboard (avec id école de test en session)
     @Override
