@@ -48,6 +48,17 @@ public class CandidatureEnfantService {
         return list;
     }
 
+    /** Toutes les candidatures ENVOYEE (pour admin). */
+    public List<CandidatureEnfant> findAllEnVoyee() throws SQLException {
+        String sql = "SELECT id, parent_id, id_ecole, nom_enfant, prenom_enfant, age, latitude, longitude, statut, trajet_id, date_demande FROM candidature_enfant WHERE statut = 'ENVOYEE' ORDER BY date_demande DESC";
+        List<CandidatureEnfant> list = new ArrayList<>();
+        try (PreparedStatement ps = getConnection().prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) list.add(mapRow(rs));
+        }
+        return list;
+    }
+
     /** Candidatures ENVOYEE pour l'école de l'agent. */
     public List<CandidatureEnfant> findEnVoyeeByEcoleId(int idEcole) throws SQLException {
         String sql = "SELECT id, parent_id, id_ecole, nom_enfant, prenom_enfant, age, latitude, longitude, statut, trajet_id, date_demande FROM candidature_enfant WHERE id_ecole = ? AND statut = 'ENVOYEE' ORDER BY date_demande DESC";

@@ -85,9 +85,6 @@ public class AdminController implements Initializable {
     private Button clearSearchButton;
 
     @FXML
-    private Button logoutButton;
-
-    @FXML
     private Label statusLabel;
 
     // ==================== CHAMPS DU FORMULAIRE ====================
@@ -224,10 +221,6 @@ public class AdminController implements Initializable {
         userTable.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> {
                     selectedUser = newValue;
-                    if (selectedUser != null) {
-                        fillFormWithUser(selectedUser);
-                        showForm();
-                    }
                 }
         );
     }
@@ -252,6 +245,7 @@ public class AdminController implements Initializable {
             afficherMessage("Veuillez sélectionner un utilisateur à modifier", "warning");
             return;
         }
+        fillFormWithUser(selectedUser);
         txtMotDePasse.setDisable(false);
         txtMotDePasse.setPromptText("Mot de passe (laisser vide pour ne pas changer)");
         showForm();
@@ -280,9 +274,11 @@ public class AdminController implements Initializable {
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
                 serviceAdmin.supprimerUtilisateur(selectedUser.getId());
-                userList.remove(selectedUser);
+                // Recharger proprement la table + stats pour rester cohérent avec les filtres
+                loadUserData();
+                clearSearch();
+                selectedUser = null;
                 hideForm();
-                updateStatistics();
                 afficherMessage("✅ Utilisateur supprimé avec succès", "success");
                 System.out.println("Suppression réussie");
             } catch (Exception e) {
@@ -323,14 +319,7 @@ public class AdminController implements Initializable {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/Talel/ConnecterUser.fxml"));
                 Parent root = loader.load();
-
-                Scene currentScene = logoutButton.getScene();
-                Stage stage = (Stage) currentScene.getWindow();
-
-                stage.setScene(new Scene(root));
-                stage.setTitle("Zayna - Connexion");
-                stage.centerOnScreen();
-
+                // Ancienne logique de déconnexion par bouton local, désormais non utilisée
                 System.out.println("✅ Déconnexion réussie");
             } catch (Exception e) {
                 System.err.println("❌ Erreur déconnexion: " + e.getMessage());
@@ -514,33 +503,32 @@ public class AdminController implements Initializable {
         }
     }
 
+    /** Stats use full userList so counters reflect real totals (not filtered view). */
     private void updateStatistics() {
         try {
-            int total = filteredData.size();
+            int total = userList.size();
+            long parentCount = userList.stream()
+                    .filter(u -> u != null && u.getCategories() == CategorieUser.PARENT)
+                    .count();
+            long maitresseCount = userList.stream()
+                    .filter(u -> u != null && u.getCategories() == CategorieUser.MAITRESSE)
+                    .count();
+            long adminCount = userList.stream()
+                    .filter(u -> u != null && u.getCategories() == CategorieUser.ADMIN)
+                    .count();
+            long responsableCount = userList.stream()
+                    .filter(u -> u != null && u.getCategories() == CategorieUser.RESPONSABLEECOLE)
+                    .count();
+            long chauffeurCount = userList.stream()
+                    .filter(u -> u != null && u.getCategories() == CategorieUser.CHAUFFEUR)
+                    .count();
 
-            long parentCount = filteredData.stream()
-                    .filter(u -> u.getCategories() == CategorieUser.PARENT)
-                    .count();
-            long maitresseCount = filteredData.stream()
-                    .filter(u -> u.getCategories() == CategorieUser.MAITRESSE)
-                    .count();
-            long adminCount = filteredData.stream()
-                    .filter(u -> u.getCategories() == CategorieUser.ADMIN)
-                    .count();
-            long responsableCount = filteredData.stream()
-                    .filter(u -> u.getCategories() == CategorieUser.RESPONSABLEECOLE)
-                    .count();
-            long chauffeurCount = filteredData.stream()
-                    .filter(u -> u.getCategories() == CategorieUser.CHAUFFEUR)
-                    .count();
-
-            totalUsersLabel.setText("Total: " + total);
-            parentCountLabel.setText("👪 Parents: " + parentCount);
-            maitresseCountLabel.setText("👩‍🏫 Maîtresses: " + maitresseCount);
-            adminCountLabel.setText("👑 Admins: " + adminCount);
-            responsableEcoleCountLabel.setText("🏫 Responsables: " + responsableCount);
-            chauffeurCountLabel.setText("🚗 Chauffeurs: " + chauffeurCount);
-
+            if (totalUsersLabel != null) totalUsersLabel.setText("Total: " + total);
+            if (parentCountLabel != null) parentCountLabel.setText("👪 Parents: " + parentCount);
+            if (maitresseCountLabel != null) maitresseCountLabel.setText("👩‍🏫 Maîtresses: " + maitresseCount);
+            if (adminCountLabel != null) adminCountLabel.setText("👑 Admins: " + adminCount);
+            if (responsableEcoleCountLabel != null) responsableEcoleCountLabel.setText("🏫 Responsables: " + responsableCount);
+            if (chauffeurCountLabel != null) chauffeurCountLabel.setText("🚗 Chauffeurs: " + chauffeurCount);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -569,7 +557,6 @@ public class AdminController implements Initializable {
         addButton.setDisable(true);
         editButton.setDisable(true);
         deleteButton.setDisable(true);
-        logoutButton.setDisable(true);
     }
 
     private void hideForm() {
@@ -578,7 +565,6 @@ public class AdminController implements Initializable {
         addButton.setDisable(false);
         editButton.setDisable(false);
         deleteButton.setDisable(false);
-        logoutButton.setDisable(false);
         userTable.getSelectionModel().clearSelection();
     }
 

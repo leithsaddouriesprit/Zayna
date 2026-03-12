@@ -17,20 +17,14 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="520.0" prefWidth="680.0" spacing="10" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshop.controlleurs.Talel.AdminController">
+<VBox alignment="TOP_LEFT" maxWidth="Infinity" maxHeight="Infinity" spacing="10" styleClass="admin-content" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshop.controlleurs.Talel.AdminController">
     <padding>
         <Insets bottom="15" left="15" right="15" top="15" />
     </padding>
 
-    <!-- En-tête avec titre et bouton de déconnexion -->
+    <!-- En-tête avec titre (déconnexion gérée par le shell admin) -->
     <HBox alignment="CENTER_LEFT" spacing="10">
         <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Gestion des Utilisateurs" HBox.hgrow="ALWAYS" />
-        <!-- CORRECTION 1: Bouton de déconnexion avec bon format -->
-        <Button fx:id="logoutButton" onAction="#handleLogoutButton" style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-weight: bold;" text="   Déconnexion   ">
-            <graphic>
-                <Label text="🚪" />
-            </graphic>
-        </Button>
     </HBox>
 
     <!-- Barre d'outils -->
@@ -114,8 +108,8 @@
         <Label fx:id="chauffeurCountLabel" style="-fx-text-fill: #F44336; -fx-font-weight: bold;" text="Chauffeurs: 0" />
     </FlowPane>
 
-    <!-- CORRECTION 2: Formulaire d'ajout/modification avec managed="true" -->
-    <GridPane fx:id="userForm" hgap="10" managed="true" style="-fx-border-color: #ddd; -fx-border-radius: 5; -fx-padding: 10; -fx-background-color: #f9f9f9;" vgap="10" visible="false">
+    <!-- Formulaire d'ajout/modification (style admin-form pour cohérence dark shell) -->
+    <GridPane fx:id="userForm" hgap="10" managed="true" styleClass="admin-form" vgap="10" visible="false">
 
         <Label text="ID:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
         <TextField fx:id="idField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="0" />

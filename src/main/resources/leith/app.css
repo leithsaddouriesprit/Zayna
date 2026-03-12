@@ -452,6 +452,143 @@
     -fx-background-color: #7c6cf7;
     -fx-effect: dropshadow(gaussian, rgba(109, 94, 247, 0.4), 14, 0.2, 0, 4);
 }
+/* Admin content area (Accueil / Gestion) – dark theme in shell */
+.admin-content {
+    -fx-background-color: #0F172A;
+}
+.admin-content .label {
+    -fx-text-fill: #F9FAFB;
+}
+.admin-content .table-view {
+    -fx-background-color: rgba(15,23,42,0.95);
+    -fx-table-cell-border-color: rgba(148,163,184,0.3);
+}
+.admin-content .table-view .column-header-background {
+    -fx-background-color: #020617;
+}
+.admin-content .table-view .column-header,
+.admin-content .table-view .column-header .label {
+    -fx-text-fill: #e5e7eb;
+}
+.admin-content .table-row-cell {
+    -fx-background-color: transparent;
+}
+.admin-content .table-row-cell:odd {
+    -fx-background-color: rgba(148,163,184,0.15);
+}
+.admin-content .table-row-cell:selected {
+    -fx-background-color: rgba(109,94,247,0.7);
+}
+.admin-content .titled-pane > .title {
+    -fx-background-color: #020617;
+}
+.admin-content .titled-pane > .title .text {
+    -fx-fill: #e5e7eb;
+}
+.admin-content .titled-pane > .content {
+    -fx-background-color: transparent;
+}
+
+/* Admin form (detail/edit panel) – dark theme when inside shell */
+.admin-form {
+    -fx-background-color: #1e293b;
+    -fx-border-color: rgba(255,255,255,0.15);
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 16;
+}
+.admin-form .label {
+    -fx-text-fill: #cbd5e1;
+}
+.admin-form .text-field, .admin-form .password-field {
+    -fx-background-color: rgba(255,255,255,0.1);
+    -fx-text-fill: #F9FAFB;
+    -fx-prompt-text-fill: #94a3b8;
+}
+
+/* ===== Admin Accueil dashboard – premium cards & sections ===== */
+.admin-dashboard-section {
+    -fx-spacing: 14;
+    -fx-padding: 20 0 24 0;
+}
+.admin-dashboard-section-title {
+    -fx-text-fill: #cbd5e1;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 8 0;
+}
+.admin-dashboard-card {
+    -fx-background-color: rgba(255, 255, 255, 0.06);
+    -fx-background-radius: 14;
+    -fx-border-color: rgba(255, 255, 255, 0.12);
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+    -fx-padding: 20 24;
+    -fx-spacing: 10;
+    -fx-alignment: center-left;
+    -fx-min-width: 200;
+    -fx-pref-width: 240;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 20, 0.12, 0, 6);
+}
+.admin-dashboard-card .label {
+    -fx-text-fill: rgba(249, 250, 251, 0.9);
+    -fx-font-size: 13px;
+}
+.admin-dashboard-card .dashboard-value {
+    -fx-text-fill: #F9FAFB;
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+}
+.admin-dashboard-section-users .admin-dashboard-card {
+    -fx-border-color: rgba(109, 94, 247, 0.35);
+    -fx-background-color: rgba(109, 94, 247, 0.08);
+}
+.admin-dashboard-section-transport .admin-dashboard-card {
+    -fx-border-color: rgba(34, 197, 94, 0.3);
+    -fx-background-color: rgba(34, 197, 94, 0.06);
+}
+.admin-dashboard-section-pending .admin-dashboard-card {
+    -fx-border-color: rgba(245, 158, 11, 0.35);
+    -fx-background-color: rgba(245, 158, 11, 0.06);
+}
+
+/* ===== Admin Statistiques – highlight cards & table ===== */
+.admin-stats-highlights {
+    -fx-spacing: 20;
+    -fx-padding: 0 0 24 0;
+}
+.admin-stats-highlight-card {
+    -fx-background-color: rgba(30, 41, 59, 0.9);
+    -fx-background-radius: 14;
+    -fx-border-color: rgba(148, 163, 184, 0.25);
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+    -fx-padding: 24 28;
+    -fx-spacing: 12;
+    -fx-alignment: center-left;
+    -fx-min-width: 260;
+    -fx-pref-width: 320;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 24, 0.15, 0, 8);
+}
+.admin-stats-highlight-card .label {
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 13px;
+}
+.admin-stats-highlight-card .stats-highlight-value {
+    -fx-text-fill: #F9FAFB;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+.admin-stats-table-section {
+    -fx-padding: 16 0 0 0;
+}
+.admin-stats-table-section .label {
+    -fx-text-fill: #cbd5e1;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 10 0;
+}
+
 .shell-chat-panel {
     -fx-background-color: #1e293b;
     -fx-background-radius: 16;

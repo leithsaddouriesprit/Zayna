@@ -95,4 +95,23 @@ public class DaoParent extends DaoUser {
         System.out.println("=== DaoParent.createParent - FIN ===");
         System.out.println("==========================================\n");
     }
+
+    /** Lecture seule : tous les parents (pour écran admin). */
+    public java.util.List<Parent> findAll() throws SQLException {
+        java.util.List<Parent> list = new java.util.ArrayList<>();
+        String sql = "SELECT id, nom, prenom, email, user_id FROM parent ORDER BY id";
+        try (Connection conn = MyBDConnexion.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Parent p = new Parent();
+                p.setId(rs.getInt("id"));
+                p.setNom(rs.getString("nom"));
+                p.setPrenom(rs.getString("prenom"));
+                p.setEmail(rs.getString("email"));
+                list.add(p);
+            }
+        }
+        return list;
+    }
 }
