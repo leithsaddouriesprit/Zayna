@@ -14,6 +14,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.application.Platform;
+import tn.esprit.workshop.controlleurs.leith.SceneNavigator;
 import tn.esprit.workshop.model.Talel.talel2.CategorieUser;
 import tn.esprit.workshop.model.Talel.talel2.User;
 import tn.esprit.workshop.services.Talel.ServiceAdmin;
@@ -315,6 +316,10 @@ public class AdminController implements Initializable {
 
         Optional<ButtonType> result = confirmation.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
+            if (SceneNavigator.isInAdminShell()) {
+                SceneNavigator.requestAdminShellLogout();
+                return;
+            }
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/Talel/ConnecterUser.fxml"));
                 Parent root = loader.load();
@@ -323,7 +328,7 @@ public class AdminController implements Initializable {
                 Stage stage = (Stage) currentScene.getWindow();
 
                 stage.setScene(new Scene(root));
-                stage.setTitle("Connexion - Système de Gestion");
+                stage.setTitle("Zayna - Connexion");
                 stage.centerOnScreen();
 
                 System.out.println("✅ Déconnexion réussie");

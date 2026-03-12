@@ -50,6 +50,9 @@ public class ChatAIController {
 
     /** Resolved on open: default child (last viewed or first of parent). */
     private Integer enfantId;
+    /** When set, Retour/close hides the panel instead of closing the stage (e.g. Parent shell widget). */
+    private Runnable embeddedModeOnClose;
+
     /** Cached context for every request. */
     private Enfant cachedEnfant;
     private Trajet cachedTrajet;
@@ -336,8 +339,17 @@ public class ChatAIController {
         }
     }
 
+    /** Call when embedding the chat in a shell panel; Retour will run this instead of closing the stage. */
+    public void setEmbeddedMode(Runnable onClose) {
+        this.embeddedModeOnClose = onClose;
+    }
+
     @FXML
     void goBack(ActionEvent event) {
-        ((Stage) taChat.getScene().getWindow()).close();
+        if (embeddedModeOnClose != null) {
+            embeddedModeOnClose.run();
+        } else if (taChat != null && taChat.getScene() != null && taChat.getScene().getWindow() instanceof Stage) {
+            ((Stage) taChat.getScene().getWindow()).close();
+        }
     }
 }

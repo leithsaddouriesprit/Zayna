@@ -92,8 +92,12 @@ public class SuiviCandidatureController {
         try {
             candidatureService.annuler(chauffeurId);
             lblMessage.setText("Candidature annulée.");
-            javafx.stage.Stage stage = (javafx.stage.Stage) btnAnnuler.getScene().getWindow();
-            if (stage != null) stage.close();
+            if (SceneNavigator.isInChauffeurShell()) {
+                SceneNavigator.chauffeurShellGoHome();
+            } else {
+                javafx.stage.Stage stage = (javafx.stage.Stage) btnAnnuler.getScene().getWindow();
+                if (stage != null) stage.close();
+            }
         } catch (SQLException e) {
             LOG.log(Level.SEVERE, "onAnnuler", e);
             lblMessage.setText("Erreur: " + e.getMessage());
@@ -102,15 +106,23 @@ public class SuiviCandidatureController {
 
     @FXML
     void onPostulerAnouveau() {
-        javafx.stage.Stage stage = (javafx.stage.Stage) btnPostulerAnouveau.getScene().getWindow();
-        if (stage != null) stage.close();
-        SceneNavigator.openPostulerChauffeur(null);
+        if (SceneNavigator.isInChauffeurShell()) {
+            SceneNavigator.openPostulerChauffeur(null);
+        } else {
+            javafx.stage.Stage stage = (javafx.stage.Stage) btnPostulerAnouveau.getScene().getWindow();
+            if (stage != null) stage.close();
+            SceneNavigator.openPostulerChauffeur(null);
+        }
     }
 
     @FXML
     void onAllerEspace() {
-        javafx.stage.Stage stage = (javafx.stage.Stage) btnAllerEspace.getScene().getWindow();
-        if (stage != null) stage.close();
-        SceneNavigator.openEspaceChauffeur();
+        if (SceneNavigator.isInChauffeurShell()) {
+            SceneNavigator.openEspaceChauffeur();
+        } else {
+            javafx.stage.Stage stage = (javafx.stage.Stage) btnAllerEspace.getScene().getWindow();
+            if (stage != null) stage.close();
+            SceneNavigator.openEspaceChauffeur();
+        }
     }
 }

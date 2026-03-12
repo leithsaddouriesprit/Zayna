@@ -14,6 +14,10 @@ public final class AppSession {
     private Integer agentId;
     /** id de la table ecole (filtrage écrans Agent). */
     private Integer ecoleId;
+    /** Nom affiché pour la barre de shell (ex. "Leith Saddouri"). */
+    private String connectedUserName;
+    /** Rôle affiché (ex. "Parent", "Chauffeur", "Agent École", "Administrateur"). */
+    private String connectedUserRole;
 
     private AppSession() {
     }
@@ -60,5 +64,21 @@ public final class AppSession {
 
     public void setEcoleId(Integer ecoleId) {
         this.ecoleId = ecoleId;
+    }
+
+    public String getConnectedUserName() {
+        return connectedUserName != null ? connectedUserName : "";
+    }
+
+    public void setConnectedUserName(String connectedUserName) {
+        this.connectedUserName = connectedUserName;
+    }
+
+    public String getConnectedUserRole() {
+        return connectedUserRole != null ? connectedUserRole : "";
+    }
+
+    public void setConnectedUserRole(String connectedUserRole) {
+        this.connectedUserRole = connectedUserRole;
     }
 }

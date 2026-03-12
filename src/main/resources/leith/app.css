@@ -380,3 +380,84 @@
 .tracking-panel .button .label {
     -fx-text-fill: #1a1a1a;
 }
+
+/* ===== Role shells: top bar, sidebar, account ===== */
+.shell-topbar {
+    -fx-background-color: #1e293b;
+    -fx-padding: 12 20;
+    -fx-spacing: 16;
+    -fx-alignment: center-left;
+}
+.shell-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #F9FAFB;
+}
+.shell-account {
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 13px;
+}
+.shell-btn-logout {
+    -fx-background-color: #64748b;
+    -fx-text-fill: white;
+    -fx-padding: 8 16;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.shell-btn-logout:hover {
+    -fx-background-color: #475569;
+}
+.shell-sidebar {
+    -fx-background-color: #1e293b;
+    -fx-padding: 20;
+    -fx-spacing: 10;
+    -fx-min-width: 220;
+}
+.shell-sidebar .button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #cbd5e1;
+    -fx-alignment: center-left;
+    -fx-padding: 10 14;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.shell-sidebar .button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-text-fill: #F9FAFB;
+}
+.shell-sidebar .button.btn-primary {
+    -fx-background-color: rgba(109, 94, 247, 0.35);
+    -fx-text-fill: #e0dcff;
+}
+.shell-sidebar .button.btn-primary:hover {
+    -fx-background-color: rgba(109, 94, 247, 0.5);
+}
+.shell-sidebar .separator {
+    -fx-padding: 8 0;
+}
+.shell-sidebar-section {
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 11px;
+    -fx-padding: 8 0 2 0;
+}
+.shell-chat-fab {
+    -fx-background-radius: 28;
+    -fx-min-width: 56;
+    -fx-min-height: 56;
+    -fx-background-color: #6D5EF7;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0.15, 0, 4);
+}
+.shell-chat-fab:hover {
+    -fx-background-color: #7c6cf7;
+    -fx-effect: dropshadow(gaussian, rgba(109, 94, 247, 0.4), 14, 0.2, 0, 4);
+}
+.shell-chat-panel {
+    -fx-background-color: #1e293b;
+    -fx-background-radius: 16;
+    -fx-padding: 0;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 24, 0.15, 0, 8);
+    -fx-border-color: rgba(255,255,255,0.1);
+    -fx-border-radius: 16;
+    -fx-border-width: 1;
+}

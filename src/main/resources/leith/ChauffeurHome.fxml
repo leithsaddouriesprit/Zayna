@@ -23,8 +23,7 @@
     <Label text="Choisissez une action :" styleClass="subtitle-label"/>
     <VBox styleClass="action-buttons" spacing="12">
         <Button fx:id="btnPostuler" text="Postuler" onAction="#onPostuler"/>
-        <Button fx:id="btnSuivi" text="Suivi Candidature" onAction="#onSuiviCandidature" disable="true"/>
-        <Button fx:id="btnEspace" text="Espace Chauffeur" onAction="#onEspaceChauffeur" disable="true"/>
+        <Button fx:id="btnSuivi" text="Suivi candidature" onAction="#onSuiviCandidature"/>
+        <Button fx:id="btnEspace" text="Espace Chauffeur" onAction="#onEspaceChauffeur"/>
     </VBox>
-
 </VBox>

@@ -308,12 +308,13 @@ public class ConnecterController implements Initializable {
                     return;
                 }
                 AppSession.getInstance().setParentId(parentId);
+                setConnectedUserDisplay(user, "Parent");
 
                 Stage stage = (Stage) loginButton.getScene().getWindow();
                 if (stage != null) {
                     stage.close();
                 }
-                SceneNavigator.openParentDashboard();
+                SceneNavigator.openParentShell();
                 return;
             }
 
@@ -327,12 +328,13 @@ public class ConnecterController implements Initializable {
                     return;
                 }
                 AppSession.getInstance().setChauffeurId(chauffeurId);
+                setConnectedUserDisplay(user, "Chauffeur");
 
                 Stage stage = (Stage) loginButton.getScene().getWindow();
                 if (stage != null) {
                     stage.close();
                 }
-                SceneNavigator.openChauffeurHome();
+                SceneNavigator.openChauffeurShell();
                 return;
             }
 
@@ -346,16 +348,29 @@ public class ConnecterController implements Initializable {
                 }
                 AppSession.getInstance().setAgentId(agentEcole[0]);
                 AppSession.getInstance().setEcoleId(agentEcole[1]);
+                setConnectedUserDisplay(user, "Agent École");
 
                 Stage stage = (Stage) loginButton.getScene().getWindow();
                 if (stage != null) {
                     stage.close();
                 }
-                SceneNavigator.openAgentDashboard();
+                SceneNavigator.openAgentShell();
                 return;
             }
 
-            // ---------- Rôles restants : écrans Talel ----------
+            // ---------- Flux Admin (shell comme les autres rôles) ----------
+            if (role == CategorieUser.ADMIN) {
+                setConnectedUserDisplay(user, "Administrateur");
+                SceneNavigator.setPendingAdminUser(user);
+                Stage stage = (Stage) loginButton.getScene().getWindow();
+                if (stage != null) {
+                    stage.close();
+                }
+                SceneNavigator.openAdminShell();
+                return;
+            }
+
+            // ---------- Rôles restants : écrans Talel (MAITRESSE, etc.) ----------
             String fxmlPath = getFxmlPathForRole(role);
 
             if (fxmlPath == null) {
@@ -374,7 +389,6 @@ public class ConnecterController implements Initializable {
             Object controller = loader.getController();
             injectUserToController(controller, user);
 
-            // Injection explicite pour l'admin si disponible
             if (controller instanceof AdminController adminController) {
                 adminController.setCurrentUser(user);
             }
@@ -502,6 +516,14 @@ public class ConnecterController implements Initializable {
             default:
                 return "Tableau de bord";
         }
+    }
+
+    /** Affiche le nom et le rôle dans les shells (barre supérieure). */
+    private void setConnectedUserDisplay(User user, String roleLabel) {
+        String name = (user.getNom() != null && !user.getNom().isBlank()) ? user.getNom() : user.getEmail();
+        if (name == null) name = "Utilisateur";
+        AppSession.getInstance().setConnectedUserName(name);
+        AppSession.getInstance().setConnectedUserRole(roleLabel);
     }
 
     /**
