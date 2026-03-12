@@ -2,7 +2,7 @@ package tn.esprit.workshop.model.Talel.Dao;
 
 import tn.esprit.workshop.model.Talel.talel2.CategorieUser;
 import tn.esprit.workshop.model.Talel.talel2.Parent;
-import tn.esprit.workshop.utilis.Talel.MyBDConnexion;
+import tn.esprit.workshop.utilis.MyBDConnexion;
 import java.sql.*;
 
 public class DaoParent extends DaoUser {
@@ -32,76 +32,48 @@ public class DaoParent extends DaoUser {
         System.out.println("\n🔌 Tentative d'ouverture de connexion...");
         long startTime = System.currentTimeMillis();
 
-        String sql = "INSERT INTO users (nom, email, mot_de_passe, categorie, telephone, adresse, profession) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        System.out.println("   📝 SQL: " + sql);
+        String sqlUsers = "INSERT INTO users (nom, email, mot_de_passe, categorie, telephone, adresse, profession) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        System.out.println("   📝 SQL users: " + sqlUsers);
 
         try (Connection conn = MyBDConnexion.getInstance().getConnection()) {
             long connectionTime = System.currentTimeMillis() - startTime;
             System.out.println("   ✅ Connexion obtenue en " + connectionTime + "ms");
-            System.out.println("   🔗 Connexion: " + conn);
-            System.out.println("   🔍 Connexion isClosed? " + conn.isClosed());
-            System.out.println("   🆔 HashCode connexion: " + System.identityHashCode(conn));
 
-            // Préparation de la requête
-            System.out.println("\n⚙️ Préparation de la requête...");
-            try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-                System.out.println("   ✅ PreparedStatement créé");
-
-                // Remplissage des paramètres
-                System.out.println("\n📥 Remplissage des paramètres:");
-
+            // 1) Insert users
+            int userId;
+            try (PreparedStatement ps = conn.prepareStatement(sqlUsers, Statement.RETURN_GENERATED_KEYS)) {
                 ps.setString(1, parent.getNom());
-                System.out.println("   1. nom = '" + parent.getNom() + "'");
-
                 ps.setString(2, parent.getEmail());
-                System.out.println("   2. email = '" + parent.getEmail() + "'");
-
                 ps.setString(3, parent.getpassword());
-                System.out.println("   3. mot_de_passe = [HASHÉ]");
-
                 ps.setString(4, CategorieUser.PARENT.name());
-                System.out.println("   4. categorie = '" + CategorieUser.PARENT.name() + "'");
-
                 ps.setString(5, parent.getTelephone());
-                System.out.println("   5. telephone = '" + parent.getTelephone() + "'");
-
                 ps.setString(6, parent.getAdresse());
-                System.out.println("   6. adresse = '" + parent.getAdresse() + "'");
-
-                ps.setString(7, parent.getProfession());
-                System.out.println("   7. profession = '" + parent.getProfession() + "'");
-
-                // Exécution
-                System.out.println("\n🚀 Exécution de la requête...");
-                long execStartTime = System.currentTimeMillis();
-
+                ps.setString(7, parent.getProfession() != null ? parent.getProfession() : "");
                 int affectedRows = ps.executeUpdate();
-
-                long execTime = System.currentTimeMillis() - execStartTime;
-                System.out.println("   ✅ Requête exécutée en " + execTime + "ms");
-                System.out.println("   📊 Lignes affectées: " + affectedRows);
-
-                if (affectedRows == 0) {
-                    System.err.println("❌ ERREUR: Aucune ligne affectée!");
-                    throw new SQLException("La création du parent a échoué, aucune ligne affectée.");
-                }
-
-                // Récupération de l'ID
-                System.out.println("\n🔑 Récupération de l'ID généré...");
-                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        int id = generatedKeys.getInt(1);
-                        parent.setId(id);
-                        System.out.println("   ✅ ID généré avec succès: " + id);
-                    } else {
-                        System.err.println("❌ ERREUR: Aucun ID généré!");
-                        throw new SQLException("La création du parent a échoué, aucun ID généré.");
-                    }
+                if (affectedRows == 0) throw new SQLException("Création users échouée, aucune ligne affectée.");
+                try (ResultSet gk = ps.getGeneratedKeys()) {
+                    if (!gk.next()) throw new SQLException("Aucun ID généré pour users.");
+                    userId = gk.getInt(1);
                 }
             }
+            System.out.println("   ✅ users créé, id = " + userId);
 
+            // 2) Insert parent (business table: id, nom, prenom, email, user_id only)
+            String sqlParent = "INSERT INTO parent (nom, prenom, email, user_id) VALUES (?, ?, ?, ?)";
+            try (PreparedStatement ps = conn.prepareStatement(sqlParent, Statement.RETURN_GENERATED_KEYS)) {
+                ps.setString(1, parent.getNom());
+                ps.setString(2, parent.getPrenom() != null ? parent.getPrenom() : "");
+                ps.setString(3, parent.getEmail());
+                ps.setInt(4, userId);
+                int affected = ps.executeUpdate();
+                if (affected == 0) throw new SQLException("Création parent échouée, aucune ligne affectée.");
+                try (ResultSet gk = ps.getGeneratedKeys()) {
+                    if (!gk.next()) throw new SQLException("Aucun ID généré pour parent.");
+                    parent.setId(gk.getInt(1));
+                }
+            }
+            System.out.println("   ✅ parent créé, id = " + parent.getId());
             System.out.println("\n✅ DaoParent.createParent terminé avec succès");
-            System.out.println("   🆔 ID final: " + parent.getId());
 
         } catch (SQLException e) {
             System.err.println("\n❌ ERREUR SQL dans DaoParent.createParent:");

@@ -4,11 +4,17 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+/**
+ * @deprecated Use {@link tn.esprit.workshop.utilis.MyBDConnexion} instead.
+ * All Talel and Leith database access now uses the shared connection (zaynaa @ port 3306).
+ * This class is kept only for reference; no code should reference it.
+ */
+@Deprecated
 public class MyBDConnexion {
-    // Vos informations
+    // Connexion adaptée au schéma partagé "zaynaa"
     private static final String USER = "root";
     private static final String PASSWORD = "T220499I";
-    private static final String URL = "jdbc:mysql://localhost:3307/zayna?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+    private static final String URL = "jdbc:mysql://localhost:3306/zaynaa?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
 
     private Connection connection;
     private static MyBDConnexion instance;
@@ -20,7 +26,7 @@ public class MyBDConnexion {
 
             // Établir la connexion
             connection = DriverManager.getConnection(URL, USER, PASSWORD);
-            System.out.println("✅ Connexion établie avec succès à la base 'zayna'");
+            System.out.println("✅ Connexion établie avec succès à la base 'zaynaa'");
             System.out.println("   Version MySQL Connector: 9.3.0");
             System.out.println("   Port: 3307");
 

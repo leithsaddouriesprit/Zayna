@@ -156,6 +156,10 @@ public class SceneNavigator {
             );
             Parent root = loader.load();
             ChatAIController controller = loader.getController();
+            if (controller == null) {
+                LOGGER.severe("ChatAI: loader.getController() is null");
+                return;
+            }
             controller.init(enfantId);
             Stage stage = new Stage();
             javafx.scene.Scene scene = new javafx.scene.Scene(root, 900, 650);

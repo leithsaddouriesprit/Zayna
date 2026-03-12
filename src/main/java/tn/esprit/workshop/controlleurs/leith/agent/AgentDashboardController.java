@@ -17,8 +17,12 @@ public class AgentDashboardController {
         Integer idEcole = AppSession.getInstance().getEcoleId();
         if (idEcole != null) {
             try {
-                String nom = new EcoleService().getById(idEcole).getNomEcole();
-                lblEcole.setText("École: " + nom);
+                var ecole = new EcoleService().getById(idEcole);
+                if (ecole != null && ecole.getNomEcole() != null) {
+                    lblEcole.setText("École: " + ecole.getNomEcole());
+                } else {
+                    lblEcole.setText("École id=" + idEcole + " (introuvable)");
+                }
             } catch (SQLException e) {
                 lblEcole.setText("École id=" + idEcole);
             }

@@ -15,21 +15,25 @@ import java.util.Optional;
 public class ControleurResponsableEcole {
 
     @FXML
-    private TextField txtNom;
+    private TextField nomField;
+    @FXML
+    private TextField prenomField;
     @FXML
     private TextField txtEmail;
     @FXML
     private PasswordField txtMotDePasse;
     @FXML
-    private TextField txtTitre;
+    private TextField txtNomEcole;
     @FXML
-    private TextField txtEcole;
+    private TextArea txtAdresseEcole;
+    @FXML
+    private TextField txtLatitude;
+    @FXML
+    private TextField txtLongitude;
     @FXML
     private TextField txtTelephone;
     @FXML
     private TextArea txtAdresse;
-    @FXML
-    private TextField txtSalaire;
     @FXML
     private Label lblMessage;
     @FXML
@@ -56,43 +60,79 @@ public class ControleurResponsableEcole {
             System.out.println("=== ControleurResponsableEcole.ajouterResponsable ===");
 
             // Récupération des données
-            String nom = txtNom.getText().trim();
+            String nom = nomField != null ? nomField.getText().trim() : "";
+            String prenom = prenomField != null ? prenomField.getText().trim() : "";
             String email = txtEmail.getText().trim().toLowerCase();
             String passwordClair = txtMotDePasse.getText();
-            String titre = txtTitre.getText().trim();
-            String ecole = txtEcole.getText().trim();
+            String nomEcole = txtNomEcole != null ? txtNomEcole.getText().trim() : "";
+            String adresseEcole = txtAdresseEcole != null ? txtAdresseEcole.getText().trim() : "";
+            String latText = txtLatitude != null ? txtLatitude.getText().trim() : "";
+            String lngText = txtLongitude != null ? txtLongitude.getText().trim() : "";
             String telephone = txtTelephone.getText().trim();
             String adresse = txtAdresse.getText().trim();
-            String salaireText = txtSalaire.getText().trim();
 
             // Validation des champs obligatoires
             if (nom.isEmpty()) {
                 afficherMessage("❌ Le nom est obligatoire", "error");
-                txtNom.requestFocus();
+                if (nomField != null) nomField.requestFocus();
                 return;
             }
-
+            if (prenom.isEmpty()) {
+                afficherMessage("❌ Le prénom est obligatoire", "error");
+                if (prenomField != null) prenomField.requestFocus();
+                return;
+            }
             if (email.isEmpty()) {
                 afficherMessage("❌ L'email est obligatoire", "error");
                 txtEmail.requestFocus();
                 return;
             }
-
             if (passwordClair.isEmpty()) {
                 afficherMessage("❌ Le mot de passe est obligatoire", "error");
                 txtMotDePasse.requestFocus();
                 return;
             }
-
-            if (titre.isEmpty()) {
-                afficherMessage("❌ Le titre est obligatoire", "error");
-                txtTitre.requestFocus();
+            if (nomEcole.isEmpty()) {
+                afficherMessage("❌ Le nom de l'école est obligatoire", "error");
+                if (txtNomEcole != null) txtNomEcole.requestFocus();
+                return;
+            }
+            if (latText.isEmpty()) {
+                afficherMessage("❌ La latitude est obligatoire", "error");
+                if (txtLatitude != null) txtLatitude.requestFocus();
+                return;
+            }
+            if (lngText.isEmpty()) {
+                afficherMessage("❌ La longitude est obligatoire", "error");
+                if (txtLongitude != null) txtLongitude.requestFocus();
                 return;
             }
 
-            if (ecole.isEmpty()) {
-                afficherMessage("❌ Le nom de l'école est obligatoire", "error");
-                txtEcole.requestFocus();
+            // Validation latitude / longitude (numériques et plages)
+            double lat;
+            double lng;
+            try {
+                lat = Double.parseDouble(latText.replace(',', '.'));
+                if (lat < -90 || lat > 90) {
+                    afficherMessage("❌ La latitude doit être entre -90 et 90", "error");
+                    if (txtLatitude != null) txtLatitude.requestFocus();
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                afficherMessage("❌ Latitude invalide (nombre attendu, ex: 36.8065)", "error");
+                if (txtLatitude != null) txtLatitude.requestFocus();
+                return;
+            }
+            try {
+                lng = Double.parseDouble(lngText.replace(',', '.'));
+                if (lng < -180 || lng > 180) {
+                    afficherMessage("❌ La longitude doit être entre -180 et 180", "error");
+                    if (txtLongitude != null) txtLongitude.requestFocus();
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                afficherMessage("❌ Longitude invalide (nombre attendu, ex: 10.1815)", "error");
+                if (txtLongitude != null) txtLongitude.requestFocus();
                 return;
             }
 
@@ -122,31 +162,17 @@ public class ControleurResponsableEcole {
                 return;
             }
 
-            // Création de l'objet ResponsableEcole
+            // Création de l'objet ResponsableEcole (users + ecole + agent_ecole)
             ResponsableEcole responsable = new ResponsableEcole();
             responsable.setNom(nom);
+            responsable.setPrenom(prenom);
             responsable.setEmail(email);
-            responsable.setTitre(titre);
-            responsable.setEcole(ecole);
+            responsable.setEcole(nomEcole);
+            responsable.setAdresseEcole(adresseEcole.isEmpty() ? null : adresseEcole);
+            responsable.setLatitude(lat);
+            responsable.setLongitude(lng);
             responsable.setTelephone(telephone.isEmpty() ? null : telephone);
             responsable.setAdresse(adresse.isEmpty() ? null : adresse);
-
-            // Validation et parsing du salaire (optionnel)
-            if (!salaireText.isEmpty()) {
-                try {
-                    double salaire = Double.parseDouble(salaireText);
-                    if (salaire < 0) {
-                        afficherMessage("❌ Le salaire ne peut pas être négatif", "error");
-                        txtSalaire.requestFocus();
-                        return;
-                    }
-                    responsable.setSalaire(salaire);
-                } catch (NumberFormatException e) {
-                    afficherMessage("❌ Le salaire doit être un nombre valide", "error");
-                    txtSalaire.requestFocus();
-                    return;
-                }
-            }
 
             System.out.println("Appel du service avec email: " + email);
 
@@ -169,16 +195,16 @@ public class ControleurResponsableEcole {
 
     @FXML
     private void viderFormulaire() {
-        txtNom.clear();
+        if (nomField != null) nomField.clear();
+        if (prenomField != null) prenomField.clear();
         txtEmail.clear();
         txtMotDePasse.clear();
-        txtTitre.clear();
-        txtEcole.clear();
+        if (txtNomEcole != null) txtNomEcole.clear();
+        if (txtAdresseEcole != null) txtAdresseEcole.clear();
+        if (txtLatitude != null) txtLatitude.clear();
+        if (txtLongitude != null) txtLongitude.clear();
         txtTelephone.clear();
         txtAdresse.clear();
-        txtSalaire.clear();
-
-        //afficherMessage("📋 Formulaire vidé", "info");
     }
 
     /**

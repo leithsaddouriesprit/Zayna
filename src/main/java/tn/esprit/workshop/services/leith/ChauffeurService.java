@@ -13,15 +13,16 @@ import java.util.logging.Logger;
 
 public class ChauffeurService {
 
-    private final Connection connection;
-
     public ChauffeurService() {
-        this.connection = MyBDConnexion.getInstance().getConnection();
+    }
+
+    private Connection getConnection() throws SQLException {
+        return MyBDConnexion.getInstance().getConnection();
     }
 
     public Chauffeur getById(int id) throws SQLException {
         String sql = "SELECT id, nom, prenom, age, nb_ans_experience FROM chauffeur WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -41,7 +42,7 @@ public class ChauffeurService {
     public int ajouterChauffeurEtRetournerId(String nom, String prenom, int age, int nbAnsExperience) throws SQLException {
         String sql = "INSERT INTO chauffeur (nom, prenom, age, nb_ans_experience) VALUES (?, ?, ?, ?)";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, nom);
             ps.setString(2, prenom);
             ps.setInt(3, age);
@@ -56,26 +57,26 @@ public class ChauffeurService {
         throw new SQLException("Impossible de récupérer l'ID généré pour le chauffeur.");
     }
 
-    public void envoyerCandidatureAgentEcole(int chauffeurId, byte[] rectoBytes, String rectoName, String rectoMime, byte[] versoBytes, String versoName, String versoMime, String maladie) throws SQLException {
+    public void envoyerCandidatureAgentEcole(int chauffeurId, int idEcole, byte[] rectoBytes, String rectoName, String rectoMime, byte[] versoBytes, String versoName, String versoMime, String maladie) throws SQLException {
 
-        // date_upload omitted so column must be NULLable or have DEFAULT; date_envoi via CURRENT_TIMESTAMP
         String sql = "INSERT INTO candidature " +
-                "(chauffeur_id, statut, date_envoi, maladie, " +
+                "(chauffeur_id, id_ecole, statut, date_envoi, maladie, " +
                 " permis_recto, permis_recto_nom, permis_recto_mime, " +
                 " permis_verso, permis_verso_nom, permis_verso_mime) " +
-                "VALUES (?, 'ENVOYEE', CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?)";
+                "VALUES (?, ?, 'ENVOYEE', CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, chauffeurId);
-            ps.setString(2, maladie);  // nullable
+            ps.setInt(2, idEcole);
+            ps.setString(3, maladie);
 
-            ps.setBytes(3, rectoBytes);
-            ps.setString(4, rectoName);
-            ps.setString(5, rectoMime);
+            ps.setBytes(4, rectoBytes);
+            ps.setString(5, rectoName);
+            ps.setString(6, rectoMime);
 
-            ps.setBytes(6, versoBytes);
-            ps.setString(7, versoName);
-            ps.setString(8, versoMime);
+            ps.setBytes(7, versoBytes);
+            ps.setString(8, versoName);
+            ps.setString(9, versoMime);
 
             ps.executeUpdate();
         }

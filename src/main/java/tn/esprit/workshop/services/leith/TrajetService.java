@@ -10,10 +10,11 @@ import java.util.List;
 
 public class TrajetService implements CRUD<Trajet> {
 
-    private final Connection connection;
-
     public TrajetService() {
-        this.connection = MyBDConnexion.getInstance().getConnection();
+    }
+
+    private Connection getConnection() throws SQLException {
+        return MyBDConnexion.getInstance().getConnection();
     }
 
     @Override
@@ -28,7 +29,7 @@ public class TrajetService implements CRUD<Trajet> {
                         t.isActif() + ", " +
                         "'" + (t.getStatut() != null ? t.getStatut() : "PLANIFIE") + "'" +
                         ")";
-        Statement st = connection.createStatement();
+        Statement st = getConnection().createStatement();
         st.executeUpdate(req);
     }
 
@@ -45,14 +46,14 @@ public class TrajetService implements CRUD<Trajet> {
                         "statut='" + (t.getStatut() != null ? t.getStatut() : "PLANIFIE") + "'" +
                         " WHERE id=" + t.getTrajetId();
 
-        Statement st = connection.createStatement();
+        Statement st = getConnection().createStatement();
         st.executeUpdate(req);
     }
 
     @Override
     public void deleteOne(Trajet t) throws SQLException {
         String req = "DELETE FROM trajet WHERE id=" + t.getTrajetId();
-        Statement st = connection.createStatement();
+        Statement st = getConnection().createStatement();
         st.executeUpdate(req);
     }
 
@@ -60,7 +61,7 @@ public class TrajetService implements CRUD<Trajet> {
     public List<Trajet> selectAll() throws SQLException {
         List<Trajet> list = new ArrayList<>();
         String req = "SELECT * FROM trajet";
-        Statement st = connection.createStatement();
+        Statement st = getConnection().createStatement();
         ResultSet rs = st.executeQuery(req);
 
         while (rs.next()) {
@@ -85,7 +86,7 @@ public class TrajetService implements CRUD<Trajet> {
                         "WHERE e.id = " + enfantId +
                         " AND e.actif = true";
 
-        Statement st = connection.createStatement();
+        Statement st = getConnection().createStatement();
         ResultSet rs = st.executeQuery(req);
 
         if (rs.next()) {
@@ -108,7 +109,7 @@ public class TrajetService implements CRUD<Trajet> {
 
         String sql = "SELECT * FROM trajet WHERE id_bus = ? AND actif = 1 LIMIT 1";
 
-       PreparedStatement ps = connection.prepareStatement(sql);
+       PreparedStatement ps = getConnection().prepareStatement(sql);
 
             ps.setInt(1, busId);
 
@@ -132,7 +133,7 @@ public class TrajetService implements CRUD<Trajet> {
 
     public Trajet getById(int id) throws SQLException {
         String sql = "SELECT * FROM trajet WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -157,7 +158,7 @@ public class TrajetService implements CRUD<Trajet> {
     public List<Trajet> selectByEcoleId(int idEcole) throws SQLException {
         List<Trajet> list = new ArrayList<>();
         String sql = "SELECT * FROM trajet WHERE id_ecole = ? ORDER BY nom";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, idEcole);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -181,7 +182,7 @@ public class TrajetService implements CRUD<Trajet> {
     /** Affecte un bus au trajet. */
     public void updateIdBus(int trajetId, Integer busId) throws SQLException {
         String sql = "UPDATE trajet SET id_bus = ? WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setObject(1, busId);
             ps.setInt(2, trajetId);
             ps.executeUpdate();

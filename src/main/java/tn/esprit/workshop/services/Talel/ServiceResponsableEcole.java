@@ -52,17 +52,26 @@ public class ServiceResponsableEcole {
             if (responsable.getNom() == null || responsable.getNom().trim().isEmpty()) {
                 throw new Exception("Le nom est obligatoire");
             }
+            if (responsable.getPrenom() == null || responsable.getPrenom().trim().isEmpty()) {
+                throw new Exception("Le prénom est obligatoire");
+            }
             if (responsable.getEmail() == null || responsable.getEmail().trim().isEmpty()) {
                 throw new Exception("L'email est obligatoire");
-            }
-            if (responsable.getTitre() == null || responsable.getTitre().trim().isEmpty()) {
-                throw new Exception("Le titre est obligatoire");
             }
             if (responsable.getEcole() == null || responsable.getEcole().trim().isEmpty()) {
                 throw new Exception("Le nom de l'école est obligatoire");
             }
-            if (responsable.getSalaire() < 0) {
-                throw new Exception("Le salaire ne peut pas être négatif");
+            if (responsable.getLatitude() == null) {
+                throw new Exception("La latitude est obligatoire");
+            }
+            if (responsable.getLatitude() < -90 || responsable.getLatitude() > 90) {
+                throw new Exception("La latitude doit être entre -90 et 90");
+            }
+            if (responsable.getLongitude() == null) {
+                throw new Exception("La longitude est obligatoire");
+            }
+            if (responsable.getLongitude() < -180 || responsable.getLongitude() > 180) {
+                throw new Exception("La longitude doit être entre -180 et 180");
             }
             if (responsable.getTelephone() != null && !responsable.getTelephone().isEmpty()
                     && !responsable.getTelephone().matches("\\d{8}")) {

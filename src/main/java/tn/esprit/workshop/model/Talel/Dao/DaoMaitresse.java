@@ -2,7 +2,7 @@ package tn.esprit.workshop.model.Talel.Dao;
 
 import tn.esprit.workshop.model.Talel.talel2.CategorieUser;
 import tn.esprit.workshop.model.Talel.talel2.Maitresse;
-import tn.esprit.workshop.utilis.Talel.MyBDConnexion;
+import tn.esprit.workshop.utilis.MyBDConnexion;
 import java.sql.*;
 
 public class DaoMaitresse extends DaoUser {

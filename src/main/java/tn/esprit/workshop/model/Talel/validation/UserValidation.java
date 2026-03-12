@@ -174,6 +174,31 @@ public class UserValidation {
     }
 
     /**
+     * Valide le prénom (champ chauffeur, même règles que le nom).
+     */
+    public static List<String> validatePrenom(String prenom) {
+        List<String> errors = new ArrayList<>();
+        if (prenom == null || prenom.trim().isEmpty()) {
+            errors.add("Le prénom est requis");
+            return errors;
+        }
+        String t = prenom.trim();
+        if (t.length() < MIN_NAME_LENGTH) {
+            errors.add("Le prénom doit contenir au moins " + MIN_NAME_LENGTH + " caractères");
+        }
+        if (t.length() > MAX_NAME_LENGTH) {
+            errors.add("Le prénom ne doit pas dépasser " + MAX_NAME_LENGTH + " caractères");
+        }
+        if (!t.matches("^[a-zA-ZÀ-ÿ\\s-]+$")) {
+            errors.add("Le prénom ne doit contenir que des lettres, espaces et tirets");
+        }
+        if (t.contains("  ")) {
+            errors.add("Le prénom ne doit pas contenir d'espaces multiples");
+        }
+        return errors;
+    }
+
+    /**
      * Valide l'email
      * @param email L'email à valider
      * @param checkFormat Vérifier le format (true) ou juste les caractères (false)
@@ -485,9 +510,10 @@ public class UserValidation {
             return new ValidationResult(false, errors);
         }
 
-        // Validation des champs de base (hérités de User)
+        // Validation des champs de base (hérités de User) + prénom (table chauffeur)
         if (isNew) {
             errors.addAll(validateNom(chauffeur.getNom()));
+            errors.addAll(validatePrenom(chauffeur.getPrenom()));
             errors.addAll(validateEmail(chauffeur.getEmail(), true));
             errors.addAll(validateMotDePasse(chauffeur.getpassword(), true));
             errors.addAll(validateCategorie(chauffeur.getCategories()));
@@ -538,7 +564,8 @@ public class UserValidation {
     }
 
     /**
-     * Valide la date d'obtention du permis
+     * Valide la date d'obtention du permis.
+     * Pas de règle d'âge minimum (pas de date de naissance dans le formulaire).
      */
     public static List<String> validateDateObtentionPermis(LocalDate date) {
         List<String> errors = new ArrayList<>();
@@ -549,9 +576,6 @@ public class UserValidation {
             }
             if (date.isBefore(LocalDate.now().minusYears(70))) {
                 errors.add("La date d'obtention du permis est trop ancienne");
-            }
-            if (date.isAfter(LocalDate.now().minusYears(16))) {
-                errors.add("L'âge minimum pour obtenir un permis est 16 ans");
             }
         }
 
@@ -674,6 +698,11 @@ public class UserValidation {
         // Validation des champs de base
         if (isNew) {
             errors.addAll(validateNom(parent.getNom()));
+            if (parent.getPrenom() != null && !parent.getPrenom().trim().isEmpty()) {
+                errors.addAll(validatePrenom(parent.getPrenom()));
+            } else {
+                errors.add("Le prénom est obligatoire");
+            }
             errors.addAll(validateEmail(parent.getEmail(), true));
             errors.addAll(validateMotDePasse(parent.getpassword(), true));
             errors.addAll(validateCategorie(parent.getCategories()));
@@ -703,14 +732,16 @@ public class UserValidation {
             }
         }
 
-        // Validation des enfants
-        errors.addAll(validateEnfants(parent.getEnfantsNoms()));
+        // Enfants non requis à l'inscription (créés plus tard via candidature enfant)
+        if (parent.getEnfantsNoms() != null && !parent.getEnfantsNoms().isEmpty()) {
+            errors.addAll(validateEnfants(parent.getEnfantsNoms()));
+        }
 
         return new ValidationResult(errors.isEmpty(), errors);
     }
 
     /**
-     * Valide la liste des enfants
+     * Valide la liste des enfants (optionnel à l'inscription)
      */
     public static List<String> validateEnfants(List<String> enfants) {
         List<String> errors = new ArrayList<>();
@@ -750,9 +781,10 @@ public class UserValidation {
             return new ValidationResult(false, errors);
         }
 
-        // Validation des champs de base
+        // Validation des champs de base + prénom (agent_ecole)
         if (isNew) {
             errors.addAll(validateNom(responsable.getNom()));
+            errors.addAll(validatePrenom(responsable.getPrenom()));
             errors.addAll(validateEmail(responsable.getEmail(), true));
             errors.addAll(validateMotDePasse(responsable.getpassword(), true));
             errors.addAll(validateCategorie(responsable.getCategories()));
@@ -768,17 +800,7 @@ public class UserValidation {
             }
         }
 
-        // Validation du titre
-        if (isNew && (responsable.getTitre() == null || responsable.getTitre().trim().isEmpty())) {
-            errors.add("Le titre est obligatoire");
-        } else if (responsable.getTitre() != null && !responsable.getTitre().trim().isEmpty()) {
-            String titre = responsable.getTitre().trim();
-            if (titre.length() > 50) {
-                errors.add("Le titre ne doit pas dépasser 50 caractères");
-            }
-        }
-
-        // Validation de l'école
+        // Validation du nom de l'école (obligatoire ; l'école est créée à l'inscription)
         if (isNew && (responsable.getEcole() == null || responsable.getEcole().trim().isEmpty())) {
             errors.add("Le nom de l'école est obligatoire");
         } else if (responsable.getEcole() != null && !responsable.getEcole().trim().isEmpty()) {
@@ -791,9 +813,22 @@ public class UserValidation {
             }
         }
 
+        // Latitude / longitude (obligatoires à la création, plages valides)
+        if (isNew) {
+            if (responsable.getLatitude() == null) {
+                errors.add("La latitude est obligatoire");
+            } else if (responsable.getLatitude() < -90 || responsable.getLatitude() > 90) {
+                errors.add("La latitude doit être entre -90 et 90");
+            }
+            if (responsable.getLongitude() == null) {
+                errors.add("La longitude est obligatoire");
+            } else if (responsable.getLongitude() < -180 || responsable.getLongitude() > 180) {
+                errors.add("La longitude doit être entre -180 et 180");
+            }
+        }
+
         errors.addAll(validateTelephone(responsable.getTelephone()));
         errors.addAll(validateAdresse(responsable.getAdresse()));
-        errors.addAll(validateSalaire(responsable.getSalaire()));
 
         return new ValidationResult(errors.isEmpty(), errors);
     }

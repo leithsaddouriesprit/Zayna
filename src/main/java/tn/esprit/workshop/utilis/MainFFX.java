@@ -1,19 +1,10 @@
 package tn.esprit.workshop.utilis;
 
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import tn.esprit.workshop.controlleurs.leith.SceneNavigator;
-import tn.esprit.workshop.controlleurs.leith.MapTrackingController;
-import tn.esprit.workshop.controlleurs.leith.PostulerChauffeurController;
-import tn.esprit.workshop.controlleurs.leith.TrackingMode;
-import tn.esprit.workshop.utilis.AppSession;
-
-import java.io.IOException;
-import java.sql.SQLException;
 
 public class MainFFX extends Application {
 

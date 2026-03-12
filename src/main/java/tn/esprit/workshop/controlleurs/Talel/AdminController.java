@@ -140,8 +140,8 @@ public class AdminController implements Initializable {
 
             setupTableColumns();
             setupComboBoxes();
+            setupSearchFilter(); // must be before loadUserData so updateStatistics() can use filteredData
             loadUserData();
-            setupSearchFilter();
             setupTableSelection();
             hideForm();
             updateStatistics();

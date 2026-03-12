@@ -53,6 +53,9 @@ public class ServiceParent {
             if (parent.getNom() == null || parent.getNom().trim().isEmpty()) {
                 throw new Exception("Le nom est obligatoire");
             }
+            if (parent.getPrenom() == null || parent.getPrenom().trim().isEmpty()) {
+                throw new Exception("Le prénom est obligatoire");
+            }
             if (parent.getEmail() == null || parent.getEmail().trim().isEmpty()) {
                 throw new Exception("L'email est obligatoire");
             }

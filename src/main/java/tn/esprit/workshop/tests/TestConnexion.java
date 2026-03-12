@@ -1,5 +1,6 @@
 package tn.esprit.workshop.tests;
-import tn.esprit.workshop.utilis.Talel.MyBDConnexion;
+import tn.esprit.workshop.utilis.MyBDConnexion;
+
 import java.sql.SQLException;
 
 public class TestConnexion {
@@ -7,36 +8,26 @@ public class TestConnexion {
         System.out.println("🔍 TEST DE CONNEXION - Zayna");
         System.out.println("=============================");
 
-        // Tentative de connexion
-        MyBDConnexion connexion = MyBDConnexion.getInstance();
+        try {
+            MyBDConnexion connexion = MyBDConnexion.getInstance();
+            var conn = connexion.getConnection();
 
-        // Vérification
-        if (connexion.getConnection() != null) {
-            System.out.println("✅ SUCCÈS: Projet connecté à la base 'zayna'");
+            System.out.println("✅ SUCCÈS: Projet connecté à la base 'zaynaa' (port 3306)");
 
-            // Tester une requête simple
-            try {
-                var stmt = connexion.getConnection().createStatement();
-                var rs = stmt.executeQuery("SELECT 'Connexion OK' as message");
+            try (var stmt = conn.createStatement();
+                 var rs = stmt.executeQuery("SELECT 'Connexion OK' as message")) {
                 if (rs.next()) {
                     System.out.println("📊 Base de données: " + rs.getString("message"));
                 }
-                rs.close();
-                stmt.close();
-
                 System.out.println("\n🎉 Votre projet est prêt à utiliser la base de données !");
-
             } catch (SQLException e) {
-                System.out.println("⚠️ Connecté mais impossible d'exécuter des requêtes");
+                System.out.println("⚠️ Connecté mais impossible d'exécuter des requêtes: " + e.getMessage());
             }
-        } else {
+        } catch (Exception e) {
             System.out.println("❌ ÉCHEC: Projet NON connecté");
-            System.out.println("\nVérifiez ces points:");
-            System.out.println("1. MySQL est-il démarré ?");
-            System.out.println("2. La base 'zayna' existe-t-elle ?");
-            System.out.println("3. Le port 3307 est-il correct ?");
+            System.out.println("   " + e.getMessage());
+            System.out.println("\nVérifiez: MySQL sur port 3306, base 'zaynaa' existante.");
         }
-
         System.out.println("=============================");
     }
 }

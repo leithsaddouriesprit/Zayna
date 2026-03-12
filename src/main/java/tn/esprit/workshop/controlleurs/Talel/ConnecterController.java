@@ -14,9 +14,17 @@ import javafx.stage.Stage;
 import javafx.application.Platform;
 import tn.esprit.workshop.model.Talel.talel2.User;
 import tn.esprit.workshop.services.Talel.ServiceAdmin;
+import tn.esprit.workshop.utilis.AppSession;
+import tn.esprit.workshop.controlleurs.leith.SceneNavigator;
+import tn.esprit.workshop.controlleurs.Talel.AdminController;
+import tn.esprit.workshop.utilis.MyBDConnexion;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
 
 public class ConnecterController implements Initializable {
@@ -128,6 +136,7 @@ public class ConnecterController implements Initializable {
     // CORRECTION 3: Méthode utilitaire pour afficher les erreurs
     private void afficherErreur(String message) {
         Platform.runLater(() -> {
+            if (loginErrorLabel == null) return;
             loginErrorLabel.setText(message);
             loginErrorLabel.setVisible(true);
 
@@ -273,39 +282,182 @@ public class ConnecterController implements Initializable {
 
     /**
      * Redirige vers la scène appropriée selon le rôle de l'utilisateur
+     * et initialise la session applicative commune (AppSession).
+     *
+     * IMPORTANT :
+     * - Parent et Chauffeur sont redirigés vers les flux Leith existants
+     *   (tracking / transport / parent / chauffeur) via SceneNavigator.
+     * - ResponsableEcole est mappé sur les écrans Agent Leith si une école
+     *   correspondante est trouvée (AppSession.ecoleId).
+     * - Les autres rôles (ADMIN, MAITRESSE, ...) restent sur les écrans Talel.
      */
     private void redirectToRoleScene(User user) {
         try {
-            String fxmlPath = getFxmlPathForRole(user.getCategories());
+            CategorieUser role = user.getCategories();
+            if (role == null) {
+                showAlert("Erreur", "Rôle utilisateur inconnu");
+                return;
+            }
+
+            // ---------- Flux Parent (Leith) ----------
+            if (role == CategorieUser.PARENT) {
+                // Résolution parent.id via parent.user_id = users.id
+                Integer parentId = resolveParentIdFromUser(user);
+                if (parentId == null) {
+                    afficherErreur("Aucun profil parent associé à ce compte. Veuillez contacter l'administrateur.");
+                    return;
+                }
+                AppSession.getInstance().setParentId(parentId);
+
+                Stage stage = (Stage) loginButton.getScene().getWindow();
+                if (stage != null) {
+                    stage.close();
+                }
+                SceneNavigator.openParentDashboard();
+                return;
+            }
+
+            // ---------- Flux Chauffeur (Leith) ----------
+            if (role == CategorieUser.CHAUFFEUR) {
+                // Leith attend chauffeur_id = chauffeur.id (FK candidature.chauffeur_id -> chauffeur.id).
+                // On résout chauffeur.id via chauffeur.user_id = users.id.
+                Integer chauffeurId = resolveChauffeurIdFromUser(user);
+                if (chauffeurId == null) {
+                    afficherErreur("Aucun profil chauffeur associé à ce compte. Veuillez contacter l'administrateur.");
+                    return;
+                }
+                AppSession.getInstance().setChauffeurId(chauffeurId);
+
+                Stage stage = (Stage) loginButton.getScene().getWindow();
+                if (stage != null) {
+                    stage.close();
+                }
+                SceneNavigator.openChauffeurHome();
+                return;
+            }
+
+            // ---------- Flux ResponsableEcole -> Agent (Leith) ----------
+            if (role == CategorieUser.RESPONSABLEECOLE) {
+                // Résolution : SELECT id, id_ecole FROM agent_ecole WHERE user_id = ?
+                int[] agentEcole = resolveAgentEcoleFromUser(user);
+                if (agentEcole == null) {
+                    afficherErreur("Aucun profil agent associé à ce compte. Veuillez contacter l'administrateur.");
+                    return;
+                }
+                AppSession.getInstance().setAgentId(agentEcole[0]);
+                AppSession.getInstance().setEcoleId(agentEcole[1]);
+
+                Stage stage = (Stage) loginButton.getScene().getWindow();
+                if (stage != null) {
+                    stage.close();
+                }
+                SceneNavigator.openAgentDashboard();
+                return;
+            }
+
+            // ---------- Rôles restants : écrans Talel ----------
+            String fxmlPath = getFxmlPathForRole(role);
 
             if (fxmlPath == null) {
                 showAlert("Erreur", "Rôle utilisateur inconnu");
                 return;
             }
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-
             if (getClass().getResource(fxmlPath) == null) {
-                showAlert("Erreur", "Tableau de bord introuvable pour le rôle: " + user.getCategories());
+                showAlert("Erreur", "Tableau de bord introuvable pour le rôle: " + role);
                 return;
             }
 
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent root = loader.load();
 
-            // Passer l'utilisateur connecté au contrôleur de la scène
             Object controller = loader.getController();
             injectUserToController(controller, user);
+
+            // Injection explicite pour l'admin si disponible
+            if (controller instanceof AdminController adminController) {
+                adminController.setCurrentUser(user);
+            }
 
             Scene scene = new Scene(root);
             Stage stage = (Stage) loginButton.getScene().getWindow();
             stage.setScene(scene);
-            stage.setTitle(getTitleForRole(user.getCategories()));
+            stage.setTitle(getTitleForRole(role));
             stage.show();
 
         } catch (IOException e) {
             e.printStackTrace();
             showAlert("Erreur", "Impossible de charger la page: " + e.getMessage());
         }
+    }
+
+    /**
+     * Résout parent.id à partir du user connecté (PARENT).
+     * Utilise la relation parent.user_id -> users.id (source de vérité zaynaa).
+     *
+     * @return parent.id ou null si aucun enregistrement parent lié.
+     */
+    private Integer resolveParentIdFromUser(User user) {
+        int userId = user.getId();
+        try (Connection conn = MyBDConnexion.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement("SELECT id FROM parent WHERE user_id = ?")) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("id");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Résolution parent par user_id: " + e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * Résout chauffeur.id à partir du user connecté (CHAUFFEUR).
+     * Utilise la relation chauffeur.user_id -> users.id (source de vérité zaynaa).
+     * Ne crée jamais de ligne chauffeur : l’inscription Talel est le seul point de création.
+     *
+     * @return l’id de la table chauffeur, ou null si aucun enregistrement lié (échec explicite).
+     */
+    private Integer resolveChauffeurIdFromUser(User user) {
+        int userId = user.getId();
+        try (Connection conn = MyBDConnexion.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(
+                     "SELECT id FROM chauffeur WHERE user_id = ?")) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("id");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Résolution chauffeur par user_id (échec) : " + e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * Résout l'enregistrement agent_ecole à partir du user connecté (RESPONSABLEECOLE).
+     * Auth via users uniquement ; agent_ecole.user_id -> users.id.
+     *
+     * @return int[] { agent_ecole.id, id_ecole } ou null si aucun enregistrement lié.
+     */
+    private int[] resolveAgentEcoleFromUser(User user) {
+        int userId = user.getId();
+        try (Connection conn = MyBDConnexion.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(
+                     "SELECT id, id_ecole FROM agent_ecole WHERE user_id = ?")) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new int[]{ rs.getInt("id"), rs.getInt("id_ecole") };
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Résolution agent_ecole par user_id (échec) : " + e.getMessage());
+        }
+        return null;
     }
 
     /**

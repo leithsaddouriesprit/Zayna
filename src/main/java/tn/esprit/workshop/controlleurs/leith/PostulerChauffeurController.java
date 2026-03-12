@@ -4,8 +4,10 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import tn.esprit.workshop.model.tous.Ecole;
 import tn.esprit.workshop.services.leith.CandidatureService;
 import tn.esprit.workshop.services.leith.ChauffeurService;
+import tn.esprit.workshop.services.leith.EcoleService;
 import tn.esprit.workshop.utilis.AppSession;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -40,6 +42,7 @@ public class PostulerChauffeurController implements Initializable {
     @FXML private Spinner<Integer> spAge;
     @FXML private Spinner<Integer> spExperience;
 
+    @FXML private ComboBox<Ecole> comboEcole;
     @FXML private ChoiceBox<String> cbMaladie; // non stocké
     @FXML private TextField tfMaladieDetails;
     @FXML private Label lblMaladieDetails;
@@ -62,6 +65,7 @@ public class PostulerChauffeurController implements Initializable {
 
     private ChauffeurService chauffeurService;
     private CandidatureService candidatureService;
+    private EcoleService ecoleService;
 
     private static final String STATUT_REFUSEE = "REFUSEE";
 
@@ -69,6 +73,20 @@ public class PostulerChauffeurController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         chauffeurService = new ChauffeurService();
         candidatureService = new CandidatureService();
+        ecoleService = new EcoleService();
+        comboEcole.setConverter(new javafx.util.StringConverter<Ecole>() {
+            @Override
+            public String toString(Ecole e) {
+                return e == null ? "" : e.getNomEcole() != null ? e.getNomEcole() : ("École #" + e.getId());
+            }
+            @Override
+            public Ecole fromString(String s) { return null; }
+        });
+        try {
+            comboEcole.getItems().setAll(ecoleService.selectAll());
+        } catch (SQLException e) {
+            lblMessage.setText("Erreur chargement écoles: " + e.getMessage());
+        }
         tfNom.setTextFormatter(new TextFormatter<>(c ->
                 c.getControlNewText().matches("[\\p{L} \\-']*") ? c : null));
 
@@ -303,6 +321,12 @@ public class PostulerChauffeurController implements Initializable {
             showError("Veuillez importer les 2 photos du permis (Recto + Verso).");
             return;
         }
+        Ecole ecoleChoisie = comboEcole.getSelectionModel().getSelectedItem();
+        if (ecoleChoisie == null) {
+            showError("Veuillez choisir une école.");
+            return;
+        }
+        int idEcole = ecoleChoisie.getId();
 
         int totalBytes = permisRectoBytes.length + permisVersoBytes.length;
         System.out.println("[Candidature] rectoBytes=" + permisRectoBytes.length + ", versoBytes=" + permisVersoBytes.length + ", total=" + totalBytes);
@@ -323,6 +347,7 @@ public class PostulerChauffeurController implements Initializable {
                 if (c == null) {
                     chauffeurService.envoyerCandidatureAgentEcole(
                             sessionChauffeurId,
+                            idEcole,
                             permisRectoBytes, permisRectoName, permisRectoMime,
                             permisVersoBytes, permisVersoName, permisVersoMime,
                             maladie
@@ -344,6 +369,7 @@ public class PostulerChauffeurController implements Initializable {
                 chauffeurId = chauffeurService.ajouterChauffeurEtRetournerId(nom, prenom, age, exp);
                 chauffeurService.envoyerCandidatureAgentEcole(
                         chauffeurId,
+                        idEcole,
                         permisRectoBytes, permisRectoName, permisRectoMime,
                         permisVersoBytes, permisVersoName, permisVersoMime,
                         maladie
@@ -357,6 +383,7 @@ public class PostulerChauffeurController implements Initializable {
             tfPrenom.clear();
             spAge.getValueFactory().setValue(25);
             spExperience.getValueFactory().setValue(0);
+            comboEcole.getSelectionModel().clearSelection();
             cbMaladie.setValue("Non");
 
             // reset photo après succès (recto/verso + ancien champ unique)

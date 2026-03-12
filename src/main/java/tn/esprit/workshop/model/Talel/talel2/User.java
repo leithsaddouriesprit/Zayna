@@ -21,8 +21,10 @@ public class User {
     public int getId() {return id;}
     public String getNom() { return nom; }
         public String getEmail() { return email; }
-        public String getpassword() { return password; }
-        public CategorieUser getCategories() { return categories; }
+    public String getpassword() { return password; }
+    /** Alias for JavaFX PropertyValueFactory("password") which expects getPassword(). */
+    public String getPassword() { return password; }
+    public CategorieUser getCategories() { return categories; }
 
     public void setId(int id) {this.id = id;}
     public void setNom(String nom) {this.nom = nom;}

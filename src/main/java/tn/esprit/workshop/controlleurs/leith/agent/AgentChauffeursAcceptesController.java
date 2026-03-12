@@ -5,6 +5,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import tn.esprit.workshop.model.leith.Candidature;
 import tn.esprit.workshop.services.leith.CandidatureService;
+import tn.esprit.workshop.utilis.AppSession;
 
 import java.net.URL;
 import java.sql.SQLException;
@@ -38,8 +39,10 @@ public class AgentChauffeursAcceptesController implements Initializable {
     }
 
     private void load() {
+        Integer idEcole = AppSession.getInstance().getEcoleId();
+        if (idEcole == null) return;
         try {
-            table.getItems().setAll(candidatureService.findAllAcceptees());
+            table.getItems().setAll(candidatureService.findAllAccepteesByEcoleId(idEcole));
         } catch (SQLException e) {
             LOG.log(Level.SEVERE, "load acceptees", e);
         }

@@ -71,16 +71,22 @@
                                  GridPane.rowIndex="3" GridPane.columnIndex="1"
                                  styleClass="spinner"/>
 
+                        <!-- École (ciblée par la candidature) -->
+                        <Label text="École *" GridPane.rowIndex="4" GridPane.columnIndex="0" styleClass="field-label"/>
+                        <ComboBox fx:id="comboEcole" promptText="Choisir une école"
+                                  GridPane.rowIndex="4" GridPane.columnIndex="1"
+                                  styleClass="choice" maxWidth="Infinity"/>
+
                         <!-- Maladie -->
-                        <Label text="Maladie ?" GridPane.rowIndex="4" GridPane.columnIndex="0" styleClass="field-label"/>
-                        <ChoiceBox fx:id="cbMaladie" GridPane.rowIndex="4" GridPane.columnIndex="1" styleClass="choice"/>
+                        <Label text="Maladie ?" GridPane.rowIndex="5" GridPane.columnIndex="0" styleClass="field-label"/>
+                        <ChoiceBox fx:id="cbMaladie" GridPane.rowIndex="5" GridPane.columnIndex="1" styleClass="choice"/>
 
                         <Label text="Si oui, précisez :" fx:id="lblMaladieDetails"
-                               GridPane.rowIndex="5" GridPane.columnIndex="0" styleClass="field-label"/>
+                               GridPane.rowIndex="6" GridPane.columnIndex="0" styleClass="field-label"/>
 
                         <TextField fx:id="tfMaladieDetails"
                                    promptText="Ex: Diabète"
-                                   GridPane.rowIndex="5" GridPane.columnIndex="1"
+                                   GridPane.rowIndex="6" GridPane.columnIndex="1"
                                    styleClass="field"/>
                     </GridPane>
 

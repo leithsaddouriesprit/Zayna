@@ -17,10 +17,11 @@ public class CandidatureService {
     public static final String STATUT_ACCEPTEE = "ACCEPTEE";
     public static final String STATUT_REFUSEE = "REFUSEE";
 
-    private final Connection connection;
-
     public CandidatureService() {
-        this.connection = MyBDConnexion.getInstance().getConnection();
+    }
+
+    private Connection getConnection() throws SQLException {
+        return MyBDConnexion.getInstance().getConnection();
     }
 
     /**
@@ -34,7 +35,7 @@ public class CandidatureService {
                         "FROM candidature c " +
                         "JOIN chauffeur ch ON c.chauffeur_id = ch.id " +
                         "WHERE c.chauffeur_id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, chauffeurId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -56,46 +57,70 @@ public class CandidatureService {
     }
 
     /**
-     * Liste des candidatures chauffeur à traiter par l'agent (statut = ENVOYEE).
-     * Requête conforme à :
-     * SELECT c.*, ch.nom, ch.prenom, ch.age, ch.nb_ans_experience
-     * FROM candidature c
-     * JOIN chauffeur ch ON c.chauffeur_id = ch.id
-     * WHERE c.statut = 'ENVOYEE'
+     * Candidatures ENVOYEE pour l'agent (toutes écoles). Pour un agent, utiliser findAllEnVoyeeByEcoleId.
      */
     public List<Candidature> findAllEnVoyee() throws SQLException {
-        String sql =
-                "SELECT c.id, c.chauffeur_id, c.statut, c.date_envoi, c.maladie, " +
+        return findAllEnVoyeeByEcoleId(null);
+    }
+
+    /** Candidatures ENVOYEE pour une école (idEcole null = toutes). */
+    public List<Candidature> findAllEnVoyeeByEcoleId(Integer idEcole) throws SQLException {
+        String sql = idEcole == null
+                ? "SELECT c.id, c.chauffeur_id, c.id_ecole, c.statut, c.date_envoi, c.maladie, " +
                         "ch.nom, ch.prenom, ch.age, ch.nb_ans_experience " +
-                        "FROM candidature c " +
-                        "JOIN chauffeur ch ON c.chauffeur_id = ch.id " +
-                        "WHERE c.statut = 'ENVOYEE' " +
-                        "ORDER BY c.date_envoi DESC";
+                        "FROM candidature c JOIN chauffeur ch ON c.chauffeur_id = ch.id " +
+                        "WHERE c.statut = 'ENVOYEE' ORDER BY c.date_envoi DESC"
+                : "SELECT c.id, c.chauffeur_id, c.id_ecole, c.statut, c.date_envoi, c.maladie, " +
+                        "ch.nom, ch.prenom, ch.age, ch.nb_ans_experience " +
+                        "FROM candidature c JOIN chauffeur ch ON c.chauffeur_id = ch.id " +
+                        "WHERE c.statut = 'ENVOYEE' AND c.id_ecole = ? ORDER BY c.date_envoi DESC";
         List<Candidature> list = new ArrayList<>();
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                list.add(mapRow(rs));
+        if (idEcole == null) {
+            try (PreparedStatement ps = getConnection().prepareStatement(sql);
+                 ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(mapRow(rs));
+            }
+        } else {
+            try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+                ps.setInt(1, idEcole);
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) list.add(mapRow(rs));
+                }
             }
         }
         return list;
     }
 
-    /** Liste des candidatures acceptées (statut = ACCEPTEE) avec infos chauffeur. */
+    /** Liste des candidatures acceptées. Pour un agent, utiliser findAllAccepteesByEcoleId. */
     public List<Candidature> findAllAcceptees() throws SQLException {
-        String sql =
-                "SELECT c.id, c.chauffeur_id, c.statut, c.date_envoi, c.maladie, " +
+        return findAllAccepteesByEcoleId(null);
+    }
+
+    /** Candidatures ACCEPTEE pour une école (idEcole null = toutes). */
+    public List<Candidature> findAllAccepteesByEcoleId(Integer idEcole) throws SQLException {
+        String sql = idEcole == null
+                ? "SELECT c.id, c.chauffeur_id, c.id_ecole, c.statut, c.date_envoi, c.maladie, " +
                         "ch.nom, ch.prenom, ch.age, ch.nb_ans_experience " +
-                        "FROM candidature c " +
-                        "JOIN chauffeur ch ON c.chauffeur_id = ch.id " +
-                        "WHERE c.statut = ? " +
-                        "ORDER BY c.date_envoi DESC";
+                        "FROM candidature c JOIN chauffeur ch ON c.chauffeur_id = ch.id " +
+                        "WHERE c.statut = ? ORDER BY c.date_envoi DESC"
+                : "SELECT c.id, c.chauffeur_id, c.id_ecole, c.statut, c.date_envoi, c.maladie, " +
+                        "ch.nom, ch.prenom, ch.age, ch.nb_ans_experience " +
+                        "FROM candidature c JOIN chauffeur ch ON c.chauffeur_id = ch.id " +
+                        "WHERE c.statut = ? AND c.id_ecole = ? ORDER BY c.date_envoi DESC";
         List<Candidature> list = new ArrayList<>();
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, STATUT_ACCEPTEE);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    list.add(mapRow(rs));
+        if (idEcole == null) {
+            try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+                ps.setString(1, STATUT_ACCEPTEE);
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) list.add(mapRow(rs));
+                }
+            }
+        } else {
+            try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+                ps.setString(1, STATUT_ACCEPTEE);
+                ps.setInt(2, idEcole);
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) list.add(mapRow(rs));
                 }
             }
         }
@@ -106,6 +131,8 @@ public class CandidatureService {
         Candidature c = new Candidature();
         c.setId(rs.getInt("id"));
         c.setChauffeurId(rs.getInt("chauffeur_id"));
+        int idEcole = rs.getInt("id_ecole");
+        if (!rs.wasNull()) c.setIdEcole(idEcole);
         c.setStatut(rs.getString("statut"));
         Timestamp ts = rs.getTimestamp("date_envoi");
         if (ts != null) c.setDateEnvoi(ts.toLocalDateTime());
@@ -119,7 +146,7 @@ public class CandidatureService {
 
     public void accepter(int candidatureId) throws SQLException {
         String sql = "UPDATE candidature SET statut = ? WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setString(1, STATUT_ACCEPTEE);
             ps.setInt(2, candidatureId);
             ps.executeUpdate();
@@ -128,7 +155,7 @@ public class CandidatureService {
 
     public void refuser(int candidatureId) throws SQLException {
         String sql = "UPDATE candidature SET statut = ? WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setString(1, STATUT_REFUSEE);
             ps.setInt(2, candidatureId);
             ps.executeUpdate();
@@ -141,7 +168,7 @@ public class CandidatureService {
      */
     public byte[][] getPermisRectoVerso(int candidatureId) throws SQLException {
         String sql = "SELECT permis_recto, permis_verso FROM candidature WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, candidatureId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -161,7 +188,7 @@ public class CandidatureService {
      */
     public void annuler(int chauffeurId) throws SQLException {
         String sql = "UPDATE candidature SET statut = ? WHERE chauffeur_id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setString(1, STATUT_REFUSEE);
             ps.setInt(2, chauffeurId);
             ps.executeUpdate();
@@ -179,7 +206,7 @@ public class CandidatureService {
         String sql = "UPDATE candidature SET statut = ?, date_envoi = CURRENT_TIMESTAMP, maladie = ?, " +
                 "permis_recto = ?, permis_recto_nom = ?, permis_recto_mime = ?, " +
                 "permis_verso = ?, permis_verso_nom = ?, permis_verso_mime = ? WHERE chauffeur_id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setString(1, STATUT_ENVOYEE);
             ps.setString(2, maladie);
             ps.setBytes(3, rectoBytes);

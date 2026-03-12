@@ -8,6 +8,8 @@ public class Bus {
     private int capacite;
     private int idChauffeur;
     private boolean actif;
+    /** École propriétaire (filtrage agent). */
+    private Integer idEcole;
 
     public Bus() {}
 
@@ -66,6 +68,14 @@ public class Bus {
 
     public void setActif(boolean actif) {
         this.actif = actif;
+    }
+
+    public Integer getIdEcole() {
+        return idEcole;
+    }
+
+    public void setIdEcole(Integer idEcole) {
+        this.idEcole = idEcole;
     }
 
     @Override

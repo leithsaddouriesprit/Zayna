@@ -10,6 +10,7 @@ import tn.esprit.workshop.controlleurs.leith.SceneNavigator;
 import tn.esprit.workshop.model.leith.Candidature;
 import tn.esprit.workshop.services.leith.BusService;
 import tn.esprit.workshop.services.leith.CandidatureService;
+import tn.esprit.workshop.utilis.AppSession;
 
 import java.net.URL;
 import java.sql.SQLException;
@@ -64,9 +65,14 @@ public class AgentAffecterChauffeurBusController implements Initializable {
     }
 
     private void load() {
+        Integer idEcole = AppSession.getInstance().getEcoleId();
+        if (idEcole == null) {
+            lblMessage.setText("Aucune école en session.");
+            return;
+        }
         try {
-            comboBus.getItems().setAll(busService.selectActifs());
-            comboChauffeur.getItems().setAll(candidatureService.findAllAcceptees());
+            comboBus.getItems().setAll(busService.selectActifs(idEcole));
+            comboChauffeur.getItems().setAll(candidatureService.findAllAccepteesByEcoleId(idEcole));
             comboBus.getSelectionModel().clearSelection();
             comboChauffeur.getSelectionModel().clearSelection();
             lblMessage.setText("");

@@ -6,8 +6,6 @@ import javafx.stage.Stage;
 import tn.esprit.workshop.model.Talel.talel2.Parent;
 import tn.esprit.workshop.model.Talel.talel2.User;
 import tn.esprit.workshop.services.Talel.ServiceParent;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.application.Platform;
@@ -19,6 +17,8 @@ public class ControleurParent {
     @FXML
     private TextField txtNom;
     @FXML
+    private TextField txtPrenom;
+    @FXML
     private TextField txtEmail;
     @FXML
     private PasswordField txtMotDePasse;
@@ -29,35 +29,21 @@ public class ControleurParent {
     @FXML
     private TextField txtProfession;
     @FXML
-    private TextField txtEnfant;
-    @FXML
-    private ListView<String> listeEnfants;
-    @FXML
     private Label lblMessage;
     @FXML
     private Button logoutButton;
     @FXML
     private Button btnAjouterParent;
-    @FXML
-    private Button btnAjouterEnfant;
-    @FXML
-    private Button btnSupprimerEnfant;
 
     private ServiceParent serviceParent;
-    private ObservableList<String> enfantsList = FXCollections.observableArrayList();
     private User connectedUser;
 
     @FXML
     public void initialize() {
         serviceParent = new ServiceParent();
-        listeEnfants.setItems(enfantsList);
-
-        // Configuration du label message - CORRECTION CRITIQUE
         lblMessage.setVisible(false);
-        lblMessage.setManaged(true);  // ← CORRIGÉ (était false)
-        lblMessage.setWrapText(true); // ← CORRIGÉ (pour les longs messages)
-
-        System.out.println("=== ControleurParent initialisé ===");
+        lblMessage.setManaged(true);
+        lblMessage.setWrapText(true);
     }
 
     @FXML
@@ -65,6 +51,7 @@ public class ControleurParent {
         try {
             // Récupération des données
             String nom = txtNom.getText().trim();
+            String prenom = txtPrenom.getText().trim();
             String email = txtEmail.getText().trim().toLowerCase();
             String passwordClair = txtMotDePasse.getText();
             String telephone = txtTelephone.getText().trim();
@@ -76,46 +63,53 @@ public class ControleurParent {
             // 1. Validation du nom
             if (nom.isEmpty()) {
                 afficherMessage("❌ Le nom est obligatoire", "error");
-                txtNom.requestFocus();  // ← CORRIGÉ : focus sur le champ
+                txtNom.requestFocus();
                 return;
             }
 
-            // 2. Validation de l'email
+            // 2. Validation du prénom
+            if (prenom.isEmpty()) {
+                afficherMessage("❌ Le prénom est obligatoire", "error");
+                txtPrenom.requestFocus();
+                return;
+            }
+
+            // 3. Validation de l'email
             if (email.isEmpty()) {
                 afficherMessage("❌ L'email est obligatoire", "error");
                 txtEmail.requestFocus();
                 return;
             }
 
-            // 3. Validation du mot de passe
+            // 4. Validation du mot de passe
             if (passwordClair.isEmpty()) {
                 afficherMessage("❌ Le mot de passe est obligatoire", "error");
                 txtMotDePasse.requestFocus();
                 return;
             }
 
-            // 4. Validation du téléphone
+            // 5. Validation du téléphone
             if (telephone.isEmpty()) {
                 afficherMessage("❌ Le téléphone est obligatoire", "error");
                 txtTelephone.requestFocus();
                 return;
             }
 
-            // 5. Validation du format email (CORRIGÉ : regex plus stricte)
+            // 6. Validation du format email (CORRIGÉ : regex plus stricte)
             if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
                 afficherMessage("❌ Format d'email invalide (ex: nom@domaine.com)", "error");
                 txtEmail.requestFocus();
                 return;
             }
 
-            // 6. Validation du téléphone (8 chiffres)
+            // 7. Validation du téléphone (8 chiffres)
             if (!telephone.matches("\\d{8}")) {
                 afficherMessage("❌ Le téléphone doit contenir exactement 8 chiffres", "error");
                 txtTelephone.requestFocus();
                 return;
             }
 
-            // 7. Validation de la longueur du mot de passe
+            // 8. Validation de la longueur du mot de passe
             if (passwordClair.length() < 6) {
                 afficherMessage("❌ Le mot de passe doit contenir au moins 6 caractères", "error");
                 txtMotDePasse.requestFocus();
@@ -127,25 +121,14 @@ public class ControleurParent {
                 return;
             }
 
-            // 8. Vérification qu'il y a au moins un enfant
-            if (enfantsList.isEmpty()) {
-                afficherMessage("⚠️ Veuillez ajouter au moins un enfant", "warning");
-                txtEnfant.requestFocus();
-                return;
-            }
-
-            // Création de l'objet Parent
+            // Création de l'objet Parent (aucun enfant créé à l'inscription)
             Parent parent = new Parent();
             parent.setNom(nom);
+            parent.setPrenom(prenom);
             parent.setEmail(email);
             parent.setTelephone(telephone);
             parent.setAdresse(adresse.isEmpty() ? null : adresse);
             parent.setProfession(profession.isEmpty() ? null : profession);
-
-            // Ajouter les enfants
-            for (String enfant : enfantsList) {
-                parent.addEnfant(enfant);
-            }
 
             // Appel au service
             serviceParent.ajouterParent(parent, passwordClair);
@@ -165,53 +148,14 @@ public class ControleurParent {
     }
 
     @FXML
-    private void ajouterEnfant() {
-        String enfant = txtEnfant.getText().trim();
-
-        if (enfant.isEmpty()) {
-            afficherMessage("⚠️ Veuillez saisir le nom de l'enfant", "warning");
-            txtEnfant.requestFocus();
-            return;
-        }
-
-        if (enfantsList.contains(enfant)) {
-            afficherMessage("⚠️ Cet enfant est déjà dans la liste", "warning");
-            txtEnfant.selectAll();
-            txtEnfant.requestFocus();
-            return;
-        }
-
-        enfantsList.add(enfant);
-        txtEnfant.clear();
-        afficherMessage("✅ Enfant ajouté à la liste", "success");
-
-        // Faire défiler la liste pour voir le nouvel enfant
-        listeEnfants.scrollTo(enfantsList.size() - 1);
-    }
-
-    @FXML
-    private void supprimerEnfant() {
-        String selected = listeEnfants.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            enfantsList.remove(selected);
-            afficherMessage("✅ Enfant retiré de la liste", "info");
-        } else {
-            afficherMessage("⚠️ Veuillez sélectionner un enfant à supprimer", "warning");
-        }
-    }
-
-    @FXML
     private void viderFormulaire() {
         txtNom.clear();
+        txtPrenom.clear();
         txtEmail.clear();
         txtMotDePasse.clear();
         txtTelephone.clear();
         txtAdresse.clear();
         txtProfession.clear();
-        enfantsList.clear();
-        txtEnfant.clear();
-
-        //afficherMessage("📋 Formulaire réinitialisé", "info");
     }
 
     /**

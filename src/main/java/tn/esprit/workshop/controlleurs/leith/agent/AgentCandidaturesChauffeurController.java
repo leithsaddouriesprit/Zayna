@@ -11,6 +11,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import tn.esprit.workshop.model.leith.Candidature;
 import tn.esprit.workshop.services.leith.CandidatureService;
+import tn.esprit.workshop.utilis.AppSession;
 
 import java.io.ByteArrayInputStream;
 import java.net.URL;
@@ -84,8 +85,13 @@ public class AgentCandidaturesChauffeurController implements Initializable {
     }
 
     private void load() {
+        Integer idEcole = AppSession.getInstance().getEcoleId();
+        if (idEcole == null) {
+            lblMessage.setText("Aucune école en session.");
+            return;
+        }
         try {
-            table.getItems().setAll(candidatureService.findAllEnVoyee());
+            table.getItems().setAll(candidatureService.findAllEnVoyeeByEcoleId(idEcole));
             lblMessage.setText("");
         } catch (SQLException e) {
             LOG.log(Level.SEVERE, "load candidatures", e);

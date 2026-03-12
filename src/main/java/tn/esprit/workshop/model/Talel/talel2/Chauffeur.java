@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class Chauffeur extends User {
+    private String prenom; // Prénom (affiché / table chauffeur); users.nom = nom de famille uniquement
     private String permis; // "B", "C", "D", etc.
     private LocalDate dateObtentionPermis;
     private String telephone;
@@ -27,6 +28,9 @@ public class Chauffeur extends User {
     }
 
     // Getters et Setters
+    public String getPrenom() { return prenom; }
+    public void setPrenom(String prenom) { this.prenom = prenom; }
+
     public String getPermis() { return permis; }
     public void setPermis(String permis) { this.permis = permis; }
 

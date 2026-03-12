@@ -63,7 +63,7 @@ public class AgentAffecterBusTrajetController implements Initializable {
         }
         try {
             comboTrajet.getItems().setAll(trajetService.selectByEcoleId(idEcole));
-            comboBus.getItems().setAll(busService.selectAll());
+            comboBus.getItems().setAll(busService.selectByEcoleId(idEcole));
             lblMessage.setText("");
         } catch (SQLException e) {
             LOG.log(Level.SEVERE, "load", e);

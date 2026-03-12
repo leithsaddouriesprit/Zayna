@@ -1,25 +1,15 @@
 package tn.esprit.workshop.services.Talel;
 
-import tn.esprit.workshop.utilis.Talel.MyBDConnexion;
+import tn.esprit.workshop.utilis.MyBDConnexion;
 import at.favre.lib.crypto.bcrypt.BCrypt;
 
 import java.sql.*;
 
 public class ServiceOublier {
 
-    private Connection conn;
-
-    /**
-     * Constructeur - Initialise la connexion à la base de données
-     */
-    public ServiceOublier() {
-        try {
-            this.conn = MyBDConnexion.getInstance().getConnection();
-            System.out.println("✅ ServiceOublier: Connexion BD établie");
-        } catch (Exception e) {
-            System.err.println("❌ ServiceOublier: Erreur de connexion BD - " + e.getMessage());
-            e.printStackTrace();
-        }
+    /** Uses shared MyBDConnexion (zaynaa @ 3306). Connection obtained per operation to avoid null/stale reference. */
+    private static Connection getConnection() throws SQLException {
+        return MyBDConnexion.getInstance().getConnection();
     }
 
     /**
@@ -27,7 +17,8 @@ public class ServiceOublier {
      */
     public boolean emailExists(String email) {
         String query = "SELECT COUNT(*) FROM users WHERE email = ?";
-        try (PreparedStatement pst = conn.prepareStatement(query)) {
+        try (Connection conn = getConnection();
+             PreparedStatement pst = conn.prepareStatement(query)) {
             pst.setString(1, email.trim().toLowerCase());
             ResultSet rs = pst.executeQuery();
             if (rs.next()) {
@@ -47,7 +38,8 @@ public class ServiceOublier {
      */
     public String getUserType(String email) {
         String query = "SELECT categorie FROM users WHERE email = ?";
-        try (PreparedStatement pst = conn.prepareStatement(query)) {
+        try (Connection conn = getConnection();
+             PreparedStatement pst = conn.prepareStatement(query)) {
             pst.setString(1, email.trim().toLowerCase());
             ResultSet rs = pst.executeQuery();
             if (rs.next()) {
@@ -64,7 +56,8 @@ public class ServiceOublier {
      */
     public String getUserName(String email) {
         String query = "SELECT nom FROM users WHERE email = ?";
-        try (PreparedStatement pst = conn.prepareStatement(query)) {
+        try (Connection conn = getConnection();
+             PreparedStatement pst = conn.prepareStatement(query)) {
             pst.setString(1, email.trim().toLowerCase());
             ResultSet rs = pst.executeQuery();
             if (rs.next()) {
@@ -80,11 +73,10 @@ public class ServiceOublier {
      * ÉTAPE 1: Sauvegarde un code de réinitialisation
      */
     public boolean saveResetCode(String email, String code) {
-        // D'abord, récupérer l'ID de l'utilisateur
         String selectQuery = "SELECT id FROM users WHERE email = ?";
         String insertQuery = "INSERT INTO password_resets (user_id, code, expiration, used) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 5 MINUTE), false)";
 
-        try {
+        try (Connection conn = getConnection()) {
             int userId = -1;
             try (PreparedStatement selectPst = conn.prepareStatement(selectQuery)) {
                 selectPst.setString(1, email.trim().toLowerCase());
@@ -108,7 +100,6 @@ public class ServiceOublier {
                     return true;
                 }
             }
-
         } catch (SQLException e) {
             System.err.println("❌ Erreur SQL dans saveResetCode: " + e.getMessage());
             e.printStackTrace();
@@ -124,7 +115,8 @@ public class ServiceOublier {
                 "JOIN users u ON pr.user_id = u.id " +
                 "WHERE u.email = ? AND pr.code = ? AND pr.expiration > NOW() AND pr.used = false";
 
-        try (PreparedStatement pst = conn.prepareStatement(query)) {
+        try (Connection conn = getConnection();
+             PreparedStatement pst = conn.prepareStatement(query)) {
             pst.setString(1, email.trim().toLowerCase());
             pst.setString(2, code);
             ResultSet rs = pst.executeQuery();
@@ -168,7 +160,8 @@ public class ServiceOublier {
             // ÉTAPE 3.2: Mettre à jour dans la base de données
             String updateQuery = "UPDATE users SET mot_de_passe = ? WHERE email = ?";
 
-            try (PreparedStatement pst = conn.prepareStatement(updateQuery)) {
+            try (Connection conn = getConnection();
+                 PreparedStatement pst = conn.prepareStatement(updateQuery)) {
                 pst.setString(1, hashedPassword);
                 pst.setString(2, email.trim().toLowerCase());
 
@@ -202,7 +195,8 @@ public class ServiceOublier {
                 "SET pr.used = true " +
                 "WHERE u.email = ? AND pr.used = false";
 
-        try (PreparedStatement tokenPst = conn.prepareStatement(updateTokenQuery)) {
+        try (Connection conn = getConnection();
+             PreparedStatement tokenPst = conn.prepareStatement(updateTokenQuery)) {
             tokenPst.setString(1, email.trim().toLowerCase());
             int rows = tokenPst.executeUpdate();
             System.out.println("✅ " + rows + " token(s) marqué(s) comme utilisé(s)");
@@ -217,7 +211,8 @@ public class ServiceOublier {
     public boolean verifyPassword(String email, String plainPassword) {
         String query = "SELECT mot_de_passe FROM users WHERE email = ?";
 
-        try (PreparedStatement pst = conn.prepareStatement(query)) {
+        try (Connection conn = getConnection();
+             PreparedStatement pst = conn.prepareStatement(query)) {
             pst.setString(1, email.trim().toLowerCase());
             ResultSet rs = pst.executeQuery();
 
@@ -257,7 +252,8 @@ public class ServiceOublier {
      */
     public void cleanupExpiredTokens() {
         String query = "DELETE FROM password_resets WHERE expiration < NOW() OR used = true";
-        try (Statement stmt = conn.createStatement()) {
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement()) {
             int rows = stmt.executeUpdate(query);
             System.out.println("🧹 Nettoyage: " + rows + " tokens expirés supprimés");
         } catch (SQLException e) {

@@ -5,6 +5,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import tn.esprit.workshop.model.leith.Bus;
 import tn.esprit.workshop.services.leith.BusService;
+import tn.esprit.workshop.utilis.AppSession;
 
 import java.net.URL;
 import java.sql.SQLException;
@@ -49,8 +50,13 @@ public class AgentBusController implements Initializable {
     }
 
     private void load() {
+        Integer idEcole = AppSession.getInstance().getEcoleId();
+        if (idEcole == null) {
+            lblMessage.setText("Aucune école en session.");
+            return;
+        }
         try {
-            table.getItems().setAll(busService.selectAll());
+            table.getItems().setAll(busService.selectByEcoleId(idEcole));
             lblMessage.setText("");
         } catch (SQLException e) {
             LOG.log(Level.SEVERE, "load bus", e);
@@ -60,9 +66,17 @@ public class AgentBusController implements Initializable {
 
     @FXML
     void ajouter() {
-        Dialog<Bus> d = dialogBus(null);
+        Integer idEcole = AppSession.getInstance().getEcoleId();
+        if (idEcole == null) {
+            new Alert(Alert.AlertType.WARNING, "Aucune école en session.").showAndWait();
+            return;
+        }
+        LOG.log(Level.FINE, "ajouter: idEcole from session = {0}", idEcole);
+        Dialog<Bus> d = dialogBus(null, idEcole);
         d.showAndWait().ifPresent(bus -> {
             try {
+                bus.setIdEcole(idEcole);
+                LOG.log(Level.FINE, "ajouter: inserting bus with id_ecole = {0}", bus.getIdEcole());
                 busService.insertOne(bus);
                 new Alert(Alert.AlertType.INFORMATION, "✅ Bus ajouté.").showAndWait();
                 load();
@@ -79,7 +93,7 @@ public class AgentBusController implements Initializable {
             new Alert(Alert.AlertType.WARNING, "Sélectionnez un bus.").showAndWait();
             return;
         }
-        Dialog<Bus> d = dialogBus(sel);
+        Dialog<Bus> d = dialogBus(sel, sel.getIdEcole() != null ? sel.getIdEcole() : AppSession.getInstance().getEcoleId());
         d.showAndWait().ifPresent(bus -> {
             try {
                 bus.setBusId(sel.getBusId());
@@ -110,7 +124,7 @@ public class AgentBusController implements Initializable {
         }
     }
 
-    private Dialog<Bus> dialogBus(Bus existing) {
+    private Dialog<Bus> dialogBus(Bus existing, Integer idEcole) {
         Dialog<Bus> d = new Dialog<>();
         d.setTitle(existing == null ? "Nouveau bus" : "Modifier bus");
         d.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
@@ -158,6 +172,7 @@ public class AgentBusController implements Initializable {
                 b.setIdChauffeur(0);
             }
             b.setActif(chkActif.isSelected());
+            if (idEcole != null) b.setIdEcole(idEcole);
             return b;
         });
         return d;

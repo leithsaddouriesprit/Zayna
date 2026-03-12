@@ -11,6 +11,7 @@ public class Candidature {
 
     private int id;
     private int chauffeurId;
+    private int idEcole;    // École ciblée (filtrage agent)
     private String statut;   // ENVOYEE, ACCEPTEE, REFUSEE
     private LocalDateTime dateEnvoi;
     private String maladie;
@@ -39,6 +40,14 @@ public class Candidature {
 
     public void setChauffeurId(int chauffeurId) {
         this.chauffeurId = chauffeurId;
+    }
+
+    public int getIdEcole() {
+        return idEcole;
+    }
+
+    public void setIdEcole(int idEcole) {
+        this.idEcole = idEcole;
     }
 
     public String getStatut() {

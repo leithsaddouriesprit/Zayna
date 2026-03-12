@@ -1,8 +1,7 @@
 package tn.esprit.workshop.model.Talel.Dao;
 
 import tn.esprit.workshop.model.Talel.talel2.*;
-import tn.esprit.workshop.model.Talel.talel2.*;
-import tn.esprit.workshop.utilis.Talel.MyBDConnexion;
+import tn.esprit.workshop.utilis.MyBDConnexion;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;

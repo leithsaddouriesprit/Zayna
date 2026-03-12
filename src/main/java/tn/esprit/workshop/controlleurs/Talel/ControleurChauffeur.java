@@ -18,6 +18,8 @@ public class ControleurChauffeur {
     @FXML
     private TextField txtNom;
     @FXML
+    private TextField txtPrenom;
+    @FXML
     private TextField txtEmail;
     @FXML
     private PasswordField txtMotDePasse;
@@ -66,6 +68,7 @@ public class ControleurChauffeur {
 
             // Récupération des données
             String nom = txtNom.getText().trim();
+            String prenom = txtPrenom != null ? txtPrenom.getText().trim() : "";
             String email = txtEmail.getText().trim().toLowerCase();
             String passwordClair = txtMotDePasse.getText();
             String permis = txtPermis.getText().trim().toUpperCase();
@@ -75,15 +78,19 @@ public class ControleurChauffeur {
             String vehicule = txtVehicule.getText().trim();
             String salaireText = txtSalaire.getText().trim();
 
-            // CORRECTION 2: Validation CHAMP PAR CHAMP avec focus
-            // 1. Validation du nom
+            // Validation champs par champs avec focus
             if (nom.isEmpty()) {
                 afficherMessage("❌ Le nom est obligatoire", "error");
-                txtNom.requestFocus();  // ← CORRIGÉ
+                txtNom.requestFocus();
+                return;
+            }
+            if (prenom.isEmpty()) {
+                afficherMessage("❌ Le prénom est obligatoire", "error");
+                if (txtPrenom != null) txtPrenom.requestFocus();
                 return;
             }
 
-            // 2. Validation de l'email
+            // Validation de l'email
             if (email.isEmpty()) {
                 afficherMessage("❌ L'email est obligatoire", "error");
                 txtEmail.requestFocus();
@@ -164,9 +171,10 @@ public class ControleurChauffeur {
                 return;
             }
 
-            // Création de l'objet Chauffeur
+            // Création de l'objet Chauffeur (users.nom = nom ; chauffeur.nom + chauffeur.prenom)
             Chauffeur chauffeur = new Chauffeur();
             chauffeur.setNom(nom);
+            chauffeur.setPrenom(prenom);
             chauffeur.setEmail(email);
             chauffeur.setPermis(permis);
             chauffeur.setDateObtentionPermis(datePermis);
@@ -205,6 +213,7 @@ public class ControleurChauffeur {
     @FXML
     private void viderFormulaire() {
         txtNom.clear();
+        if (txtPrenom != null) txtPrenom.clear();
         txtEmail.clear();
         txtMotDePasse.clear();
         txtPermis.clear();

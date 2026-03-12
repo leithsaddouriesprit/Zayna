@@ -10,6 +10,8 @@ public final class AppSession {
     private int parentId;
     private Integer selectedEnfantId;
     private Integer chauffeurId;
+    /** id de la table agent_ecole (identité métier agent). */
+    private Integer agentId;
     /** id de la table ecole (filtrage écrans Agent). */
     private Integer ecoleId;
 
@@ -42,6 +44,14 @@ public final class AppSession {
 
     public void setChauffeurId(Integer chauffeurId) {
         this.chauffeurId = chauffeurId;
+    }
+
+    public Integer getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(Integer agentId) {
+        this.agentId = agentId;
     }
 
     public Integer getEcoleId() {

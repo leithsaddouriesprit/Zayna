@@ -1,7 +1,7 @@
 package tn.esprit.workshop.model.Talel.Dao;
 import tn.esprit.workshop.model.Talel.talel2.CategorieUser;
 import tn.esprit.workshop.model.Talel.talel2.Chauffeur;
-import tn.esprit.workshop.utilis.Talel.MyBDConnexion;
+import tn.esprit.workshop.utilis.MyBDConnexion;
 import java.sql.*;
 
 
@@ -30,12 +30,25 @@ public class DaoChauffeur extends DaoUser {
                 throw new SQLException("La création du chauffeur a échoué, aucune ligne affectée.");
             }
 
-            // Récupérer l'ID généré
+            // Récupérer l'ID généré (users.id)
+            int userId;
             try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    c.setId(generatedKeys.getInt(1));
-
+                if (!generatedKeys.next()) {
+                    throw new SQLException("La création du chauffeur a échoué, aucun ID utilisateur généré.");
                 }
+                userId = generatedKeys.getInt(1);
+                c.setId(userId);
+            }
+
+            // Insérer la ligne métier dans chauffeur (chauffeur.user_id -> users.id)
+            String sqlChauffeur = "INSERT INTO chauffeur (user_id, nom, prenom, age, nb_ans_experience) VALUES (?, ?, ?, ?, ?)";
+            try (PreparedStatement psChauffeur = conn.prepareStatement(sqlChauffeur)) {
+                psChauffeur.setInt(1, userId);
+                psChauffeur.setString(2, c.getNom() != null ? c.getNom().trim() : "");
+                psChauffeur.setString(3, c.getPrenom() != null ? c.getPrenom().trim() : "");
+                psChauffeur.setInt(4, 0);
+                psChauffeur.setInt(5, 0);
+                psChauffeur.executeUpdate();
             }
         }
     }

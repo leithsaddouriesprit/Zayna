@@ -52,6 +52,9 @@ public class ServiceChauffeur {
             if (chauffeur.getNom() == null || chauffeur.getNom().trim().isEmpty()) {
                 throw new Exception("Le nom est obligatoire");
             }
+            if (chauffeur.getPrenom() == null || chauffeur.getPrenom().trim().isEmpty()) {
+                throw new Exception("Le prénom est obligatoire");
+            }
             if (chauffeur.getEmail() == null || chauffeur.getEmail().trim().isEmpty()) {
                 throw new Exception("L'email est obligatoire");
             }

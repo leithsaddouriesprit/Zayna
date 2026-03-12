@@ -13,15 +13,16 @@ public class CandidatureEnfantService {
     public static final String STATUT_ACCEPTEE = "ACCEPTEE";
     public static final String STATUT_REFUSEE = "REFUSEE";
 
-    private final Connection connection;
-
     public CandidatureEnfantService() {
-        this.connection = MyBDConnexion.getInstance().getConnection();
+    }
+
+    private Connection getConnection() throws SQLException {
+        return MyBDConnexion.getInstance().getConnection();
     }
 
     public void insert(int parentId, int idEcole, String nomEnfant, String prenomEnfant, int age, double latitude, double longitude) throws SQLException {
         String sql = "INSERT INTO candidature_enfant (parent_id, id_ecole, nom_enfant, prenom_enfant, age, latitude, longitude, statut, date_demande) VALUES (?, ?, ?, ?, ?, ?, ?, 'ENVOYEE', CURRENT_TIMESTAMP)";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, parentId);
             ps.setInt(2, idEcole);
             ps.setString(3, nomEnfant);
@@ -36,7 +37,7 @@ public class CandidatureEnfantService {
     public List<CandidatureEnfant> findByParentId(int parentId) throws SQLException {
         String sql = "SELECT id, parent_id, id_ecole, nom_enfant, prenom_enfant, age, latitude, longitude, statut, trajet_id, date_demande FROM candidature_enfant WHERE parent_id = ? ORDER BY date_demande DESC";
         List<CandidatureEnfant> list = new ArrayList<>();
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, parentId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -51,7 +52,7 @@ public class CandidatureEnfantService {
     public List<CandidatureEnfant> findEnVoyeeByEcoleId(int idEcole) throws SQLException {
         String sql = "SELECT id, parent_id, id_ecole, nom_enfant, prenom_enfant, age, latitude, longitude, statut, trajet_id, date_demande FROM candidature_enfant WHERE id_ecole = ? AND statut = 'ENVOYEE' ORDER BY date_demande DESC";
         List<CandidatureEnfant> list = new ArrayList<>();
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, idEcole);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -64,7 +65,7 @@ public class CandidatureEnfantService {
 
     public void refuser(int candidatureEnfantId) throws SQLException {
         String sql = "UPDATE candidature_enfant SET statut = 'REFUSEE' WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, candidatureEnfantId);
             ps.executeUpdate();
         }
@@ -72,7 +73,7 @@ public class CandidatureEnfantService {
 
     public void accepter(int candidatureEnfantId, int trajetId) throws SQLException {
         String sql = "UPDATE candidature_enfant SET statut = 'ACCEPTEE', trajet_id = ? WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, trajetId);
             ps.setInt(2, candidatureEnfantId);
             ps.executeUpdate();
@@ -81,7 +82,7 @@ public class CandidatureEnfantService {
 
     public CandidatureEnfant getById(int id) throws SQLException {
         String sql = "SELECT id, parent_id, id_ecole, nom_enfant, prenom_enfant, age, latitude, longitude, statut, trajet_id, date_demande FROM candidature_enfant WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return mapRow(rs);

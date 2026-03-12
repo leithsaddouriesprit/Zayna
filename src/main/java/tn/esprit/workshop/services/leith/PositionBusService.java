@@ -7,10 +7,11 @@ import java.sql.*;
 
 public class PositionBusService {
 
-    private final Connection connection;
-
     public PositionBusService() {
-        this.connection = MyBDConnexion.getInstance().getConnection();
+    }
+
+    private Connection getConnection() throws SQLException {
+        return MyBDConnexion.getInstance().getConnection();
     }
 
     public void insertPosition(PositionBus p) throws SQLException {
@@ -21,7 +22,7 @@ public class PositionBusService {
                         p.getLongitude() + ", " +
                         p.getVitesse() +
                         ")";
-        Statement st = connection.createStatement();
+        Statement st = getConnection().createStatement();
         st.executeUpdate(req);
     }
 
@@ -30,7 +31,7 @@ public class PositionBusService {
                 "SELECT * FROM position_bus WHERE id_bus=" + busId +
                         " ORDER BY timestamp DESC LIMIT 1";
 
-        Statement st = connection.createStatement();
+        Statement st = getConnection().createStatement();
         ResultSet rs = st.executeQuery(req);
 
         if (rs.next()) {

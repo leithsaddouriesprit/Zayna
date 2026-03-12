@@ -3,6 +3,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class Parent extends User {
+    private String prenom;
     private String telephone;
     private String adresse;
     private String profession;
@@ -24,6 +25,9 @@ public class Parent extends User {
     }
 
     // Getters et Setters
+    public String getPrenom() { return prenom; }
+    public void setPrenom(String prenom) { this.prenom = prenom; }
+
     public String getTelephone() { return telephone; }
     public void setTelephone(String telephone) { this.telephone = telephone; }
 

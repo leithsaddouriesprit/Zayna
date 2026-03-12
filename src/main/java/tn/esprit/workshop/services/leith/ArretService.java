@@ -11,10 +11,11 @@ import java.util.List;
 
 public class ArretService implements CRUD<Arret> {
 
-    private final Connection connection;
-
     public ArretService() {
-        this.connection = MyBDConnexion.getInstance().getConnection();
+    }
+
+    private Connection getConnection() throws SQLException {
+        return MyBDConnexion.getInstance().getConnection();
     }
 
     @Override
@@ -28,7 +29,7 @@ public class ArretService implements CRUD<Arret> {
                         a.getOrdre() + ", " +
                         "'" + a.getHeurePrevue() + "'" +
                         ")";
-        Statement st = connection.createStatement();
+        Statement st = getConnection().createStatement();
         st.executeUpdate(req);
     }
 
@@ -43,14 +44,14 @@ public class ArretService implements CRUD<Arret> {
                         "heure_prevue='" + a.getHeurePrevue() + "'" +
                         " WHERE id=" + a.getArretId();
 
-        Statement st = connection.createStatement();
+        Statement st = getConnection().createStatement();
         st.executeUpdate(req);
     }
 
     @Override
     public void deleteOne(Arret a) throws SQLException {
         String req = "DELETE FROM arret WHERE id=" + a.getArretId();
-        Statement st = connection.createStatement();
+        Statement st = getConnection().createStatement();
         st.executeUpdate(req);
     }
 
@@ -58,7 +59,7 @@ public class ArretService implements CRUD<Arret> {
     public List<Arret> selectAll() throws SQLException {
         List<Arret> list = new ArrayList<>();
         String req = "SELECT * FROM arret";
-        Statement st = connection.createStatement();
+        Statement st = getConnection().createStatement();
         ResultSet rs = st.executeQuery(req);
 
         while (rs.next()) {
@@ -78,7 +79,7 @@ public class ArretService implements CRUD<Arret> {
     public List<Arret> getArretsByTrajetOrdered(int trajetId) throws SQLException {
         List<Arret> list = new ArrayList<>();
         String req = "SELECT * FROM arret WHERE id_trajet=" + trajetId + " ORDER BY ordre_arret ASC";
-        Statement st = connection.createStatement();
+        Statement st = getConnection().createStatement();
         ResultSet rs = st.executeQuery(req);
 
         while (rs.next()) {
@@ -101,7 +102,7 @@ public class ArretService implements CRUD<Arret> {
                         "JOIN enfant e ON e.trajet_id = t.id " +
                         "WHERE e.id=" + enfantId + " AND e.actif=true";
 
-        Statement st = connection.createStatement();
+        Statement st = getConnection().createStatement();
         ResultSet rs = st.executeQuery(req);
 
         if (rs.next()) {
@@ -122,7 +123,7 @@ public class ArretService implements CRUD<Arret> {
         String sql = "SELECT id, id_trajet, nom, latitude, longitude, ordre_arret, heure_prevue " +
                 "FROM arret WHERE id_trajet=? ORDER BY ordre_arret ASC";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, trajetId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -144,7 +145,7 @@ public class ArretService implements CRUD<Arret> {
 
     public Arret getDepart(int trajetId) throws SQLException {
         String req = "SELECT * FROM arret WHERE id_trajet = " + trajetId + " ORDER BY ordre_arret ASC LIMIT 1";
-        Statement st = connection.createStatement();
+        Statement st = getConnection().createStatement();
         ResultSet rs = st.executeQuery(req);
 
         if (rs.next()) {
@@ -163,7 +164,7 @@ public class ArretService implements CRUD<Arret> {
     /** Met à jour l'ordre d'un arrêt. */
     public void updateOrdre(int arretId, int ordre) throws SQLException {
         String sql = "UPDATE arret SET ordre_arret = ? WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, ordre);
             ps.setInt(2, arretId);
             ps.executeUpdate();
@@ -178,7 +179,7 @@ public class ArretService implements CRUD<Arret> {
                         "ORDER BY ordre_arret DESC " +
                         "LIMIT 1";
 
-        Statement st = connection.createStatement();
+        Statement st = getConnection().createStatement();
         ResultSet rs = st.executeQuery(req);
 
         if (rs.next()) {

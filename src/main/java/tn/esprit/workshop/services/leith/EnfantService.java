@@ -10,10 +10,11 @@ import java.util.List;
 
 public class EnfantService implements CRUD<Enfant> {
 
-    private final Connection connection;
-
     public EnfantService() {
-        this.connection = MyBDConnexion.getInstance().getConnection();
+    }
+
+    private Connection getConnection() throws SQLException {
+        return MyBDConnexion.getInstance().getConnection();
     }
 
     @Override
@@ -27,14 +28,14 @@ public class EnfantService implements CRUD<Enfant> {
                         e.isActif() + ", " +
                         (e.isOnBoard() ? 1 : 0) +
                         ")";
-        Statement st = connection.createStatement();
+        Statement st = getConnection().createStatement();
         st.executeUpdate(req);
     }
 
     /** Insère un enfant depuis une candidature acceptée (actif=1, on_board=0). */
     public void insertFromCandidature(String nom, String prenom, int parentId, int trajetId) throws SQLException {
         String sql = "INSERT INTO enfant (nom, prenom, parent_id, trajet_id, actif, on_board) VALUES (?, ?, ?, ?, 1, 0)";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setString(1, nom);
             ps.setString(2, prenom);
             ps.setInt(3, parentId);
@@ -52,14 +53,14 @@ public class EnfantService implements CRUD<Enfant> {
                         "trajet_id=" + e.getTrajetId() + ", " +
                         "actif=" + e.isActif() +
                         " WHERE id=" + e.getEnfantId();
-        Statement st = connection.createStatement();
+        Statement st = getConnection().createStatement();
         st.executeUpdate(req);
     }
 
     @Override
     public void deleteOne(Enfant e) throws SQLException {
         String req = "DELETE FROM enfant WHERE id=" + e.getEnfantId();
-        Statement st = connection.createStatement();
+        Statement st = getConnection().createStatement();
         st.executeUpdate(req);
     }
 
@@ -67,7 +68,7 @@ public class EnfantService implements CRUD<Enfant> {
     public List<Enfant> selectAll() throws SQLException {
         List<Enfant> list = new ArrayList<>();
         String req = "SELECT * FROM enfant";
-        Statement st = connection.createStatement();
+        Statement st = getConnection().createStatement();
         ResultSet rs = st.executeQuery(req);
 
         while (rs.next()) {
@@ -88,7 +89,7 @@ public class EnfantService implements CRUD<Enfant> {
         Enfant enfant = null;
         String sql = "SELECT * FROM enfant WHERE id = ?";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
 
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
@@ -118,7 +119,7 @@ public class EnfantService implements CRUD<Enfant> {
     public List<Enfant> getByParentId(int parentId) throws SQLException {
         List<Enfant> list = new ArrayList<>();
         String sql = "SELECT id, nom, prenom, parent_id, trajet_id, actif FROM enfant WHERE parent_id = ? AND actif = 1";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, parentId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -137,7 +138,7 @@ public class EnfantService implements CRUD<Enfant> {
 
     public Enfant getEnfantByTrajetId(int trajetId) throws SQLException {
         String sql = "SELECT * FROM enfant WHERE trajet_id = ? LIMIT 1";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, trajetId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
