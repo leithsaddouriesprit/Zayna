@@ -8,10 +8,14 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import tn.esprit.workshop.model.Reclamation;
 import tn.esprit.workshop.model.Reponse;
+import tn.esprit.workshop.services.FiltrageService;
 import tn.esprit.workshop.services.ReclamationService;
 import tn.esprit.workshop.services.ReponseService;
 import tn.esprit.workshop.services.TraductionService;
-
+import javafx.geometry.Insets;
+import java.util.Optional;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import java.net.URL;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -65,6 +69,7 @@ public class GestionReclamationController implements Initializable {
     private final ReponseService reponseService = new ReponseService();
     private final int currentUserId = 1;
     private final TraductionService traductionService = new TraductionService();
+    private final FiltrageService filtrageService = new FiltrageService();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -416,8 +421,62 @@ public class GestionReclamationController implements Initializable {
             showAlert("Erreur", "❌ Veuillez préciser votre demande", Alert.AlertType.WARNING);
             return;
         }
+        // ✅ FILTRAGE : Vérifier les mots grossiers
+        FiltrageService.ResultatFiltrage resultatFiltrage = filtrageService.analyser(message);
+        if (resultatFiltrage.contientGrossieretes()) {
+            // Créer une alerte personnalisée
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("⚠️ Langage inapproprié");
+            alert.setHeaderText("Des mots inappropriés ont été détectés");
+            // Créer un contenu plus détaillé
+            VBox content = new VBox(10);
+            content.setPadding(new Insets(20));
 
-        // Confirmation
+            Label originalLabel = new Label("Message original:");
+            originalLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #e74c3c;");
+            TextArea originalArea = new TextArea(message);
+            originalArea.setEditable(false);
+            originalArea.setPrefRowCount(2);
+            originalArea.setStyle("-fx-background-color: #f8f8f8;");
+
+            Label filtreLabel = new Label("Message filtré proposé:");
+            filtreLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #27ae60;");
+            TextArea filtreArea = new TextArea(resultatFiltrage.getTexteFiltre());
+            filtreArea.setEditable(false);
+            filtreArea.setPrefRowCount(2);
+            filtreArea.setStyle("-fx-background-color: #f8f8f8;");
+
+            content.getChildren().addAll(originalLabel, originalArea, filtreLabel, filtreArea);
+            alert.getDialogPane().setContent(content);
+
+            // Boutons personnalisés
+            ButtonType btnFiltre = new ButtonType("✅ Utiliser la version filtrée", ButtonBar.ButtonData.OK_DONE);
+            ButtonType btnModifier = new ButtonType("✏️ Modifier mon message", ButtonBar.ButtonData.NO);
+            ButtonType btnAnnuler = new ButtonType("❌ Annuler", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+            alert.getButtonTypes().setAll(btnFiltre, btnModifier, btnAnnuler);
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent()) {
+                if (result.get() == btnFiltre) {
+                    // Remplacer par la version filtrée
+                    messageField.setText(resultatFiltrage.getTexteFiltre());
+                    message = resultatFiltrage.getTexteFiltre();
+                    statusLabel.setText("✅ Message filtré automatiquement");
+                } else if (result.get() == btnModifier) {
+                    // L'utilisateur veut modifier
+                    messageField.requestFocus();
+                    messageField.selectAll();
+                    return; // Arrêter l'envoi
+                } else {
+                    // Annuler
+                    return; // Arrêter l'envoi
+                }
+            } else {
+                return; // Annuler si la boîte de dialogue est fermée
+            }
+        }
+            // Confirmation
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirmation");
         confirm.setHeaderText("Envoyer la réclamation");
