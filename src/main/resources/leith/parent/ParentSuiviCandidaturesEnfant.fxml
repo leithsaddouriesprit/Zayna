@@ -6,20 +6,23 @@
 <?import java.net.URL?>
 <VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="tn.esprit.workshop.controlleurs.leith.parent.ParentSuiviCandidaturesEnfantController"
-      styleClass="card" spacing="12">
-    <stylesheets><URL value="@../app.css"/></stylesheets>
-    <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+      styleClass="content-area admin-main-panel parent-page" spacing="12">
+    <stylesheets><URL value="@../design/global.css"/></stylesheets>
+    <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
 
-    <Label text="Suivi des candidatures transport enfant" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+    <Label text="Suivi des candidatures transport enfant" styleClass="admin-page-title"/>
+    <Label text="Consultez l'état de chaque candidature envoyée." styleClass="admin-page-subtitle" style="-fx-text-fill: #f1c40f;"/>
 
-    <TableView fx:id="table" VBox.vgrow="ALWAYS">
-        <columns>
-            <TableColumn fx:id="colNom" text="Nom" prefWidth="100"/>
-            <TableColumn fx:id="colPrenom" text="Prénom" prefWidth="100"/>
-            <TableColumn fx:id="colAge" text="Âge" prefWidth="50"/>
-            <TableColumn fx:id="colStatut" text="Statut" prefWidth="100"/>
-            <TableColumn fx:id="colDate" text="Date demande" prefWidth="140"/>
-        </columns>
-    </TableView>
-    <Label fx:id="lblMessage" text=""/>
+    <VBox styleClass="admin-table-panel parent-section-panel" spacing="10" VBox.vgrow="ALWAYS">
+        <TableView fx:id="table" VBox.vgrow="ALWAYS" styleClass="table-view">
+            <columns>
+                <TableColumn fx:id="colNom" text="Nom" prefWidth="100"/>
+                <TableColumn fx:id="colPrenom" text="Prénom" prefWidth="100"/>
+                <TableColumn fx:id="colAge" text="Âge" prefWidth="50"/>
+                <TableColumn fx:id="colStatut" text="Statut" prefWidth="100"/>
+                <TableColumn fx:id="colDate" text="Date demande" prefWidth="140"/>
+            </columns>
+        </TableView>
+        <Label fx:id="lblMessage" text="" styleClass="section-subtitle"/>
+    </VBox>
 </VBox>

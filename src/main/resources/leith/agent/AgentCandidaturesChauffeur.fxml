@@ -6,12 +6,15 @@
 <?import java.net.URL?>
 <VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="tn.esprit.workshop.controlleurs.leith.agent.AgentCandidaturesChauffeurController"
-      styleClass="card" spacing="12">
-    <stylesheets><URL value="@../app.css"/></stylesheets>
+      styleClass="card content-area" spacing="12">
+    <stylesheets>
+        <URL value="@../app.css"/>
+        <URL value="@../design/global.css"/>
+    </stylesheets>
     <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
 
-    <Label text="Candidatures Chauffeur" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
-    <TableView fx:id="table" VBox.vgrow="ALWAYS">
+    <Label text="Candidatures Chauffeur" styleClass="title-md"/>
+    <TableView fx:id="table" VBox.vgrow="ALWAYS" styleClass="table-view">
         <columns>
             <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
             <TableColumn fx:id="colNom" text="Nom" prefWidth="100"/>

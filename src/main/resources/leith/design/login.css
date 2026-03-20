@@ -1,0 +1,198 @@
+/* =========================
+   ROOT / BACKGROUND
+   ========================= */
+.root {
+    -fx-font-family: "Inter", "Segoe UI", "Arial";
+}
+
+.login-root {
+    -fx-background-color: #000000;
+}
+
+/* =========================
+   GLOBAL LABELS
+   ========================= */
+.label {
+    -fx-text-fill: white;
+}
+
+/* =========================
+   TOP BRAND AREA
+   ========================= */
+.brand-box {
+    -fx-alignment: center;
+    -fx-spacing: 10;
+}
+
+.brand-logo {
+    -fx-fit-width: 186;
+    -fx-fit-height: 116;
+    -fx-preserve-ratio: true;
+}
+
+.brand-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #FFFFFF;
+}
+
+.brand-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #FFFFFFCC;
+}
+
+/* =========================
+   LOGIN CARD
+   ========================= */
+.login-card {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-padding: 0 30 30 30;
+    -fx-spacing: 20;
+    -fx-alignment: center;
+}
+
+.section-title {
+    -fx-font-size: 13px;
+    -fx-font-weight: 500;
+    -fx-text-fill: #FFFFFF;
+    -fx-alignment: center;
+}
+
+/* =========================
+   ERROR LABEL
+   ========================= */
+.error-label {
+    -fx-text-fill: #FFFFFF;
+    -fx-background-color: #C62828;
+    -fx-background-radius: 10;
+    -fx-padding: 10 12 10 12;
+    -fx-font-size: 12px;
+    -fx-wrap-text: true;
+}
+
+/* =========================
+   FIELD LABELS
+   ========================= */
+.field-label {
+    -fx-font-weight: 600;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 13px;
+}
+
+/* =========================
+   INPUT FIELDS
+   ========================= */
+.text-field,
+.password-field {
+    -fx-pref-width: 323px;
+    -fx-pref-height: 32px;
+    -fx-background-color: #F3F4F6;
+    -fx-background-radius: 200;
+    -fx-border-color: transparent;
+    -fx-border-radius: 200;
+    -fx-text-fill: #111111;
+    -fx-prompt-text-fill: #9CA3AF;
+    -fx-font-size: 13px;
+    -fx-padding: 0 14 0 14;
+}
+
+.text-field:focused,
+.password-field:focused {
+    -fx-background-color: white;
+    -fx-border-color: #FEC111;
+    -fx-border-width: 1.2;
+    -fx-effect: dropshadow(gaussian, rgba(254,193,17,0.18), 8, 0.15, 0, 0);
+}
+
+/* =========================
+   LOGIN BUTTON
+   ========================= */
+.primary-login-btn {
+    -fx-pref-width: 323px;
+    -fx-pref-height: 32px;
+    -fx-background-color: #FEC111;
+    -fx-background-radius: 200;
+    -fx-border-color: #FFFFFF;
+    -fx-border-width: 1;
+    -fx-border-radius: 200;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 4, 0.2, 0, 4);
+}
+
+.primary-login-btn:hover {
+    -fx-opacity: 0.92;
+}
+
+.primary-login-btn:pressed {
+    -fx-translate-y: 1;
+}
+
+/* =========================
+   PROGRESS INDICATOR
+   ========================= */
+.progress-indicator {
+    -fx-progress-color: white;
+    -fx-max-width: 25;
+    -fx-max-height: 25;
+}
+
+/* =========================
+   LINKS
+   ========================= */
+.hyperlink {
+    -fx-border-color: transparent;
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-underline: false;
+    -fx-cursor: hand;
+}
+
+.hyperlink:hover {
+    -fx-underline: true;
+}
+
+.forgot-link {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 14px;
+}
+
+.role-link {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+}
+
+.role-link:hover {
+    -fx-text-fill: #FEC111;
+}
+
+/* =========================
+   ROLE SECTION
+   ========================= */
+.role-title {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+}
+
+.role-separator {
+    -fx-text-fill: #FEC111;
+    -fx-font-size: 16px;
+    -fx-font-weight: 700;
+}
+
+/* =========================
+   OPTIONAL SPACING HELPERS
+   ========================= */
+.center-box {
+    -fx-alignment: center;
+}
+
+.role-row {
+    -fx-alignment: center;
+    -fx-spacing: 15;
+}

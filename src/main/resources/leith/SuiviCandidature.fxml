@@ -9,32 +9,61 @@
 <VBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="tn.esprit.workshop.controlleurs.leith.SuiviCandidatureController"
-      styleClass="suivi-candidature"
-      spacing="16" alignment="CENTER_LEFT">
+      styleClass="suivi-candidature content-area admin-main-panel chauffeur-page"
+      spacing="14" alignment="TOP_LEFT">
     <stylesheets>
-        <URL value="@/leith/app.css"/>
-        <URL value="@/leith/chauffeur-module.css"/>
+        <URL value="@/leith/design/global.css"/>
     </stylesheets>
 
     <padding>
         <Insets top="24" right="24" bottom="24" left="24"/>
     </padding>
 
-    <Label text="Suivi Candidature" styleClass="title-label"/>
-    <Label fx:id="lblNomPrenom" text="Nom, Prénom" styleClass="field-label"/>
-    <Label fx:id="lblStatut" text="Statut" styleClass="field-label"/>
-    <Label fx:id="lblDateEnvoi" text="Date envoi" styleClass="field-label"/>
-    <Label fx:id="lblMaladie" text="Maladie" styleClass="field-label"/>
-    <StackPane styleClass="permis-preview">
-        <ImageView fx:id="imgPermisPreview" fitWidth="120" fitHeight="80" preserveRatio="true" visible="false"/>
-    </StackPane>
+    <Label text="Suivi Candidature" styleClass="admin-page-title"/>
+    <Label text="Consultez l'état de votre dossier chauffeur." styleClass="admin-page-subtitle" style="-fx-text-fill: #f1c40f;"/>
 
-    <HBox styleClass="button-bar" spacing="12">
-        <Button fx:id="btnAnnuler" text="Annuler" onAction="#onAnnuler" visible="false"/>
-        <Button fx:id="btnPostulerAnouveau" text="Postuler à nouveau" onAction="#onPostulerAnouveau" visible="false"/>
-        <Button fx:id="btnAllerEspace" text="Aller à Espace Chauffeur" onAction="#onAllerEspace" visible="false"/>
-    </HBox>
+    <VBox spacing="14" styleClass="admin-section-panel chauffeur-suivi-panel" VBox.vgrow="ALWAYS">
+        <VBox spacing="12" styleClass="chauffeur-suivi-card chauffeur-suivi-main-card" maxWidth="Infinity">
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="Candidature" styleClass="admin-stat-card-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lblStatut" text="Statut" styleClass="chauffeur-status-badge"/>
+            </HBox>
 
-    <Label fx:id="lblMessage" text="" wrapText="true"/>
+            <GridPane hgap="12" vgap="10">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="170" prefWidth="200"/>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                </columnConstraints>
+
+                <Label text="Nom et prénom" styleClass="section-subtitle" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <Label fx:id="lblNomPrenom" text="Nom, Prénom" styleClass="field-label" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                <Label text="Date d'envoi" styleClass="section-subtitle" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <Label fx:id="lblDateEnvoi" text="Date envoi" styleClass="field-label" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                <Label text="Informations médicales" styleClass="section-subtitle" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                <Label fx:id="lblMaladie" text="Maladie" wrapText="true" styleClass="field-label" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+            </GridPane>
+        </VBox>
+
+        <VBox spacing="8" styleClass="chauffeur-suivi-card chauffeur-permis-card" maxWidth="Infinity">
+            <Label text="Aperçu permis" styleClass="section-subtitle"/>
+            <StackPane alignment="CENTER_LEFT">
+                <ImageView fx:id="imgPermisPreview" fitWidth="260" fitHeight="150" preserveRatio="true" visible="false"/>
+            </StackPane>
+        </VBox>
+
+        <VBox spacing="10" styleClass="chauffeur-suivi-card chauffeur-suivi-actions" maxWidth="Infinity">
+            <Label text="Actions disponibles" styleClass="admin-stat-card-title"/>
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <Button fx:id="btnAnnuler" text="Annuler" onAction="#onAnnuler" visible="false" styleClass="btn-soft"/>
+                <Button fx:id="btnPostulerAnouveau" text="Postuler à nouveau" onAction="#onPostulerAnouveau" visible="false" styleClass="btn-primary"/>
+                <Button fx:id="btnAllerEspace" text="Aller à Espace Chauffeur" onAction="#onAllerEspace" visible="false" styleClass="btn-secondary"/>
+            </HBox>
+        </VBox>
+
+        <Label fx:id="lblMessage" text="" wrapText="true" styleClass="section-subtitle chauffeur-message"/>
+    </VBox>
 
 </VBox>

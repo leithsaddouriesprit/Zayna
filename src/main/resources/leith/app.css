@@ -232,6 +232,58 @@
     -fx-border-width: 1;
 }
 
+/* ===== Parent dashboard (home) ===== */
+.parent-dashboard-row {
+    -fx-spacing: 18;
+    -fx-padding: 0 0 12 0;
+}
+.parent-card {
+    -fx-background-color: linear-gradient(to bottom right, rgba(15,23,42,0.98), rgba(17,24,39,0.96));
+    -fx-background-radius: 18;
+    -fx-border-color: rgba(148, 163, 184, 0.35);
+    -fx-border-radius: 18;
+    -fx-border-width: 1;
+    -fx-padding: 18 20 20 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.40), 26, 0.22, 0, 10);
+}
+.parent-card-title {
+    -fx-text-fill: #E5E7EB;
+    -fx-font-weight: 700;
+    -fx-font-size: 15px;
+    -fx-padding: 0 0 2 0;
+}
+.parent-card-text {
+    -fx-text-fill: #CBD5F5;
+    -fx-font-size: 13px;
+    -fx-line-spacing: 1.2;
+}
+.parent-card-wide {
+    -fx-min-width: 220;
+}
+.parent-weather-card {
+    -fx-border-color: rgba(59, 130, 246, 0.5);
+}
+.parent-weather-icon {
+    -fx-font-size: 26px;
+}
+.parent-weather-temp {
+    -fx-text-fill: #F9FAFB;
+    -fx-font-size: 26px;
+    -fx-font-weight: 800;
+}
+.parent-tip-card {
+    -fx-border-color: rgba(245, 158, 11, 0.5);
+}
+.parent-safety-card {
+    -fx-border-color: rgba(34, 197, 94, 0.5);
+}
+.parent-illustration-card {
+    -fx-border-color: rgba(148, 163, 184, 0.4);
+}
+.parent-illustration-icon {
+    -fx-font-size: 42px;
+}
+
 /* Primary: #6D5EF7 */
 .primary-btn, .btn-primary {
     -fx-background-color: #6D5EF7;
@@ -587,6 +639,127 @@
     -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-padding: 0 0 10 0;
+}
+
+/* ===== Agent dashboard – tableau de bord Agent École ===== */
+.agent-dashboard {
+    -fx-background-color: transparent;
+}
+.agent-dashboard-header {
+    -fx-padding: 0 0 16 0;
+}
+.agent-dashboard-school {
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+.agent-dashboard-agent {
+    -fx-text-fill: #F9FAFB;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+.agent-dashboard-subtitle {
+    -fx-text-fill: rgba(203, 213, 225, 0.85);
+    -fx-font-size: 14px;
+}
+.agent-dashboard-section-title {
+    -fx-text-fill: #cbd5e1;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 0 10 0;
+}
+.agent-dashboard-stats-row {
+    -fx-spacing: 20;
+    -fx-padding: 0 0 8 0;
+}
+.agent-dashboard-card {
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+    -fx-border-width: 1;
+    -fx-padding: 22 24;
+    -fx-spacing: 10;
+    -fx-alignment: center-left;
+    -fx-min-width: 160;
+    -fx-pref-width: 220;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 22, 0.15, 0, 8);
+}
+.agent-dashboard-card .agent-dashboard-card-title {
+    -fx-text-fill: rgba(249, 250, 251, 0.9);
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-wrap-text: true;
+}
+.agent-dashboard-card .agent-dashboard-value {
+    -fx-text-fill: #F9FAFB;
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+}
+.agent-card-chauffeur {
+    -fx-background-color: rgba(245, 158, 11, 0.12);
+    -fx-border-color: rgba(245, 158, 11, 0.45);
+}
+.agent-card-enfant {
+    -fx-background-color: rgba(139, 92, 246, 0.12);
+    -fx-border-color: rgba(139, 92, 246, 0.45);
+}
+.agent-card-bus {
+    -fx-background-color: rgba(59, 130, 246, 0.12);
+    -fx-border-color: rgba(59, 130, 246, 0.45);
+}
+.agent-card-trajets {
+    -fx-background-color: rgba(34, 197, 94, 0.12);
+    -fx-border-color: rgba(34, 197, 94, 0.45);
+}
+.agent-card-enfants-transportes {
+    -fx-background-color: rgba(20, 184, 166, 0.12);
+    -fx-border-color: rgba(20, 184, 166, 0.5);
+}
+.agent-dashboard-alerts {
+    -fx-background-color: rgba(30, 41, 59, 0.6);
+    -fx-background-radius: 14;
+    -fx-border-color: rgba(245, 158, 11, 0.3);
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+    -fx-padding: 18 22;
+}
+.agent-dashboard-alerts-text {
+    -fx-text-fill: #e2e8f0;
+    -fx-font-size: 14px;
+    -fx-wrap-text: true;
+}
+.agent-dashboard-summary {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-background-radius: 14;
+    -fx-border-color: rgba(148, 163, 184, 0.2);
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+    -fx-padding: 18 22;
+}
+.agent-dashboard-summary-text {
+    -fx-text-fill: #cbd5e1;
+    -fx-font-size: 14px;
+    -fx-wrap-text: true;
+}
+.agent-dashboard-actions {
+    -fx-spacing: 16;
+    -fx-padding: 4 0 0 0;
+}
+.agent-quick-action-btn {
+    -fx-background-color: rgba(109, 94, 247, 0.25);
+    -fx-background-radius: 14;
+    -fx-border-color: rgba(109, 94, 247, 0.5);
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+    -fx-padding: 14 24;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #F9FAFB;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(109, 94, 247, 0.25), 16, 0.12, 0, 4);
+}
+.agent-quick-action-btn:hover {
+    -fx-background-color: rgba(109, 94, 247, 0.35);
+    -fx-border-color: rgba(109, 94, 247, 0.65);
 }
 
 .shell-chat-panel {

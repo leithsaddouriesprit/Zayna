@@ -9,10 +9,10 @@
 <StackPane xmlns="http://javafx.com/javafx/21"
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="tn.esprit.workshop.controlleurs.leith.PostulerChauffeurController"
-           styleClass="root">
+           styleClass="root content-area admin-main-panel chauffeur-page">
 
     <stylesheets>
-        <URL value="@/leith/app.css"/>
+        <URL value="@/leith/design/global.css"/>
     </stylesheets>
 
     <!-- ✅ Scroll pour que tout s'affiche même si la fenêtre est petite -->
@@ -26,7 +26,7 @@
         <content>
             <!-- ✅ Wrapper pour centrer la card -->
             <VBox alignment="TOP_CENTER" styleClass="page-wrap">
-                <VBox spacing="16.0" styleClass="card" maxWidth="720">
+                <VBox spacing="16.0" styleClass="card admin-section-panel chauffeur-form-panel" maxWidth="780">
                     <padding>
                         <Insets top="26" right="26" bottom="22" left="26"/>
                     </padding>

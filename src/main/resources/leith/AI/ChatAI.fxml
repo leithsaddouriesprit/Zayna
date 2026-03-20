@@ -33,7 +33,7 @@
             <padding>
                 <Insets top="16" right="20" bottom="20" left="20"/>
             </padding>
-            <TextField fx:id="tfMessage" styleClass="chat-input" promptText="Écrire un message..." HBox.hgrow="ALWAYS" onAction="#send"/>
+            <TextField fx:id="tfMessage" styleClass="chat-input ai-input" promptText="Écrire un message..." HBox.hgrow="ALWAYS" onAction="#send"/>
             <Button fx:id="btnSend" text="Envoyer" styleClass="chat-btn-send" onAction="#send"/>
         </HBox>
     </bottom>

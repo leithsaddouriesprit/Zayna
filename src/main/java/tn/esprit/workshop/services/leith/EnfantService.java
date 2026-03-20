@@ -157,5 +157,15 @@ public class EnfantService implements CRUD<Enfant> {
         return null;
     }
 
-
+    /** Nombre d'enfants actifs dont le trajet appartient à l'école (pour dashboard agent). */
+    public int countActifsByEcoleId(int idEcole) throws SQLException {
+        String sql = "SELECT COUNT(*) AS n FROM enfant e JOIN trajet t ON e.trajet_id = t.id WHERE t.id_ecole = ? AND e.actif = 1";
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setInt(1, idEcole);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt("n");
+            }
+        }
+        return 0;
+    }
 }

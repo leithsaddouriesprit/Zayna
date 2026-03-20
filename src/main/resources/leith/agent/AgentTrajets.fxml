@@ -6,19 +6,22 @@
 <?import java.net.URL?>
 <VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="tn.esprit.workshop.controlleurs.leith.agent.AgentTrajetsController"
-      styleClass="card" spacing="12">
-    <stylesheets><URL value="@../app.css"/></stylesheets>
+      styleClass="card content-area" spacing="12">
+    <stylesheets>
+        <URL value="@../app.css"/>
+        <URL value="@../design/global.css"/>
+    </stylesheets>
     <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
 
-    <Label text="Gestion Trajets (école de l'agent)" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+    <Label text="Gestion Trajets (école de l'agent)" styleClass="title-md"/>
 
     <HBox spacing="8">
-        <Button text="Ajouter" onAction="#ajouter"/>
-        <Button text="Modifier" onAction="#modifier" fx:id="btnModifier" disable="true"/>
-        <Button text="Supprimer" onAction="#supprimer" fx:id="btnSupprimer" disable="true"/>
+        <Button text="Ajouter" onAction="#ajouter" styleClass="btn-primary"/>
+        <Button text="Modifier" onAction="#modifier" fx:id="btnModifier" disable="true" styleClass="btn-secondary"/>
+        <Button text="Supprimer" onAction="#supprimer" fx:id="btnSupprimer" disable="true" styleClass="btn-soft"/>
     </HBox>
 
-    <TableView fx:id="table" VBox.vgrow="ALWAYS">
+    <TableView fx:id="table" VBox.vgrow="ALWAYS" styleClass="table-view">
         <columns>
             <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
             <TableColumn fx:id="colNom" text="Nom" prefWidth="150"/>

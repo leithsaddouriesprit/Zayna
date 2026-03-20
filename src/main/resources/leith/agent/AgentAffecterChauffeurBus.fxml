@@ -6,11 +6,14 @@
 <?import java.net.URL?>
 <VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="tn.esprit.workshop.controlleurs.leith.agent.AgentAffecterChauffeurBusController"
-      styleClass="card" spacing="12">
-    <stylesheets><URL value="@../app.css"/></stylesheets>
+      styleClass="card content-area" spacing="12">
+    <stylesheets>
+        <URL value="@../app.css"/>
+        <URL value="@../design/global.css"/>
+    </stylesheets>
     <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
 
-    <Label text="Affecter Chauffeur → Bus" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+    <Label text="Affecter Chauffeur → Bus" styleClass="title-md"/>
 
     <HBox spacing="12" alignment="CENTER_LEFT">
         <Label text="Bus:"/>
@@ -18,6 +21,6 @@
         <Label text="Chauffeur (accepté):"/>
         <ComboBox fx:id="comboChauffeur" prefWidth="250" promptText="Choisir un chauffeur"/>
     </HBox>
-    <Button text="Enregistrer" onAction="#enregistrer"/>
+    <Button text="Enregistrer" onAction="#enregistrer" styleClass="btn-primary"/>
     <Label fx:id="lblMessage" text="" wrapText="true"/>
 </VBox>

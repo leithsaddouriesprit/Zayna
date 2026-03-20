@@ -8,14 +8,15 @@
 <StackPane xmlns="http://javafx.com/javafx/21"
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="tn.esprit.workshop.controlleurs.leith.EspaceChauffeurController"
-           styleClass="root espace-chauffeur">
+           styleClass="root espace-chauffeur app-root">
     <stylesheets>
         <URL value="@/leith/app.css"/>
         <URL value="@/leith/chauffeur-module.css"/>
+        <URL value="@/leith/design/global.css"/>
     </stylesheets>
 
     <ScrollPane styleClass="espace-scroll" fitToWidth="true" fitToHeight="true">
-        <VBox styleClass="espace-card" spacing="20" alignment="CENTER_LEFT">
+        <VBox styleClass="espace-card content-area" spacing="20" alignment="CENTER_LEFT">
             <padding>
                 <Insets top="24" right="24" bottom="24" left="24"/>
             </padding>
@@ -23,13 +24,13 @@
             <Label text="Espace Chauffeur" styleClass="title-label"/>
 
             <!-- Card affichée quand aucun bus affecté -->
-            <VBox fx:id="boxNoBus" styleClass="card" alignment="CENTER" spacing="12" visible="true" managed="true">
+            <VBox fx:id="boxNoBus" styleClass="card surface-panel" alignment="CENTER" spacing="12" visible="true" managed="true">
                 <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
                 <Label text="Aucun bus affecté pour le moment, veuillez patienter..." styleClass="info-label" wrapText="true"/>
             </VBox>
 
             <!-- Sections Bus / Trajet / Arrêts (masquées si aucun bus) -->
-            <VBox fx:id="boxBusContent" spacing="20" visible="false" managed="false">
+            <VBox fx:id="boxBusContent" spacing="20" visible="false" managed="false" styleClass="surface-panel-soft">
                 <Label text="Bus" styleClass="section-title"/>
                 <Label fx:id="lblNumeroBus" text="—" styleClass="info-label"/>
                 <Label fx:id="lblMatricule" text="—" styleClass="info-label"/>
@@ -52,7 +53,7 @@
                     </columns>
                 </TableView>
 
-                <Button fx:id="btnReclamer" text="Réclamer" onAction="#onReclamer"/>
+                <Button fx:id="btnReclamer" text="Réclamer" onAction="#onReclamer" styleClass="btn-primary"/>
             </VBox>
         </VBox>
     </ScrollPane>

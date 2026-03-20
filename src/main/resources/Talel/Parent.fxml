@@ -15,23 +15,27 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import java.net.URL?>
 
-<VBox cache="true" layoutX="2.0" layoutY="2.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="640.0" spacing="1.0" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshop.controlleurs.Talel.ControleurParent">
+<VBox cache="true" layoutX="2.0" layoutY="2.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="640.0" spacing="10.0" styleClass="reg-page" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshop.controlleurs.Talel.ControleurParent">
+    <stylesheets>
+        <URL value="@/leith/design/global.css" />
+    </stylesheets>
     <padding>
-        <Insets bottom="10.0" left="25.0" right="10.0" top="5.0" />
+        <Insets bottom="20.0" left="24.0" right="24.0" top="20.0" />
     </padding>
 
     <!-- Bouton Déconnexion en haut à droite -->
     <HBox alignment="TOP_RIGHT">
-        <Button fx:id="logoutButton" onAction="#handleLogoutButton" style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-weight: bold;" text="Déconnexion" />
+        <Button fx:id="logoutButton" onAction="#handleLogoutButton" styleClass="btn-soft" text="Déconnexion" />
     </HBox>
 
     <!-- En-tête -->
-    <HBox alignment="CENTER_LEFT" spacing="10">
+    <HBox alignment="CENTER_LEFT" spacing="10" styleClass="reg-header">
         <Label style="-fx-font-size: 30px;" text="👪" />
-        <VBox>
-            <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="AJOUTER UN PARENT" />
-            <Label style="-fx-text-fill: #7f8c8d;" text="Remplissez le formulaire pour ajouter un nouveau parent" />
+        <VBox spacing="4">
+            <Label styleClass="reg-title" text="AJOUTER UN PARENT" />
+            <Label styleClass="reg-subtitle" text="Remplissez le formulaire pour ajouter un nouveau parent" />
         </VBox>
     </HBox>
 
@@ -45,10 +49,10 @@
     </Label>
 
     <!-- Formulaire -->
-    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-border-color: transparent;">
-        <VBox spacing="15">
+    <ScrollPane fitToWidth="true" styleClass="reg-scroll">
+        <VBox spacing="15" styleClass="reg-card">
             <!-- Section Informations du parent -->
-            <TitledPane collapsible="false" expanded="true" text="Informations du parent">
+            <TitledPane collapsible="false" expanded="true" text="Informations du parent" styleClass="reg-titled-pane">
                 <content>
                     <GridPane hgap="15" style="-fx-padding: 10;" vgap="12">
                         <Label style="-fx-font-weight: bold;" text="Nom *" GridPane.columnIndex="0" GridPane.rowIndex="0" />
@@ -91,12 +95,12 @@
 
             <!-- Boutons -->
             <HBox alignment="CENTER" spacing="15">
-                <Button fx:id="btnAjouterParent" onAction="#ajouterParent" prefHeight="40" prefWidth="200" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold;" text="Ajouter le parent">
+                <Button fx:id="btnAjouterParent" onAction="#ajouterParent" prefHeight="40" prefWidth="200" styleClass="btn-primary" text="Ajouter le parent">
                     <font>
                         <Font size="14" />
                     </font>
                 </Button>
-                <Button onAction="#viderFormulaire" prefHeight="40" prefWidth="100" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" text="Vider" />
+                <Button onAction="#viderFormulaire" prefHeight="40" prefWidth="100" styleClass="btn-secondary" text="Vider" />
             </HBox>
 
             <Label style="-fx-text-fill: #7f8c8d; -fx-font-style: italic;" text="* Champs obligatoires" />

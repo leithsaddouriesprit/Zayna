@@ -17,18 +17,18 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_LEFT" maxWidth="Infinity" maxHeight="Infinity" spacing="10" styleClass="admin-content" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshop.controlleurs.Talel.AdminController">
+<VBox alignment="TOP_LEFT" maxWidth="Infinity" maxHeight="Infinity" spacing="10" styleClass="admin-content content-area admin-main-panel" stylesheets="@/leith/design/global.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshop.controlleurs.Talel.AdminController">
     <padding>
         <Insets bottom="15" left="15" right="15" top="15" />
     </padding>
 
     <!-- En-tête avec titre (déconnexion gérée par le shell admin) -->
     <HBox alignment="CENTER_LEFT" spacing="10">
-        <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Gestion des Utilisateurs" HBox.hgrow="ALWAYS" />
+        <Label text="Gestion des Utilisateurs" styleClass="admin-page-title" HBox.hgrow="ALWAYS" />
     </HBox>
 
     <!-- Barre d'outils -->
-    <ToolBar>
+    <ToolBar styleClass="admin-section-panel">
         <items>
             <Button fx:id="addButton" onAction="#handleAddButton" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" text="   Ajouter   ">
                 <graphic>
@@ -46,7 +46,7 @@
                 </graphic>
             </Button>
             <Separator orientation="VERTICAL" />
-            <Button fx:id="refreshButton" onAction="#handleRefreshButton" text="   Actualiser   ">
+            <Button fx:id="refreshButton" onAction="#handleRefreshButton" text="   Actualiser   " styleClass="btn-secondary">
                 <graphic>
                     <Label text="🔄" />
                 </graphic>
@@ -55,7 +55,7 @@
     </ToolBar>
 
     <!-- Panneau de recherche et filtres -->
-    <GridPane hgap="10" vgap="10">
+    <GridPane hgap="10" vgap="10" styleClass="admin-section-panel">
         <padding>
             <Insets bottom="10" top="10" />
         </padding>
@@ -66,7 +66,7 @@
         <Label text="Catégorie:" GridPane.columnIndex="2" GridPane.rowIndex="0" />
         <ComboBox fx:id="categoryFilterCombo" onAction="#handleCategoryFilter" promptText="Toutes" GridPane.columnIndex="3" GridPane.rowIndex="0" />
 
-        <Button fx:id="clearSearchButton" onAction="#handleClearSearchButton" text="   Effacer les filtres   " GridPane.columnIndex="4" GridPane.rowIndex="0">
+        <Button fx:id="clearSearchButton" onAction="#handleClearSearchButton" text="   Effacer les filtres   " styleClass="btn-soft" GridPane.columnIndex="4" GridPane.rowIndex="0">
             <graphic>
                 <Label text="❌" />
             </graphic>
@@ -85,7 +85,7 @@
     </GridPane>
 
     <!-- Tableau des utilisateurs -->
-    <TableView fx:id="userTable" VBox.vgrow="ALWAYS">
+    <TableView fx:id="userTable" styleClass="table-view admin-table-panel" VBox.vgrow="ALWAYS">
         <columns>
             <TableColumn fx:id="colId" prefWidth="50" text="ID" />
             <TableColumn fx:id="colNom" prefWidth="150" text="Nom" />
@@ -96,7 +96,7 @@
     </TableView>
 
     <!-- Statistiques -->
-    <FlowPane alignment="CENTER" hgap="15" vgap="5">
+    <FlowPane alignment="CENTER" hgap="15" vgap="5" styleClass="admin-section-panel">
         <padding>
             <Insets bottom="10" top="10" />
         </padding>
@@ -149,5 +149,5 @@
     </GridPane>
 
     <!-- CORRECTION 3: Barre de statut avec wrapText="true" -->
-    <Label fx:id="statusLabel" wrapText="true" style="-fx-padding: 10; -fx-background-radius: 5;" />
+    <Label fx:id="statusLabel" wrapText="true" styleClass="info-box info-text" />
 </VBox>

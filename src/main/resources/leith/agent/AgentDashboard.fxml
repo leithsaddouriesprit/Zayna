@@ -6,41 +6,83 @@
 <?import java.net.URL?>
 <VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="tn.esprit.workshop.controlleurs.leith.agent.AgentDashboardController"
-      styleClass="card" spacing="16" alignment="CENTER_LEFT">
-    <stylesheets><URL value="@../app.css"/></stylesheets>
-    <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
+      styleClass="agent-dashboard content-area" spacing="24" alignment="TOP_LEFT">
+    <stylesheets>
+        <URL value="@../app.css"/>
+        <URL value="@../design/global.css"/>
+    </stylesheets>
+    <padding><Insets top="28" right="28" bottom="28" left="28"/></padding>
 
-    <Label text="Tableau de bord Agent – École" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+    <!-- A. En-tête synthétique -->
+    <VBox spacing="6" maxWidth="Infinity"
+          style="-fx-background-color: linear-gradient(to bottom right, #1C1C1C, #131313); -fx-background-radius: 16; -fx-border-color: rgba(255,255,255,0.24); -fx-border-radius: 16; -fx-border-width: 1; -fx-padding: 16 18 16 18;">
+        <Label fx:id="lblEcole" text="École" styleClass="agent-dashboard-school"
+               style="-fx-text-fill: #FFFFFF; -fx-font-size: 25px; -fx-font-weight: 900;"/>
+        <Label fx:id="lblAgentName" text="Agent" styleClass="agent-dashboard-agent"
+               style="-fx-text-fill: #F0F0F0; -fx-font-size: 17px; -fx-font-weight: 800;"/>
+        <Label fx:id="lblSubtitle" text="Vue d'ensemble de votre école aujourd'hui" styleClass="agent-dashboard-subtitle"
+               style="-fx-text-fill: #F1C40F; -fx-font-size: 13px; -fx-font-weight: 700;"/>
+    </VBox>
 
-    <Label fx:id="lblEcole" text="École: --"/>
+    <!-- B. Grands widgets statistiques -->
+    <Label text="Indicateurs" styleClass="agent-dashboard-section-title"/>
+    <GridPane hgap="14" vgap="0" maxWidth="Infinity"
+              style="-fx-background-color: rgba(217,217,217,0.18); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.26); -fx-border-radius: 14; -fx-border-width: 1; -fx-padding: 14;">
+        <columnConstraints>
+            <ColumnConstraints percentWidth="20" hgrow="ALWAYS"/>
+            <ColumnConstraints percentWidth="20" hgrow="ALWAYS"/>
+            <ColumnConstraints percentWidth="20" hgrow="ALWAYS"/>
+            <ColumnConstraints percentWidth="20" hgrow="ALWAYS"/>
+            <ColumnConstraints percentWidth="20" hgrow="ALWAYS"/>
+        </columnConstraints>
 
-    <Separator/>
+        <VBox GridPane.columnIndex="0" spacing="8" HBox.hgrow="ALWAYS" maxWidth="Infinity"
+              style="-fx-background-color: linear-gradient(to bottom right, #4A4A4A, #3A3A3A); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.34); -fx-border-radius: 14; -fx-border-width: 1; -fx-padding: 16; -fx-min-height: 120;">
+            <Label text="Candidatures chauffeur en attente" wrapText="true"
+                   style="-fx-text-fill: #FFFFFF; -fx-font-size: 13px; -fx-font-weight: 800;"/>
+            <Label fx:id="lblCandidaturesChauffeur" text="0"
+                   style="-fx-text-fill: #FFFFFF; -fx-font-size: 28px; -fx-font-weight: 900;"/>
+        </VBox>
+        <VBox GridPane.columnIndex="1" spacing="8" HBox.hgrow="ALWAYS" maxWidth="Infinity"
+              style="-fx-background-color: linear-gradient(to bottom right, #4A4A4A, #3A3A3A); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.34); -fx-border-radius: 14; -fx-border-width: 1; -fx-padding: 16; -fx-min-height: 120;">
+            <Label text="Candidatures enfant en attente" wrapText="true"
+                   style="-fx-text-fill: #FFFFFF; -fx-font-size: 13px; -fx-font-weight: 800;"/>
+            <Label fx:id="lblCandidaturesEnfant" text="0"
+                   style="-fx-text-fill: #FFFFFF; -fx-font-size: 28px; -fx-font-weight: 900;"/>
+        </VBox>
+        <VBox GridPane.columnIndex="2" spacing="8" HBox.hgrow="ALWAYS" maxWidth="Infinity"
+              style="-fx-background-color: linear-gradient(to bottom right, #4A4A4A, #3A3A3A); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.34); -fx-border-radius: 14; -fx-border-width: 1; -fx-padding: 16; -fx-min-height: 120;">
+            <Label text="Bus de l'école" wrapText="true"
+                   style="-fx-text-fill: #FFFFFF; -fx-font-size: 13px; -fx-font-weight: 800;"/>
+            <Label fx:id="lblBus" text="0"
+                   style="-fx-text-fill: #FFFFFF; -fx-font-size: 28px; -fx-font-weight: 900;"/>
+        </VBox>
+        <VBox GridPane.columnIndex="3" spacing="8" HBox.hgrow="ALWAYS" maxWidth="Infinity"
+              style="-fx-background-color: linear-gradient(to bottom right, #4A4A4A, #3A3A3A); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.34); -fx-border-radius: 14; -fx-border-width: 1; -fx-padding: 16; -fx-min-height: 120;">
+            <Label text="Trajets de l'école" wrapText="true"
+                   style="-fx-text-fill: #FFFFFF; -fx-font-size: 13px; -fx-font-weight: 800;"/>
+            <Label fx:id="lblTrajets" text="0"
+                   style="-fx-text-fill: #FFFFFF; -fx-font-size: 28px; -fx-font-weight: 900;"/>
+        </VBox>
+        <VBox GridPane.columnIndex="4" spacing="8" HBox.hgrow="ALWAYS" maxWidth="Infinity"
+              style="-fx-background-color: linear-gradient(to bottom right, #4A4A4A, #3A3A3A); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.34); -fx-border-radius: 14; -fx-border-width: 1; -fx-padding: 16; -fx-min-height: 120;">
+            <Label text="Enfants acceptés / transportés" wrapText="true"
+                   style="-fx-text-fill: #FFFFFF; -fx-font-size: 13px; -fx-font-weight: 800;"/>
+            <Label fx:id="lblEnfantsTransportes" text="0"
+                   style="-fx-text-fill: #FFFFFF; -fx-font-size: 28px; -fx-font-weight: 900;"/>
+        </VBox>
+    </GridPane>
 
-    <Label text="Candidatures chauffeur"/>
-    <HBox spacing="8">
-        <Button text="Candidatures à traiter (ENVOYEE)" onAction="#openCandidaturesChauffeur"/>
-        <Button text="Chauffeurs acceptés" onAction="#openChauffeursAcceptes"/>
-    </HBox>
+    <!-- C. Points d'attention -->
+    <Label text="Points d'attention" styleClass="agent-dashboard-section-title"/>
+    <VBox fx:id="boxAlertes" styleClass="agent-dashboard-alerts" spacing="8">
+        <Label fx:id="lblAlertes" wrapText="true" styleClass="agent-dashboard-alerts-text"/>
+    </VBox>
 
-    <Label text="Bus"/>
-    <HBox spacing="8">
-        <Button text="Gestion Bus" onAction="#openBus"/>
-        <Button text="Affecter Chauffeur → Bus" onAction="#openAffecterChauffeurBus"/>
-    </HBox>
+    <!-- D. Résumé opérationnel -->
+    <Label text="Résumé opérationnel" styleClass="agent-dashboard-section-title"/>
+    <VBox styleClass="agent-dashboard-summary" spacing="10">
+        <Label fx:id="lblResume" wrapText="true" styleClass="agent-dashboard-summary-text"/>
+    </VBox>
 
-    <Label text="Trajets"/>
-    <HBox spacing="8">
-        <Button text="Gestion Trajets" onAction="#openTrajets"/>
-        <Button text="Affecter Bus → Trajet" onAction="#openAffecterBusTrajet"/>
-    </HBox>
-
-    <Label text="Arrêts"/>
-    <HBox spacing="8">
-        <Button text="Arrêts d'un trajet" onAction="#openArrets"/>
-    </HBox>
-
-    <Label text="Candidatures enfant"/>
-    <HBox spacing="8">
-        <Button text="Candidatures enfant" onAction="#openCandidaturesEnfant"/>
-    </HBox>
 </VBox>

@@ -3,29 +3,30 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
 <?import java.net.URL?>
+
 <VBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="tn.esprit.workshop.controlleurs.leith.ParentHomeController"
-      spacing="20" alignment="CENTER_LEFT">
+      spacing="18" alignment="TOP_LEFT" styleClass="content-area admin-main-panel parent-page">
     <stylesheets>
-        <URL value="@/leith/app.css"/>
+        <URL value="@/leith/design/global.css"/>
     </stylesheets>
-
 
     <padding>
         <Insets top="24" right="24" bottom="24" left="24"/>
     </padding>
 
-    <Label text="Mes enfants" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+    <!-- Mes enfants page: only children and actions -->
+    <VBox spacing="10" styleClass="admin-section-panel parent-section-panel" VBox.vgrow="ALWAYS">
+        <Label text="Mes enfants" styleClass="admin-page-title"/>
+        <Label text="Sélectionnez un enfant :" styleClass="admin-page-subtitle" style="-fx-text-fill: #f1c40f;"/>
+        <ListView fx:id="listEnfants" VBox.vgrow="ALWAYS" styleClass="table-view parent-list-view"/>
 
-    <Label text="Sélectionnez un enfant :"/>
-    <ListView fx:id="listEnfants" VBox.vgrow="ALWAYS" maxHeight="200"/>
-
-    <HBox spacing="12" alignment="CENTER_LEFT">
-        <Button fx:id="btnTracking" text="Tracking" onAction="#openTracking" disable="true"/>
-        <Button fx:id="btnAskZayna" text="Ask Zayna AI" onAction="#openChatAI" disable="true"/>
-    </HBox>
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Button fx:id="btnTracking" text="Tracking" onAction="#openTracking" disable="true" styleClass="btn-primary"/>
+            <Button fx:id="btnAskZayna" text="Ask Zayna AI" onAction="#openChatAI" disable="true" styleClass="btn-secondary"/>
+        </HBox>
+    </VBox>
 
 </VBox>

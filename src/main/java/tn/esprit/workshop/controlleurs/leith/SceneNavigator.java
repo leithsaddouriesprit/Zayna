@@ -136,7 +136,6 @@ public class SceneNavigator {
             Parent root = loader.load();
             Stage stage = new Stage();
             javafx.scene.Scene scene = new javafx.scene.Scene(root, 900, 600);
-            applyAppCss(scene, root);
             stage.setTitle("Zayna – Administration");
             stage.setScene(scene);
             stage.setMaximized(true);

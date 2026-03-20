@@ -6,35 +6,40 @@
 <?import java.net.URL?>
 <VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="tn.esprit.workshop.controlleurs.leith.parent.ParentDemandeTransportController"
-      styleClass="card" spacing="12">
-    <stylesheets><URL value="@../app.css"/></stylesheets>
-    <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+      styleClass="content-area admin-main-panel parent-page" spacing="14">
+    <stylesheets><URL value="@../design/global.css"/></stylesheets>
+    <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
 
-    <Label text="Demande de transport scolaire" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+    <Label text="Demande de transport scolaire" styleClass="admin-page-title"/>
+    <Label text="Renseignez les informations de l'enfant pour envoyer une candidature." styleClass="admin-page-subtitle" style="-fx-text-fill: #f1c40f;"/>
 
-    <HBox spacing="8" alignment="CENTER_LEFT">
-        <Label text="École:"/>
-        <ComboBox fx:id="comboEcole" prefWidth="280" promptText="Choisir une école"/>
-    </HBox>
+    <VBox spacing="12" styleClass="admin-section-panel parent-section-panel" VBox.vgrow="ALWAYS">
+        <HBox spacing="8" alignment="CENTER_LEFT">
+            <Label text="École:" styleClass="field-label"/>
+            <ComboBox fx:id="comboEcole" prefWidth="320" promptText="Choisir une école"/>
+        </HBox>
 
-    <Label text="Enfant"/>
-    <GridPane hgap="8" vgap="8">
-        <Label text="Nom:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-        <TextField fx:id="tfNom" GridPane.columnIndex="1" GridPane.rowIndex="0" prefWidth="200"/>
-        <Label text="Prénom:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-        <TextField fx:id="tfPrenom" GridPane.columnIndex="1" GridPane.rowIndex="1" prefWidth="200"/>
-        <Label text="Âge:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-        <Spinner fx:id="spAge" GridPane.columnIndex="1" GridPane.rowIndex="2" prefWidth="80"/>
-    </GridPane>
+        <Label text="Enfant" styleClass="admin-stat-card-title"/>
+        <GridPane hgap="10" vgap="10">
+            <Label text="Nom:" styleClass="field-label" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+            <TextField fx:id="tfNom" GridPane.columnIndex="1" GridPane.rowIndex="0" prefWidth="240"/>
+            <Label text="Prénom:" styleClass="field-label" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+            <TextField fx:id="tfPrenom" GridPane.columnIndex="1" GridPane.rowIndex="1" prefWidth="240"/>
+            <Label text="Âge:" styleClass="field-label" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+            <Spinner fx:id="spAge" GridPane.columnIndex="1" GridPane.rowIndex="2" prefWidth="110"/>
+        </GridPane>
 
-    <Label text="Adresse (coordonnées)"/>
-    <HBox spacing="8">
-        <Label text="Latitude:"/>
-        <TextField fx:id="tfLat" prefWidth="120"/>
-        <Label text="Longitude:"/>
-        <TextField fx:id="tfLng" prefWidth="120"/>
-    </HBox>
+        <Label text="Adresse (coordonnées)" styleClass="admin-stat-card-title"/>
+        <HBox spacing="8" alignment="CENTER_LEFT">
+            <Label text="Latitude:" styleClass="field-label"/>
+            <TextField fx:id="tfLat" prefWidth="150"/>
+            <Label text="Longitude:" styleClass="field-label"/>
+            <TextField fx:id="tfLng" prefWidth="150"/>
+        </HBox>
 
-    <Button text="Envoyer la demande" onAction="#envoyer"/>
-    <Label fx:id="lblMessage" text="" wrapText="true"/>
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Button text="Envoyer la demande" onAction="#envoyer" styleClass="btn-primary"/>
+            <Label fx:id="lblMessage" text="" wrapText="true" styleClass="section-subtitle"/>
+        </HBox>
+    </VBox>
 </VBox>
