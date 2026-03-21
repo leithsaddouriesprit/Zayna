@@ -136,7 +136,6 @@ public class GestionReclamationController implements Initializable {
         languesMap.put("Japonais", "ja");
         languesMap.put("Russe", "ru");
         languesMap.put("Portugais", "pt");
-
         // ✅ Remplir le ChoiceBox avec les NOMS (pas les codes)
         langueCibleChoice.getItems().clear();
         langueCibleChoice.getItems().addAll(languesMap.keySet());
