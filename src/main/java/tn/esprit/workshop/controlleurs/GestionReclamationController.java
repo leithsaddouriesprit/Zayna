@@ -55,7 +55,11 @@ public class GestionReclamationController implements Initializable {
     @FXML private ChoiceBox<String> cantineTypeChoice;
     @FXML private TextField ecoleNomField;
     @FXML private TextField autrePrecisionField;
-
+    @FXML private Label detailUserLabel;
+    @FXML private Label detailTypeLabel;
+    @FXML private TextArea detailMessageArea;
+    @FXML private Label detailDateLabel;
+    @FXML private Label detailInfosLabel;
     @FXML private TableView<Reclamation> tableReclamation;
     @FXML private TableColumn<Reclamation, String> colType;
     @FXML private TableColumn<Reclamation, String> colDescription;
@@ -70,6 +74,7 @@ public class GestionReclamationController implements Initializable {
     private final int currentUserId = 1;
     private final TraductionService traductionService = new TraductionService();
     private final FiltrageService filtrageService = new FiltrageService();
+    private final UserService userService = new UserService();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -100,6 +105,8 @@ public class GestionReclamationController implements Initializable {
                     if (newSelection != null) {
                         remplirFormulaireAvecReclamation(newSelection);
                         chargerReponse(newSelection.getId());
+                        afficherDetailsReclamation(newSelection);
+
                     }
                 }
         );
@@ -317,6 +324,13 @@ public class GestionReclamationController implements Initializable {
                 reponseArea.setText(reponse.getMessage());
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
                 statutReponseLabel.setText("Répondu le " + reponse.getDate().format(formatter));
+                // ✅ Afficher qui a répondu
+                Users user = userService.getById(reponse.getUserId());
+                if (user != null) {
+                    reponseAuteurLabel.setText("Par: " + user.getPrenom() + " " + user.getNom());
+                } else {
+                    reponseAuteurLabel.setText("Par: Administrateur");
+                }
                 // ✅ Activer le bouton de traduction
                 if (traduireReponseButton != null) {
                     traduireReponseButton.setDisable(false);
@@ -336,6 +350,60 @@ public class GestionReclamationController implements Initializable {
             reponseArea.setText("Erreur chargement réponse");
             statutReponseLabel.setText("Indisponible");
             e.printStackTrace();
+        }
+    }
+    // ================= AFFICHER DÉTAILS =================
+
+    private void afficherDetailsReclamation(Reclamation r) {
+        // Mettre à jour les champs de base
+        if (detailTypeLabel != null) detailTypeLabel.setText(r.getType());
+        if (detailMessageArea != null) detailMessageArea.setText(r.getDescription());
+
+        // Formatage de la date
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        if (r.getDateReclamation() != null && detailDateLabel != null) {
+            detailDateLabel.setText(format.format(r.getDateReclamation()));
+        }
+
+        // ✅ Afficher les vraies infos utilisateur
+        if (detailUserLabel != null) {
+            Users user = userService.getById(r.getUserId());
+            if (user != null) {
+                detailUserLabel.setText(user.getPrenom() + " " + user.getNom());
+            } else {
+                detailUserLabel.setText("Utilisateur #" + r.getUserId());
+            }
+        }
+
+        // Afficher les détails spécifiques
+        if (detailInfosLabel != null) {
+            String infos = getDetailsComplets(r);
+            detailInfosLabel.setText(infos);
+        }
+    }
+
+    // ✅ MÉTHODE UTILITAIRE POUR LES DÉTAILS SPÉCIFIQUES
+    private String getDetailsComplets(Reclamation r) {
+        if (r.getType() == null) return "Aucun détail";
+
+        switch (r.getType()) {
+            case "Chauffeur":
+                StringBuilder chauffeur = new StringBuilder();
+                if (r.getChauffeurPrenom() != null) chauffeur.append(r.getChauffeurPrenom()).append(" ");
+                if (r.getChauffeurNom() != null) chauffeur.append(r.getChauffeurNom());
+                return chauffeur.length() > 0 ? chauffeur.toString() : "Nom non spécifié";
+            case "Bus":
+                return r.getBusMatricule() != null ? r.getBusMatricule() : "Matricule non spécifié";
+            case "Cantine":
+                return r.getCantineType() != null ? r.getCantineType() : "Type non spécifié";
+            case "École":
+                return r.getEcoleNom() != null ? r.getEcoleNom() : "Nom non spécifié";
+            case "Autre":
+                return r.getAutrePrecision() != null ? r.getAutrePrecision() : "Précision non spécifiée";
+            case "Trajet":
+                return "Aucun détail requis";
+            default:
+                return "Détails non disponibles";
         }
     }
 
