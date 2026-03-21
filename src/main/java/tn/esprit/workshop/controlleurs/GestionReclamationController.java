@@ -121,6 +121,8 @@ public class GestionReclamationController implements Initializable {
         if (traiteesCount == null) traiteesCount.setText("0");
 
     }
+
+
     private void initialiserLangues() {
         // ✅ Créer la map avec les noms affichés et les codes ISO
         languesMap = new LinkedHashMap<>();
