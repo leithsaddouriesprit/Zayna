@@ -25,11 +25,17 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-
+import tn.esprit.workshop.model.Talel.talel2.User;
+import tn.esprit.workshop.services.Talel.ServiceAdmin;
+import tn.esprit.workshop.services.Talel.ServiceParent;
+import tn.esprit.workshop.services.Talel.ServiceChauffeur;
+import tn.esprit.workshop.services.Talel.ServiceMaitresse;
+import tn.esprit.workshop.services.Talel.ServiceResponsableEcole;
 public class GestionReclamationController implements Initializable {
     @FXML private Label compteurReclamations;
     @FXML private ChoiceBox<String> typeChoice;
     @FXML private TextArea messageField;
+    @FXML private Label reponseAuteurLabel;
     @FXML private TextArea reponseArea;
     @FXML private TextField searchField;
     @FXML private Label statusLabel;
@@ -41,7 +47,7 @@ public class GestionReclamationController implements Initializable {
     @FXML private Label totalReclamations;
     @FXML private Label enAttenteCount;
     @FXML private Label traiteesCount;
-
+    @FXML private Label detailUserTypeLabel;
     // Nouveaux champs FXML
     @FXML private VBox panelChauffeur;
     @FXML private VBox panelBus;
@@ -74,7 +80,7 @@ public class GestionReclamationController implements Initializable {
     private final int currentUserId = 1;
     private final TraductionService traductionService = new TraductionService();
     private final FiltrageService filtrageService = new FiltrageService();
-    private final UserService userService = new UserService();
+    private final ServiceAdmin serviceAdmin = new ServiceAdmin();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -320,31 +326,42 @@ public class GestionReclamationController implements Initializable {
     private void chargerReponse(int reclamationId) {
         try {
             Reponse reponse = reponseService.getReponseByReclamationId(reclamationId);
-            this.reponseCourante = reponse; // Stocker la réponse
+            this.reponseCourante = reponse;
             if (reponse != null) {
                 reponseArea.setText(reponse.getMessage());
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
                 statutReponseLabel.setText("Répondu le " + reponse.getDate().format(formatter));
+
                 // ✅ Afficher qui a répondu
-                Users user = userService.getById(reponse.getUserId());
-                if (user != null) {
-                    reponseAuteurLabel.setText("Par: " + user.getPrenom() + " " + user.getNom());
-                } else {
+                try {
+                    // Récupérer l'ID de l'utilisateur depuis la réponse
+                    // NOTE: Vous devez avoir un champ user_id dans la table reponse
+                    // Si ce champ n'existe pas, vous ne pourrez pas afficher qui a répondu
+                    int userId = reponse.getUserId(); // Vous devez avoir getUserId() dans Reponse
+                    User user = serviceAdmin.getUtilisateurById(userId);
+                    if (user != null) {
+                        reponseAuteurLabel.setText("Par: " + user.getNom());
+                    } else {
+                        reponseAuteurLabel.setText("Par: Administrateur");
+                    }
+                } catch (Exception e) {
                     reponseAuteurLabel.setText("Par: Administrateur");
                 }
-                // ✅ Activer le bouton de traduction
+
                 if (traduireReponseButton != null) {
                     traduireReponseButton.setDisable(false);
                 }
             } else {
                 reponseArea.setText("Aucune réponse pour le moment...");
                 statutReponseLabel.setText("En attente de réponse");
-                // ✅ Désactiver le bouton de traduction
                 if (traduireReponseButton != null) {
                     traduireReponseButton.setDisable(true);
                 }
                 if (traductionReponseLabel != null) {
                     traductionReponseLabel.setText("");
+                }
+                if (reponseAuteurLabel != null) {
+                    reponseAuteurLabel.setText("");
                 }
             }
         } catch (SQLException e) {
@@ -356,27 +373,32 @@ public class GestionReclamationController implements Initializable {
     // ================= AFFICHER DÉTAILS =================
 
     private void afficherDetailsReclamation(Reclamation r) {
-        // Mettre à jour les champs de base
         if (detailTypeLabel != null) detailTypeLabel.setText(r.getType());
         if (detailMessageArea != null) detailMessageArea.setText(r.getDescription());
 
-        // Formatage de la date
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         if (r.getDateReclamation() != null && detailDateLabel != null) {
             detailDateLabel.setText(format.format(r.getDateReclamation()));
         }
 
-        // ✅ Afficher les vraies infos utilisateur
         if (detailUserLabel != null) {
-            Users user = userService.getById(r.getUserId());
-            if (user != null) {
-                detailUserLabel.setText(user.getPrenom() + " " + user.getNom());
-            } else {
+            try {
+                User user = serviceAdmin.getUtilisateurById(r.getUserId());
+                if (user != null) {
+                    // ✅ Utiliser getNom() (pas de prénom)
+                    detailUserLabel.setText(user.getNom());
+                    // ✅ Afficher la catégorie si le label existe
+                    if (detailUserTypeLabel != null) {
+                        detailUserTypeLabel.setText(user.getCategories().toString());
+                    }
+                } else {
+                    detailUserLabel.setText("Utilisateur #" + r.getUserId());
+                }
+            } catch (Exception e) {
                 detailUserLabel.setText("Utilisateur #" + r.getUserId());
             }
         }
 
-        // Afficher les détails spécifiques
         if (detailInfosLabel != null) {
             String infos = getDetailsComplets(r);
             detailInfosLabel.setText(infos);

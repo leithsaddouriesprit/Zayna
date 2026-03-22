@@ -331,7 +331,10 @@
                               wrapText="true"
                               promptText="Aucune réponse..."
                               style="-fx-background-color: #f8fafc; -fx-background-radius: 15; -fx-border-color: #e2e8f0; -fx-border-radius: 15; -fx-text-fill: #1e293b; -fx-prompt-text-fill: #94a3b8; -fx-padding: 12; -fx-font-size: 14px;"/>
-
+                    <!-- ✅ AJOUTEZ ICI LE LABEL POUR L'AUTEUR DE LA RÉPONSE -->
+                    <Label fx:id="reponseAuteurLabel"
+                           text=""
+                           style="-fx-text-fill: #2e7d32; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 5 0 0 0;"/>
                     <HBox spacing="15" alignment="CENTER_LEFT">
                         <Circle radius="8" fill="#f59e0b"/>
                         <Label text="Statut :" style="-fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
