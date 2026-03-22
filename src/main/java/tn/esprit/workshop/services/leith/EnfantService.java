@@ -1,5 +1,6 @@
 package tn.esprit.workshop.services.leith;
 
+import tn.esprit.workshop.model.leith.AgentEnfantEcoleRow;
 import tn.esprit.workshop.model.leith.Enfant;
 import tn.esprit.workshop.services.CRUD;
 import tn.esprit.workshop.utilis.MyBDConnexion;
@@ -222,5 +223,133 @@ public class EnfantService implements CRUD<Enfant> {
             }
         }
         return 0;
+    }
+
+    /**
+     * Enfants visibles agent : uniquement ceux avec {@code enfant.trajet_id} renseigné,
+     * trajet existant, et {@code trajet.id_ecole} = école de l'agent (périmètre strict, pas de lecture globale sur {@code enfant}).
+     */
+    public List<AgentEnfantEcoleRow> listActifsByEcoleViaTrajet(int idEcole, String search) throws SQLException {
+        List<AgentEnfantEcoleRow> list = new ArrayList<>();
+        String term = search == null ? "" : search.trim().toLowerCase();
+        String like = "%" + term + "%";
+        String sql = """
+                SELECT e.id, e.nom, e.prenom, e.trajet_id, e.actif, e.on_board,
+                       t.nom AS trajet_nom, t.id_bus AS traj_bus_id,
+                       b.matricule AS bus_matricule, b.numero_bus AS bus_numero
+                FROM enfant e
+                INNER JOIN trajet t ON t.id = e.trajet_id
+                LEFT JOIN bus b ON b.id = t.id_bus
+                WHERE t.id_ecole = ?
+                  AND e.trajet_id IS NOT NULL
+                  AND e.actif = 1
+                  AND (LOWER(e.nom) LIKE ? OR LOWER(e.prenom) LIKE ? OR ? = '')
+                ORDER BY e.nom, e.prenom
+                """;
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setInt(1, idEcole);
+            ps.setString(2, like);
+            ps.setString(3, like);
+            ps.setString(4, term);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapAgentEnfantEcoleRow(rs));
+                }
+            }
+        }
+        return list;
+    }
+
+    private static AgentEnfantEcoleRow mapAgentEnfantEcoleRow(ResultSet rs) throws SQLException {
+        AgentEnfantEcoleRow r = new AgentEnfantEcoleRow();
+        r.setEnfantId(rs.getInt("id"));
+        r.setNom(rs.getString("nom"));
+        r.setPrenom(rs.getString("prenom"));
+        r.setTrajetId(rs.getInt("trajet_id"));
+        r.setTrajetNom(rs.getString("trajet_nom"));
+        int bid = rs.getInt("traj_bus_id");
+        if (rs.wasNull() || bid == 0) {
+            r.setIdBus(null);
+            r.setBusLabel("—");
+        } else {
+            r.setIdBus(bid);
+            String mat = rs.getString("bus_matricule");
+            String num = rs.getString("bus_numero");
+            String label = (mat != null && !mat.isBlank()) ? mat
+                    : (num != null && !num.isBlank()) ? num : ("Bus " + bid);
+            r.setBusLabel(label);
+        }
+        r.setActif(rs.getBoolean("actif"));
+        r.setOnBoard(rs.getBoolean("on_board"));
+        return r;
+    }
+
+    /** Vérifie que l'enfant est rattaché à un trajet de cette école (trajet obligatoire, filtre id_ecole). */
+    public boolean isEnfantInEcoleScope(int enfantId, int ecoleId) throws SQLException {
+        String sql = """
+                SELECT 1 FROM enfant e
+                INNER JOIN trajet t ON t.id = e.trajet_id
+                WHERE e.id = ?
+                  AND e.trajet_id IS NOT NULL
+                  AND t.id_ecole = ?
+                LIMIT 1
+                """;
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setInt(1, enfantId);
+            ps.setInt(2, ecoleId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    /**
+     * Affecte l'enfant à un trajet de l'école (changement de trajet = changement de bus via trajet.id_bus).
+     * Exige un bus déjà affecté au trajet (id_bus non nul et non 0). Remet on_board à false.
+     */
+    public void updateEnfantTrajetForEcole(int enfantId, int newTrajetId, int ecoleId) throws SQLException {
+        try (Connection conn = getConnection()) {
+            int idBus;
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "SELECT id_bus FROM trajet WHERE id = ? AND id_ecole = ?")) {
+                ps.setInt(1, newTrajetId);
+                ps.setInt(2, ecoleId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (!rs.next()) {
+                        throw new SQLException("Trajet introuvable ou hors de votre école.");
+                    }
+                    idBus = rs.getInt("id_bus");
+                    if (rs.wasNull() || idBus == 0) {
+                        throw new SQLException("Aucun bus sur ce trajet.");
+                    }
+                }
+            }
+            String upd = """
+                    UPDATE enfant e
+                    INNER JOIN trajet t ON e.trajet_id = t.id AND t.id_ecole = ?
+                    SET e.trajet_id = ?, e.on_board = 0
+                    WHERE e.id = ?
+                    """;
+            try (PreparedStatement ps = conn.prepareStatement(upd)) {
+                ps.setInt(1, ecoleId);
+                ps.setInt(2, newTrajetId);
+                ps.setInt(3, enfantId);
+                if (ps.executeUpdate() != 1) {
+                    throw new SQLException("Impossible de mettre à jour l'affectation.");
+                }
+            }
+        }
+    }
+
+    /** Suppression uniquement si l'enfant est dans le périmètre école (via trajet). */
+    public void deleteEnfantIfInEcoleScope(int enfantId, int ecoleId) throws SQLException {
+        if (!isEnfantInEcoleScope(enfantId, ecoleId)) {
+            throw new SQLException("Enfant hors périmètre.");
+        }
+        Enfant e = getEnfantById(enfantId);
+        if (e == null) {
+            throw new SQLException("Enfant introuvable.");
+        }
+        deleteOne(e);
     }
 }
