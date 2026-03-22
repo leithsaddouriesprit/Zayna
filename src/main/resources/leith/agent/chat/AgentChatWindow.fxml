@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.workshop.controlleurs.leith.agent.chat.AgentChatWindowController"
+            styleClass="chat-root agent-chat-root">
+    <stylesheets>
+        <URL value="@../../AI/chat-ai.css"/>
+        <URL value="@agent-chat.css"/>
+    </stylesheets>
+
+    <top>
+        <HBox styleClass="chat-header" alignment="CENTER_LEFT" spacing="12">
+            <padding>
+                <Insets top="14" right="20" bottom="14" left="20"/>
+            </padding>
+            <ImageView fitHeight="36.0" fitWidth="120.0" preserveRatio="true" styleClass="chat-header-logo" pickOnBounds="true">
+                <image>
+                    <Image url="@../../design/logo.png"/>
+                </image>
+            </ImageView>
+            <Label text="Assistant Zayna" styleClass="chat-header-subtitle agent-chat-header-title"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Retour" styleClass="chat-btn-back" onAction="#goBack"/>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox styleClass="chat-body" VBox.vgrow="ALWAYS">
+            <ScrollPane fx:id="scrollMessages" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                        styleClass="chat-messages-scroll" VBox.vgrow="ALWAYS">
+                <content>
+                    <VBox fx:id="boxMessages" styleClass="chat-messages-list" spacing="14" maxWidth="Infinity">
+                        <padding>
+                            <Insets top="16" right="16" bottom="16" left="16"/>
+                        </padding>
+                    </VBox>
+                </content>
+            </ScrollPane>
+        </VBox>
+    </center>
+
+    <bottom>
+        <HBox styleClass="chat-footer" alignment="CENTER" spacing="12">
+            <padding>
+                <Insets top="16" right="20" bottom="20" left="20"/>
+            </padding>
+            <TextField fx:id="tfMessage" styleClass="chat-input ai-input" promptText="Écrire un message..." HBox.hgrow="ALWAYS" onAction="#send"/>
+            <Button fx:id="btnSend" text="Envoyer" styleClass="chat-btn-send" onAction="#send"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>

@@ -1,0 +1,11 @@
+/* Agent assistant chat — loaded with chat-ai.css; same bubble/header classes as parent chat. */
+
+.agent-chat-root.chat-root {
+    -fx-background-color: #121212;
+}
+
+.agent-chat-header-title {
+    -fx-text-fill: #FEC111;
+    -fx-font-size: 13px;
+    -fx-font-weight: normal;
+}

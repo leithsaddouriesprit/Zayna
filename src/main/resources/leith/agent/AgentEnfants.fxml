@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.workshop.controlleurs.leith.agent.AgentEnfantsController"
+      styleClass="card content-area" spacing="12">
+    <stylesheets>
+        <URL value="@../app.css"/>
+        <URL value="@../design/global.css"/>
+    </stylesheets>
+    <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+
+    <Label text="Enfants de l'école" styleClass="title-md"/>
+    <Label text="Enfants rattachés à un trajet de votre école (nom, trajet, bus, statut transport)"
+           style="-fx-text-fill: #94A3B8; -fx-font-size: 13px;"/>
+
+    <HBox spacing="8" alignment="CENTER_LEFT">
+        <TextField fx:id="fieldSearch" promptText="Rechercher (nom, prénom)" prefWidth="280"/>
+        <Button text="Actualiser" onAction="#reload" styleClass="btn-secondary"/>
+    </HBox>
+
+    <TableView fx:id="table" VBox.vgrow="ALWAYS" styleClass="table-view">
+        <columns>
+            <TableColumn fx:id="colNom" text="Nom" prefWidth="100"/>
+            <TableColumn fx:id="colPrenom" text="Prénom" prefWidth="100"/>
+            <TableColumn fx:id="colTrajet" text="Trajet" prefWidth="160"/>
+            <TableColumn fx:id="colBus" text="Bus" prefWidth="140"/>
+            <TableColumn fx:id="colOnBoard" text="À bord" prefWidth="80"/>
+            <TableColumn fx:id="colActions" text="Actions" prefWidth="300"/>
+        </columns>
+    </TableView>
+
+    <FlowPane alignment="CENTER_LEFT" hgap="16" vgap="6" styleClass="admin-section-panel">
+        <Label fx:id="lblTotal" styleClass="title-md" text="Enfants : 0"/>
+    </FlowPane>
+    <Label fx:id="lblMessage" wrapText="true"/>
+</VBox>
