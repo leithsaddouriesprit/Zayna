@@ -33,6 +33,7 @@ public class ReponseService {
                 Reponse r = new Reponse(
                         rs.getInt("id"),
                         rs.getInt("reclamation_id"),
+                        rs.getInt("user_id"),
                         rs.getString("message"),
                         rs.getTimestamp("date_reponse").toLocalDateTime()
                 );
@@ -51,6 +52,7 @@ public class ReponseService {
                 return new Reponse(
                         rs.getInt("id"),
                         rs.getInt("reclamation_id"),
+                        rs.getInt("user_id"),
                         rs.getString("message"),
                         rs.getTimestamp("date_reponse").toLocalDateTime()
                 );
@@ -68,6 +70,7 @@ public class ReponseService {
                     Reponse r = new Reponse();
                     r.setId(rs.getInt("id"));
                     r.setReclamationId(rs.getInt("reclamation_id"));
+                    r.setUserId(rs.getInt("user_id"));
                     r.setMessage(rs.getString("message"));
                     r.setDate(rs.getTimestamp("date_reponse").toLocalDateTime());
                     return r;
@@ -101,6 +104,7 @@ public class ReponseService {
                 return new Reponse(
                         rs.getInt("id"),
                         rs.getInt("reclamation_id"),
+                        rs.getInt("user_id"),
                         rs.getString("message"),
                         rs.getTimestamp("date_reponse").toLocalDateTime()
                 );
@@ -114,9 +118,10 @@ public class ReponseService {
         String sql = "UPDATE reponse SET reclamation_id = ?, message = ?, date_reponse = ? WHERE id = ?";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setInt(1, r.getReclamationId());
-            ps.setString(2, r.getMessage());
-            ps.setTimestamp(3, Timestamp.valueOf(r.getDate()));
-            ps.setInt(4, r.getId());
+            ps.setInt(2,r.getUserId());
+            ps.setString(3, r.getMessage());
+            ps.setTimestamp(4, Timestamp.valueOf(r.getDate()));
+            ps.setInt(5, r.getId());
             ps.executeUpdate();
         }
     }
@@ -141,6 +146,7 @@ public class ReponseService {
                 Reponse r = new Reponse(
                         rs.getInt("id"),
                         rs.getInt("reclamation_id"),
+                        rs.getInt("user_id"),
                         rs.getString("message"),
                         rs.getTimestamp("date_reponse").toLocalDateTime()
                 );

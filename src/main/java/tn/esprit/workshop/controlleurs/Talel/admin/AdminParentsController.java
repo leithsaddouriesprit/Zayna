@@ -6,7 +6,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -119,14 +118,5 @@ public class AdminParentsController implements Initializable {
         if (lblTotalParents != null) lblTotalParents.setText("Parents: " + parentRows.size());
         if (lblTotalAccepted != null) lblTotalAccepted.setText("Enfants acceptés: " + totalAccepted);
         if (lblTotalPending != null) lblTotalPending.setText("En attente: " + pendingList.size());
-    }
-
-    @FXML
-    private void onReclamations() {
-        Alert a = new Alert(Alert.AlertType.INFORMATION);
-        a.setTitle("Réclamations");
-        a.setHeaderText(null);
-        a.setContentText("Fonction à venir.");
-        a.showAndWait();
     }
 }

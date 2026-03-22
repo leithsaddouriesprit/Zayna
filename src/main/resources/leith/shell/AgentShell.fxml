@@ -41,7 +41,6 @@
                 <Label text="Agent école" styleClass="admin-brand-subtitle"/>
             </VBox>
 
-            <VBox fx:id="agentNavBody" spacing="8">
             <ToggleButton text="Accueil" onAction="#goHome" maxWidth="Infinity" styleClass="admin-nav-item" selected="true" toggleGroup="$navGroup"/>
 
             <TitledPane text="▸ Candidatures chauffeur" expanded="false" styleClass="sidebar-group admin-nav-group">
@@ -76,51 +75,17 @@
                 <content>
                     <VBox spacing="6" styleClass="sidebar-group-content">
                         <ToggleButton text="Candidatures enfant" onAction="#openCandidaturesEnfant" maxWidth="Infinity" styleClass="admin-nav-item admin-nav-subitem" toggleGroup="$navGroup"/>
-                        <ToggleButton text="Enfants" onAction="#openEnfants" maxWidth="Infinity" styleClass="admin-nav-item admin-nav-subitem" toggleGroup="$navGroup"/>
                     </VBox>
                 </content>
             </TitledPane>
-
-            <TitledPane text="▸ Gestion maîtresse" expanded="false" styleClass="sidebar-group admin-nav-group">
-                <content>
-                    <VBox spacing="6" styleClass="sidebar-group-content">
-                        <ToggleButton text="Nouvelle maîtresse" onAction="#openNouvelleMaitresse" maxWidth="Infinity" styleClass="admin-nav-item admin-nav-subitem" toggleGroup="$navGroup"/>
-                        <ToggleButton text="Maîtresses existantes" onAction="#openMaitressesExistantes" maxWidth="Infinity" styleClass="admin-nav-item admin-nav-subitem" toggleGroup="$navGroup"/>
-                    </VBox>
-                </content>
-            </TitledPane>
-
-            <ToggleButton text="Gestion réclamations" onAction="#openGestionReclamations" maxWidth="Infinity" styleClass="admin-nav-item" toggleGroup="$navGroup"/>
-            </VBox>
         </VBox>
     </left>
 
     <center>
-        <StackPane BorderPane.alignment="CENTER">
-            <StackPane fx:id="contentArea" styleClass="content-area" StackPane.alignment="CENTER">
-                <StackPane.margin>
-                    <Insets left="14.0"/>
-                </StackPane.margin>
-            </StackPane>
-            <VBox fx:id="agentChatPanel" visible="false" managed="false" styleClass="shell-chat-panel"
-                  maxWidth="380" maxHeight="480" minWidth="360" minHeight="420"
-                  StackPane.alignment="BOTTOM_RIGHT">
-                <StackPane.margin>
-                    <Insets right="24" bottom="100"/>
-                </StackPane.margin>
-                <HBox alignment="CENTER_RIGHT" styleClass="parent-shell-chat-header">
-                    <Region HBox.hgrow="ALWAYS"/>
-                    <Label text="Assistant Zayna" styleClass="parent-shell-chat-title"/>
-                    <Button fx:id="btnCloseAgentChat" text="✕" onAction="#toggleAgentChat" styleClass="parent-shell-chat-close"/>
-                </HBox>
-                <StackPane fx:id="agentChatContent" VBox.vgrow="ALWAYS"/>
-            </VBox>
-            <Button fx:id="btnAgentChatFab" text="💬" onAction="#toggleAgentChat" styleClass="shell-chat-fab"
-                    StackPane.alignment="BOTTOM_RIGHT">
-                <StackPane.margin>
-                    <Insets right="24" bottom="24"/>
-                </StackPane.margin>
-            </Button>
+        <StackPane fx:id="contentArea" styleClass="content-area" BorderPane.alignment="CENTER">
+            <BorderPane.margin>
+                <Insets left="14.0"/>
+            </BorderPane.margin>
         </StackPane>
     </center>
 </BorderPane>

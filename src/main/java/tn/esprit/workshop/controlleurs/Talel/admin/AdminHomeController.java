@@ -4,7 +4,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import tn.esprit.workshop.model.Talel.talel2.CategorieUser;
-import tn.esprit.workshop.model.leith.CandidatureAgentStatut;
 import tn.esprit.workshop.services.Talel.ServiceAdmin;
 import tn.esprit.workshop.services.leith.*;
 
@@ -16,7 +15,6 @@ import java.util.ResourceBundle;
 public class AdminHomeController implements Initializable {
 
     @FXML private Label lblTotalUsers;
-    @FXML private Label lblTotalMaitresses;
     @FXML private Label lblTotalParents;
     @FXML private Label lblTotalChauffeurs;
     @FXML private Label lblTotalAgents;
@@ -25,7 +23,6 @@ public class AdminHomeController implements Initializable {
     @FXML private Label lblTotalChildren;
     @FXML private Label lblPendingChild;
     @FXML private Label lblPendingChauffeur;
-    @FXML private Label lblPendingCandidatureEcole;
     @FXML private Label lblSchools;
     @FXML private Label lblAssignedChauffeurs;
 
@@ -36,7 +33,6 @@ public class AdminHomeController implements Initializable {
     private final CandidatureEnfantService candidatureEnfantService = new CandidatureEnfantService();
     private final CandidatureService candidatureService = new CandidatureService();
     private final EcoleService ecoleService = new EcoleService();
-    private final CandidatureAgentService candidatureAgentService = new CandidatureAgentService();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -49,7 +45,6 @@ public class AdminHomeController implements Initializable {
             long parents = serviceAdmin.countByCategorie(CategorieUser.PARENT);
             long chauffeurs = serviceAdmin.countByCategorie(CategorieUser.CHAUFFEUR);
             long agents = serviceAdmin.countByCategorie(CategorieUser.RESPONSABLEECOLE);
-            long maitresses = serviceAdmin.countByCategorie(CategorieUser.MAITRESSE);
 
             int trajets = 0;
             try { trajets = trajetService.selectAll().size(); } catch (SQLException ignored) {}
@@ -77,16 +72,10 @@ public class AdminHomeController implements Initializable {
             int pendingChauffeur = 0;
             try { pendingChauffeur = candidatureService.findAllEnVoyee().size(); } catch (SQLException ignored) {}
 
-            int pendingCandidatureEcole = 0;
-            try {
-                pendingCandidatureEcole = candidatureAgentService.countByStatut(CandidatureAgentStatut.EN_ATTENTE);
-            } catch (SQLException ignored) {}
-
             int schools = 0;
             try { schools = ecoleService.selectAll().size(); } catch (SQLException ignored) {}
 
             if (lblTotalUsers != null) lblTotalUsers.setText(String.valueOf(totalUsers));
-            if (lblTotalMaitresses != null) lblTotalMaitresses.setText(String.valueOf(maitresses));
             if (lblTotalParents != null) lblTotalParents.setText(String.valueOf(parents));
             if (lblTotalChauffeurs != null) lblTotalChauffeurs.setText(String.valueOf(chauffeurs));
             if (lblTotalAgents != null) lblTotalAgents.setText(String.valueOf(agents));
@@ -95,9 +84,6 @@ public class AdminHomeController implements Initializable {
             if (lblTotalChildren != null) lblTotalChildren.setText(String.valueOf(children));
             if (lblPendingChild != null) lblPendingChild.setText(String.valueOf(pendingChild));
             if (lblPendingChauffeur != null) lblPendingChauffeur.setText(String.valueOf(pendingChauffeur));
-            if (lblPendingCandidatureEcole != null) {
-                lblPendingCandidatureEcole.setText(String.valueOf(pendingCandidatureEcole));
-            }
             if (lblSchools != null) lblSchools.setText(String.valueOf(schools));
             if (lblAssignedChauffeurs != null) lblAssignedChauffeurs.setText(String.valueOf(assignedChauffeurs));
         } catch (Exception e) {

@@ -8,13 +8,8 @@
       styleClass="admin-content content-area admin-main-panel" spacing="16" stylesheets="@/leith/design/global.css">
     <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
 
-    <HBox alignment="CENTER_LEFT" spacing="16" maxWidth="Infinity">
-        <VBox spacing="4" HBox.hgrow="ALWAYS">
-            <Label text="Parents" styleClass="admin-page-title"/>
-            <Label text="Tous les parents, enfants acceptés et candidatures en attente" styleClass="admin-page-subtitle"/>
-        </VBox>
-        <Button text="Réclamations" onAction="#onReclamations" styleClass="btn-secondary"/>
-    </HBox>
+    <Label text="Parents" styleClass="admin-page-title"/>
+    <Label text="Tous les parents, enfants acceptés et candidatures en attente" styleClass="admin-page-subtitle"/>
 
     <TableView fx:id="tableParents" VBox.vgrow="ALWAYS" styleClass="table-view admin-table-panel">
         <columns>
