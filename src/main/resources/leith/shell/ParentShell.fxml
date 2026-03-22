@@ -44,6 +44,7 @@
             <ToggleButton text="Mes enfants" onAction="#openMesEnfants" maxWidth="Infinity" styleClass="admin-nav-item" toggleGroup="$navGroup"/>
             <ToggleButton text="Demande transport" onAction="#openDemandeTransport" maxWidth="Infinity" styleClass="admin-nav-item" toggleGroup="$navGroup"/>
             <ToggleButton text="Suivi candidatures" onAction="#openSuiviCandidatures" maxWidth="Infinity" styleClass="admin-nav-item" toggleGroup="$navGroup"/>
+            <ToggleButton text="Réclamer" onAction="#openReclamer" maxWidth="Infinity" styleClass="admin-nav-item" toggleGroup="$navGroup"/>
         </VBox>
     </left>
 

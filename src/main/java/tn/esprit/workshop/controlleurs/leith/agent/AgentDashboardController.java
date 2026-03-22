@@ -10,6 +10,7 @@ import tn.esprit.workshop.services.leith.CandidatureEnfantService;
 import tn.esprit.workshop.services.leith.CandidatureService;
 import tn.esprit.workshop.services.leith.EcoleService;
 import tn.esprit.workshop.services.leith.EnfantService;
+import tn.esprit.workshop.services.leith.MaitresseMetierService;
 import tn.esprit.workshop.services.leith.TrajetService;
 import tn.esprit.workshop.utilis.AppSession;
 
@@ -27,6 +28,7 @@ public class AgentDashboardController {
     @FXML private Label lblBus;
     @FXML private Label lblTrajets;
     @FXML private Label lblEnfantsTransportes;
+    @FXML private Label lblMaitressesEcole;
     @FXML private Label lblAlertes;
     @FXML private Label lblResume;
     @FXML private VBox boxAlertes;
@@ -65,6 +67,7 @@ public class AgentDashboardController {
         if (lblBus != null) lblBus.setText("0");
         if (lblTrajets != null) lblTrajets.setText("0");
         if (lblEnfantsTransportes != null) lblEnfantsTransportes.setText("0");
+        if (lblMaitressesEcole != null) lblMaitressesEcole.setText("0");
     }
 
     private void loadStats(int idEcole) {
@@ -102,6 +105,15 @@ public class AgentDashboardController {
             lblEnfantsTransportes.setText(String.valueOf(nbEnfants));
         } catch (SQLException e) {
             lblEnfantsTransportes.setText("0");
+        }
+        try {
+            MaitresseMetierService maitresseMetierService = new MaitresseMetierService();
+            int nbMaitresses = maitresseMetierService.listByEcole(idEcole, "").size();
+            if (lblMaitressesEcole != null) {
+                lblMaitressesEcole.setText(String.valueOf(nbMaitresses));
+            }
+        } catch (SQLException e) {
+            if (lblMaitressesEcole != null) lblMaitressesEcole.setText("0");
         }
     }
 

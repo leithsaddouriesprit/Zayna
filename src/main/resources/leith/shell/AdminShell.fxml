@@ -43,6 +43,7 @@
 
             <ToggleButton text="Accueil" onAction="#goHome" maxWidth="Infinity" styleClass="admin-nav-item" selected="true" toggleGroup="$navGroup"/>
             <ToggleButton text="Gestion utilisateurs" onAction="#openGestionUtilisateurs" maxWidth="Infinity" styleClass="admin-nav-item" toggleGroup="$navGroup"/>
+            <ToggleButton text="Candidature école" onAction="#openCandidatureEcole" maxWidth="Infinity" styleClass="admin-nav-item" toggleGroup="$navGroup"/>
 
             <TitledPane text="▾ Vues par rôle" expanded="true" styleClass="sidebar-group admin-nav-group">
                 <content>

@@ -6,9 +6,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import tn.esprit.workshop.utilis.AppSession;
 import tn.esprit.workshop.controlleurs.leith.SceneNavigator;
+import tn.esprit.workshop.services.leith.CandidatureAgentService;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,6 +21,7 @@ public class AgentShellController {
 
     @FXML private StackPane contentArea;
     @FXML private Label lblAccountInfo;
+    @FXML private VBox agentNavBody;
 
     @FXML
     public void initialize() {
@@ -29,6 +32,19 @@ public class AgentShellController {
                 ((Stage) contentArea.getScene().getWindow()).setOnHidden(e -> SceneNavigator.unregisterAgentShell());
             }
         });
+        Integer uid = AppSession.getInstance().getConnectedUserId();
+        if (uid != null && !new CandidatureAgentService().isAccessApproved(uid)) {
+            if (agentNavBody != null) {
+                agentNavBody.setVisible(false);
+                agentNavBody.setManaged(false);
+            }
+            loadContent("/leith/agent/AgentCandidatureEcolePending.fxml");
+            return;
+        }
+        if (agentNavBody != null) {
+            agentNavBody.setVisible(true);
+            agentNavBody.setManaged(true);
+        }
         loadContent("/leith/agent/AgentDashboard.fxml");
     }
 
@@ -95,6 +111,21 @@ public class AgentShellController {
     @FXML
     void openCandidaturesEnfant() {
         loadContent("/leith/agent/AgentCandidaturesEnfant.fxml");
+    }
+
+    @FXML
+    void openNouvelleMaitresse() {
+        loadContent("/leith/agent/AgentNouvelleMaitresse.fxml");
+    }
+
+    @FXML
+    void openMaitressesExistantes() {
+        loadContent("/leith/agent/AgentMaitressesListe.fxml");
+    }
+
+    @FXML
+    void openGestionReclamations() {
+        loadContent("/leith/agent/AgentReclamationsPlaceholder.fxml");
     }
 
     @FXML

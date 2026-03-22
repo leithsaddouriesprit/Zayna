@@ -12,18 +12,18 @@
     <Label text="Vue synthétique par école (trajets, enfants, demandes, chauffeurs)" styleClass="admin-page-subtitle"/>
 
     <!-- Indicateurs clés -->
-    <HBox styleClass="admin-stats-highlights admin-section-panel" alignment="CENTER" spacing="18" maxWidth="Infinity">
-        <VBox styleClass="admin-stats-highlight-card" spacing="10" alignment="CENTER" HBox.hgrow="ALWAYS" maxWidth="Infinity" minWidth="260" minHeight="138" prefHeight="138">
+    <HBox styleClass="admin-stats-highlights admin-section-panel" alignment="CENTER" spacing="22" maxWidth="Infinity">
+        <VBox styleClass="admin-stats-highlight-card" spacing="10" alignment="CENTER" HBox.hgrow="ALWAYS" maxWidth="Infinity" minWidth="240" prefWidth="320" minHeight="148" prefHeight="148">
             <Label text="École avec le plus de trajets" wrapText="true" textAlignment="CENTER" maxWidth="Infinity" styleClass="admin-stat-card-title"/>
             <Label fx:id="lblTopTrajetsSchool" styleClass="stats-highlight-value" wrapText="true" textAlignment="CENTER" maxWidth="Infinity"/>
         </VBox>
-        <VBox styleClass="admin-stats-highlight-card" spacing="10" alignment="CENTER" HBox.hgrow="ALWAYS" maxWidth="Infinity" minWidth="260" minHeight="138" prefHeight="138">
+        <VBox styleClass="admin-stats-highlight-card" spacing="10" alignment="CENTER" HBox.hgrow="ALWAYS" maxWidth="Infinity" minWidth="240" prefWidth="320" minHeight="148" prefHeight="148">
             <Label text="École avec le plus d'enfants" wrapText="true" textAlignment="CENTER" maxWidth="Infinity" styleClass="admin-stat-card-title"/>
             <Label fx:id="lblTopChildrenSchool" styleClass="stats-highlight-value" wrapText="true" textAlignment="CENTER" maxWidth="Infinity"/>
         </VBox>
-        <VBox styleClass="admin-stats-highlight-card" spacing="10" alignment="CENTER" HBox.hgrow="ALWAYS" maxWidth="Infinity" minWidth="260" minHeight="138" prefHeight="138">
-            <Label text="École avec le plus de demandes enfant en attente" wrapText="true" textAlignment="CENTER" maxWidth="Infinity" styleClass="admin-stat-card-title"/>
-            <Label fx:id="lblTopPendingChildSchool" styleClass="stats-highlight-value" wrapText="true" textAlignment="CENTER" maxWidth="Infinity"/>
+        <VBox styleClass="admin-stats-highlight-card" spacing="10" alignment="CENTER" HBox.hgrow="ALWAYS" maxWidth="Infinity" minWidth="240" prefWidth="320" minHeight="148" prefHeight="148">
+            <Label text="École avec le plus de réclamations" wrapText="true" textAlignment="CENTER" maxWidth="Infinity" styleClass="admin-stat-card-title"/>
+            <Label fx:id="lblTopReclamationsSchool" styleClass="stats-highlight-value" wrapText="true" textAlignment="CENTER" maxWidth="Infinity"/>
         </VBox>
     </HBox>
 
@@ -38,6 +38,7 @@
                 <TableColumn fx:id="colBuses" text="Bus" prefWidth="80"/>
                 <TableColumn fx:id="colPendingChild" text="Candidatures enfant ENVOYEE" prefWidth="200"/>
                 <TableColumn fx:id="colAcceptedChauffeurs" text="Chauffeurs acceptés" prefWidth="150"/>
+                <TableColumn fx:id="colReclamations" text="Nombre de réclamations" prefWidth="160"/>
             </columns>
         </TableView>
     </VBox>

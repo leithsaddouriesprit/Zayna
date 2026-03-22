@@ -85,7 +85,8 @@
    ========================= */
 .text-field,
 .password-field {
-    -fx-pref-width: 323px;
+    -fx-pref-width: 300px;
+    -fx-max-width: 320px;
     -fx-pref-height: 32px;
     -fx-background-color: #F3F4F6;
     -fx-background-radius: 200;
@@ -109,7 +110,8 @@
    LOGIN BUTTON
    ========================= */
 .primary-login-btn {
-    -fx-pref-width: 323px;
+    -fx-pref-width: 300px;
+    -fx-max-width: 320px;
     -fx-pref-height: 32px;
     -fx-background-color: #FEC111;
     -fx-background-radius: 200;
@@ -179,6 +181,16 @@
     -fx-font-weight: 500;
 }
 
+.role-section {
+    -fx-padding: 4 0 0 0;
+}
+
+.role-row {
+    -fx-alignment: center;
+    -fx-spacing: 8;
+    -fx-padding: 0 4 0 4;
+}
+
 .role-separator {
     -fx-text-fill: #FEC111;
     -fx-font-size: 16px;
@@ -190,9 +202,4 @@
    ========================= */
 .center-box {
     -fx-alignment: center;
-}
-
-.role-row {
-    -fx-alignment: center;
-    -fx-spacing: 15;
 }

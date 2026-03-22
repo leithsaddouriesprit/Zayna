@@ -30,7 +30,7 @@
     <!-- Barre d'outils -->
     <ToolBar styleClass="admin-section-panel">
         <items>
-            <Button fx:id="addButton" onAction="#handleAddButton" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" text="   Ajouter   ">
+            <Button fx:id="addButton" onAction="#handleAddButton" managed="false" visible="false" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" text="   Ajouter   ">
                 <graphic>
                     <Label text="➕" />
                 </graphic>

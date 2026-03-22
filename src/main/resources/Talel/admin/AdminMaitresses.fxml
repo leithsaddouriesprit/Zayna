@@ -9,19 +9,27 @@
     <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
 
     <Label text="Maîtresses" styleClass="admin-page-title"/>
-    <Label text="Liste des maîtresses (données disponibles)" styleClass="admin-page-subtitle"/>
+    <Label text="Vue globale (école et bus affecté)" styleClass="admin-page-subtitle"/>
+
+    <HBox spacing="8" alignment="CENTER_LEFT">
+        <TextField fx:id="fieldSearch" promptText="Rechercher…" prefWidth="240"/>
+        <Button text="Actualiser" onAction="#reload" styleClass="btn-secondary"/>
+    </HBox>
 
     <TableView fx:id="tableMaitresses" VBox.vgrow="ALWAYS" styleClass="table-view admin-table-panel">
         <columns>
-            <TableColumn fx:id="colId" text="Id" prefWidth="60"/>
-            <TableColumn fx:id="colNom" text="Nom" prefWidth="150"/>
-            <TableColumn fx:id="colEmail" text="Email" prefWidth="220"/>
+            <TableColumn fx:id="colId" text="Id" prefWidth="50"/>
+            <TableColumn fx:id="colNom" text="Nom" prefWidth="100"/>
+            <TableColumn fx:id="colPrenom" text="Prénom" prefWidth="100"/>
+            <TableColumn fx:id="colEmail" text="Email" prefWidth="200"/>
             <TableColumn fx:id="colEcole" text="École" prefWidth="150"/>
-            <TableColumn fx:id="colReclamations" text="" prefWidth="100"/>
+            <TableColumn fx:id="colBus" text="Bus" prefWidth="140"/>
+            <TableColumn fx:id="colReclamations" text="" prefWidth="110"/>
         </columns>
     </TableView>
 
     <FlowPane alignment="CENTER_LEFT" hgap="20" vgap="8" styleClass="admin-section-panel">
-        <Label fx:id="lblTotal" style="-fx-font-weight: bold; -fx-text-fill: #F9FAFB;" text="Maîtresses: 0"/>
+        <Label fx:id="lblMaitressesTotal" style="-fx-font-weight: bold; -fx-text-fill: #FEC111;" text="Maîtresses : 0"/>
+        <Label fx:id="lblMaitressesAvecBus" style="-fx-font-weight: bold; -fx-text-fill: #60A5FA;" text="Maîtresses affectées à un bus : 0"/>
     </FlowPane>
 </VBox>

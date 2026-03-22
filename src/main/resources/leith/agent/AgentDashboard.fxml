@@ -29,11 +29,12 @@
     <GridPane hgap="14" vgap="0" maxWidth="Infinity"
               style="-fx-background-color: rgba(217,217,217,0.18); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.26); -fx-border-radius: 14; -fx-border-width: 1; -fx-padding: 14;">
         <columnConstraints>
-            <ColumnConstraints percentWidth="20" hgrow="ALWAYS"/>
-            <ColumnConstraints percentWidth="20" hgrow="ALWAYS"/>
-            <ColumnConstraints percentWidth="20" hgrow="ALWAYS"/>
-            <ColumnConstraints percentWidth="20" hgrow="ALWAYS"/>
-            <ColumnConstraints percentWidth="20" hgrow="ALWAYS"/>
+            <ColumnConstraints percentWidth="16.67" hgrow="ALWAYS" minWidth="90"/>
+            <ColumnConstraints percentWidth="16.67" hgrow="ALWAYS" minWidth="90"/>
+            <ColumnConstraints percentWidth="16.66" hgrow="ALWAYS" minWidth="90"/>
+            <ColumnConstraints percentWidth="16.67" hgrow="ALWAYS" minWidth="90"/>
+            <ColumnConstraints percentWidth="16.66" hgrow="ALWAYS" minWidth="90"/>
+            <ColumnConstraints percentWidth="16.67" hgrow="ALWAYS" minWidth="90"/>
         </columnConstraints>
 
         <VBox GridPane.columnIndex="0" spacing="8" HBox.hgrow="ALWAYS" maxWidth="Infinity"
@@ -69,6 +70,13 @@
             <Label text="Enfants acceptés / transportés" wrapText="true"
                    style="-fx-text-fill: #FFFFFF; -fx-font-size: 13px; -fx-font-weight: 800;"/>
             <Label fx:id="lblEnfantsTransportes" text="0"
+                   style="-fx-text-fill: #FFFFFF; -fx-font-size: 28px; -fx-font-weight: 900;"/>
+        </VBox>
+        <VBox GridPane.columnIndex="5" spacing="8" HBox.hgrow="ALWAYS" maxWidth="Infinity"
+              style="-fx-background-color: linear-gradient(to bottom right, #4A4A4A, #3A3A3A); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.34); -fx-border-radius: 14; -fx-border-width: 1; -fx-padding: 16; -fx-min-height: 120;">
+            <Label text="Maîtresses de l'école" wrapText="true"
+                   style="-fx-text-fill: #FFFFFF; -fx-font-size: 13px; -fx-font-weight: 800;"/>
+            <Label fx:id="lblMaitressesEcole" text="0"
                    style="-fx-text-fill: #FFFFFF; -fx-font-size: 28px; -fx-font-weight: 900;"/>
         </VBox>
     </GridPane>

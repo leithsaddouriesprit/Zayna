@@ -23,7 +23,7 @@ public class AdminStatsController implements Initializable {
 
     @FXML private Label lblTopTrajetsSchool;
     @FXML private Label lblTopChildrenSchool;
-    @FXML private Label lblTopPendingChildSchool;
+    @FXML private Label lblTopReclamationsSchool;
 
     @FXML private TableView<SchoolStatsRow> tableStats;
     @FXML private TableColumn<SchoolStatsRow, String> colEcole;
@@ -32,6 +32,7 @@ public class AdminStatsController implements Initializable {
     @FXML private TableColumn<SchoolStatsRow, Number> colBuses;
     @FXML private TableColumn<SchoolStatsRow, Number> colPendingChild;
     @FXML private TableColumn<SchoolStatsRow, Number> colAcceptedChauffeurs;
+    @FXML private TableColumn<SchoolStatsRow, Number> colReclamations;
 
     private final AdminDataService adminDataService = new AdminDataService();
     private final EcoleService ecoleService = new EcoleService();
@@ -46,14 +47,16 @@ public class AdminStatsController implements Initializable {
         private final int buses;
         private final int pendingChild;
         private final int acceptedChauffeurs;
+        private final int reclamations;
 
-        public SchoolStatsRow(String ecoleNom, int trajets, int enfants, int buses, int pendingChild, int acceptedChauffeurs) {
+        public SchoolStatsRow(String ecoleNom, int trajets, int enfants, int buses, int pendingChild, int acceptedChauffeurs, int reclamations) {
             this.ecoleNom = ecoleNom;
             this.trajets = trajets;
             this.enfants = enfants;
             this.buses = buses;
             this.pendingChild = pendingChild;
             this.acceptedChauffeurs = acceptedChauffeurs;
+            this.reclamations = reclamations;
         }
 
         public String getEcoleNom() { return ecoleNom; }
@@ -62,6 +65,7 @@ public class AdminStatsController implements Initializable {
         public int getBuses() { return buses; }
         public int getPendingChild() { return pendingChild; }
         public int getAcceptedChauffeurs() { return acceptedChauffeurs; }
+        public int getReclamations() { return reclamations; }
     }
 
     @Override
@@ -72,6 +76,7 @@ public class AdminStatsController implements Initializable {
         colBuses.setCellValueFactory(c -> new javafx.beans.property.SimpleIntegerProperty(c.getValue().getBuses()));
         colPendingChild.setCellValueFactory(c -> new javafx.beans.property.SimpleIntegerProperty(c.getValue().getPendingChild()));
         colAcceptedChauffeurs.setCellValueFactory(c -> new javafx.beans.property.SimpleIntegerProperty(c.getValue().getAcceptedChauffeurs()));
+        colReclamations.setCellValueFactory(c -> new javafx.beans.property.SimpleIntegerProperty(c.getValue().getReclamations()));
         loadStats();
     }
 
@@ -118,10 +123,14 @@ public class AdminStatsController implements Initializable {
                 int nbBuses = busesByEcole.getOrDefault(id, 0L).intValue();
                 int nbPendingChild = pendingChildByEcole.getOrDefault(id, 0L).intValue();
                 int nbAccepted = acceptedChauffeursByEcole.getOrDefault(id, 0L).intValue();
-                rows.add(new SchoolStatsRow(nom, nbTrajets, nbEnfants, nbBuses, nbPendingChild, nbAccepted));
+                rows.add(new SchoolStatsRow(nom, nbTrajets, nbEnfants, nbBuses, nbPendingChild, nbAccepted, 0));
             }
 
             tableStats.getItems().setAll(rows);
+
+            if (lblTopReclamationsSchool != null) {
+                lblTopReclamationsSchool.setText("0");
+            }
 
             lblTopTrajetsSchool.setText(rows.stream()
                     .max(Comparator.comparingInt(SchoolStatsRow::getTrajets))
@@ -131,12 +140,11 @@ public class AdminStatsController implements Initializable {
                     .max(Comparator.comparingInt(SchoolStatsRow::getEnfants))
                     .map(r -> r.getEcoleNom() + " (" + r.getEnfants() + ")")
                     .orElse("—"));
-            lblTopPendingChildSchool.setText(rows.stream()
-                    .max(Comparator.comparingInt(SchoolStatsRow::getPendingChild))
-                    .map(r -> r.getEcoleNom() + " (" + r.getPendingChild() + ")")
-                    .orElse("—"));
         } catch (SQLException e) {
             e.printStackTrace();
+            if (lblTopReclamationsSchool != null) {
+                lblTopReclamationsSchool.setText("0");
+            }
         }
     }
 }

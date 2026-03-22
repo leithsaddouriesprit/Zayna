@@ -81,6 +81,11 @@ public class ParentShellController {
     }
 
     @FXML
+    void openReclamer() {
+        loadContent("/leith/parent/ParentReclamerPlaceholder.fxml");
+    }
+
+    @FXML
     void toggleChat() {
         if (chatPanel == null) return;
         boolean show = !chatPanel.isVisible();

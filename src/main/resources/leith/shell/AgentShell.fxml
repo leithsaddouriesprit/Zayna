@@ -41,6 +41,7 @@
                 <Label text="Agent école" styleClass="admin-brand-subtitle"/>
             </VBox>
 
+            <VBox fx:id="agentNavBody" spacing="8">
             <ToggleButton text="Accueil" onAction="#goHome" maxWidth="Infinity" styleClass="admin-nav-item" selected="true" toggleGroup="$navGroup"/>
 
             <TitledPane text="▸ Candidatures chauffeur" expanded="false" styleClass="sidebar-group admin-nav-group">
@@ -78,6 +79,18 @@
                     </VBox>
                 </content>
             </TitledPane>
+
+            <TitledPane text="▸ Gestion maîtresse" expanded="false" styleClass="sidebar-group admin-nav-group">
+                <content>
+                    <VBox spacing="6" styleClass="sidebar-group-content">
+                        <ToggleButton text="Nouvelle maîtresse" onAction="#openNouvelleMaitresse" maxWidth="Infinity" styleClass="admin-nav-item admin-nav-subitem" toggleGroup="$navGroup"/>
+                        <ToggleButton text="Maîtresses existantes" onAction="#openMaitressesExistantes" maxWidth="Infinity" styleClass="admin-nav-item admin-nav-subitem" toggleGroup="$navGroup"/>
+                    </VBox>
+                </content>
+            </TitledPane>
+
+            <ToggleButton text="Gestion réclamations" onAction="#openGestionReclamations" maxWidth="Infinity" styleClass="admin-nav-item" toggleGroup="$navGroup"/>
+            </VBox>
         </VBox>
     </left>
 

@@ -2,6 +2,8 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21"
@@ -15,7 +17,11 @@
             <padding>
                 <Insets top="14" right="20" bottom="14" left="20"/>
             </padding>
-            <Label text="ZAYNA" styleClass="chat-header-title"/>
+            <ImageView fitHeight="36.0" fitWidth="120.0" preserveRatio="true" styleClass="chat-header-logo" pickOnBounds="true">
+                <image>
+                    <Image url="@/leith/design/logo.png"/>
+                </image>
+            </ImageView>
             <Label text="Assistant IA" styleClass="chat-header-subtitle"/>
             <Region HBox.hgrow="ALWAYS"/>
             <Button text="Retour" styleClass="chat-btn-back" onAction="#goBack"/>
@@ -24,7 +30,16 @@
 
     <center>
         <VBox styleClass="chat-body" VBox.vgrow="ALWAYS">
-            <TextArea fx:id="taChat" styleClass="chat-messages" editable="false" wrapText="true" VBox.vgrow="ALWAYS"/>
+            <ScrollPane fx:id="scrollMessages" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                        styleClass="chat-messages-scroll" VBox.vgrow="ALWAYS">
+                <content>
+                    <VBox fx:id="boxMessages" styleClass="chat-messages-list" spacing="14" maxWidth="Infinity">
+                        <padding>
+                            <Insets top="16" right="16" bottom="16" left="16"/>
+                        </padding>
+                    </VBox>
+                </content>
+            </ScrollPane>
         </VBox>
     </center>
 

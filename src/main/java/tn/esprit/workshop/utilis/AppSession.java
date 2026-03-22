@@ -18,6 +18,10 @@ public final class AppSession {
     private String connectedUserName;
     /** Rôle affiché (ex. "Parent", "Chauffeur", "Agent École", "Administrateur"). */
     private String connectedUserRole;
+    /** users.id du compte connecté (agent, maîtresse, etc.). */
+    private Integer connectedUserId;
+    /** maitresse.id pour l’espace maîtresse. */
+    private Integer maitresseId;
 
     private AppSession() {
     }
@@ -80,5 +84,21 @@ public final class AppSession {
 
     public void setConnectedUserRole(String connectedUserRole) {
         this.connectedUserRole = connectedUserRole;
+    }
+
+    public Integer getConnectedUserId() {
+        return connectedUserId;
+    }
+
+    public void setConnectedUserId(Integer connectedUserId) {
+        this.connectedUserId = connectedUserId;
+    }
+
+    public Integer getMaitresseId() {
+        return maitresseId;
+    }
+
+    public void setMaitresseId(Integer maitresseId) {
+        this.maitresseId = maitresseId;
     }
 }

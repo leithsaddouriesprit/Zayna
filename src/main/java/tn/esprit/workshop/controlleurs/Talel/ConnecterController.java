@@ -18,13 +18,14 @@ import tn.esprit.workshop.utilis.AppSession;
 import tn.esprit.workshop.controlleurs.leith.SceneNavigator;
 import tn.esprit.workshop.controlleurs.Talel.AdminController;
 import tn.esprit.workshop.utilis.MyBDConnexion;
+import tn.esprit.workshop.services.leith.MaitresseMetierService;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ResourceBundle;
 
 public class ConnecterController implements Initializable {
@@ -307,6 +308,7 @@ public class ConnecterController implements Initializable {
                     afficherErreur("Aucun profil parent associé à ce compte. Veuillez contacter l'administrateur.");
                     return;
                 }
+                AppSession.getInstance().setConnectedUserId(user.getId());
                 AppSession.getInstance().setParentId(parentId);
                 setConnectedUserDisplay(user, "Parent");
 
@@ -327,6 +329,7 @@ public class ConnecterController implements Initializable {
                     afficherErreur("Aucun profil chauffeur associé à ce compte. Veuillez contacter l'administrateur.");
                     return;
                 }
+                AppSession.getInstance().setConnectedUserId(user.getId());
                 AppSession.getInstance().setChauffeurId(chauffeurId);
                 setConnectedUserDisplay(user, "Chauffeur");
 
@@ -346,6 +349,7 @@ public class ConnecterController implements Initializable {
                     afficherErreur("Aucun profil agent associé à ce compte. Veuillez contacter l'administrateur.");
                     return;
                 }
+                AppSession.getInstance().setConnectedUserId(user.getId());
                 AppSession.getInstance().setAgentId(agentEcole[0]);
                 AppSession.getInstance().setEcoleId(agentEcole[1]);
                 setConnectedUserDisplay(user, "Agent École");
@@ -358,8 +362,35 @@ public class ConnecterController implements Initializable {
                 return;
             }
 
+            // ---------- Flux Maîtresse (shell Leith) ----------
+            if (role == CategorieUser.MAITRESSE) {
+                int[] mIds;
+                try {
+                    mIds = new MaitresseMetierService().resolveMaitresseIdsByUserId(user.getId());
+                } catch (SQLException e) {
+                    afficherErreur("Erreur lors du chargement du profil maîtresse.");
+                    return;
+                }
+                if (mIds == null) {
+                    afficherErreur("Aucun profil maîtresse associé à ce compte. Veuillez contacter l'administrateur.");
+                    return;
+                }
+                AppSession.getInstance().setConnectedUserId(user.getId());
+                AppSession.getInstance().setMaitresseId(mIds[0]);
+                AppSession.getInstance().setEcoleId(mIds[1]);
+                setConnectedUserDisplay(user, "Maîtresse");
+
+                Stage stage = (Stage) loginButton.getScene().getWindow();
+                if (stage != null) {
+                    stage.close();
+                }
+                SceneNavigator.openMaitresseShell();
+                return;
+            }
+
             // ---------- Flux Admin (shell comme les autres rôles) ----------
             if (role == CategorieUser.ADMIN) {
+                AppSession.getInstance().setConnectedUserId(user.getId());
                 setConnectedUserDisplay(user, "Administrateur");
                 SceneNavigator.setPendingAdminUser(user);
                 Stage stage = (Stage) loginButton.getScene().getWindow();
@@ -486,7 +517,7 @@ public class ConnecterController implements Initializable {
             case CHAUFFEUR:
                 return "/Talel/Chauffeur.fxml";
             case MAITRESSE:
-                return "/Talel/Maitresse.fxml";
+                return null;
             case PARENT:
                 return "/Talel/Parent.fxml";
             case RESPONSABLEECOLE:

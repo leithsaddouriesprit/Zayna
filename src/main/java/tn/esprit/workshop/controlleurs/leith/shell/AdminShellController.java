@@ -97,6 +97,11 @@ public class AdminShellController {
     }
 
     @FXML
+    void openCandidatureEcole() {
+        loadContent("/Talel/admin/AdminCandidatureEcole.fxml");
+    }
+
+    @FXML
     void openParents() {
         loadContent("/Talel/admin/AdminParents.fxml");
     }

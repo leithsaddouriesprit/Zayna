@@ -9,6 +9,7 @@ import tn.esprit.workshop.controlleurs.leith.AI.ChatAIController;
 import tn.esprit.workshop.controlleurs.leith.shell.AdminShellController;
 import tn.esprit.workshop.controlleurs.leith.shell.AgentShellController;
 import tn.esprit.workshop.controlleurs.leith.shell.ChauffeurShellController;
+import tn.esprit.workshop.controlleurs.leith.shell.MaitresseShellController;
 import tn.esprit.workshop.controlleurs.leith.shell.ParentShellController;
 import tn.esprit.workshop.model.Talel.talel2.User;
 import tn.esprit.workshop.utilis.AppSession;
@@ -27,6 +28,7 @@ public class SceneNavigator {
     private static ChauffeurShellController chauffeurShell;
     private static AgentShellController agentShell;
     private static AdminShellController adminShell;
+    private static MaitresseShellController maitresseShell;
 
     /** User to inject into Admin content when opening AdminShell (set by ConnecterController). */
     private static User pendingAdminUser;
@@ -39,6 +41,8 @@ public class SceneNavigator {
     public static void unregisterAgentShell() { agentShell = null; }
     public static void registerAdminShell(AdminShellController c) { adminShell = c; }
     public static void unregisterAdminShell() { adminShell = null; }
+    public static void registerMaitresseShell(MaitresseShellController c) { maitresseShell = c; }
+    public static void unregisterMaitresseShell() { maitresseShell = null; }
 
     public static void setPendingAdminUser(User user) { pendingAdminUser = user; }
     public static User getAndClearPendingAdminUser() {
@@ -142,6 +146,33 @@ public class SceneNavigator {
             stage.show();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error opening AdminShell", e);
+        }
+    }
+
+    /** Espace maîtresse (shell avec accueil + gestion enfants). */
+    public static void openMaitresseShell() {
+        try {
+            FXMLLoader loader = new FXMLLoader(SceneNavigator.class.getResource("/leith/shell/MaitresseShell.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            javafx.scene.Scene scene = new javafx.scene.Scene(root, 900, 600);
+            applyAppCss(scene, root);
+            stage.setTitle("Zayna – Espace Maîtresse");
+            stage.setScene(scene);
+            stage.setMaximized(true);
+            stage.show();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error opening MaitresseShell", e);
+        }
+    }
+
+    public static boolean isInMaitresseShell() {
+        return maitresseShell != null;
+    }
+
+    public static void maitresseShellGoHome() {
+        if (maitresseShell != null) {
+            maitresseShell.loadContent("/leith/maitresse/MaitresseHome.fxml");
         }
     }
 

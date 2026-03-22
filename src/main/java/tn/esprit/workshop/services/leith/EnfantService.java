@@ -79,9 +79,64 @@ public class EnfantService implements CRUD<Enfant> {
             e.setParentId(rs.getInt("parent_id"));
             e.setTrajetId(rs.getInt("trajet_id"));
             e.setActif(rs.getBoolean("actif"));
+            e.setOnBoard(rs.getBoolean("on_board"));
             list.add(e);
         }
         return list;
+    }
+
+    /**
+     * Enfants actifs dont le trajet emprunte le bus indiqué (maîtresse).
+     */
+    public List<Enfant> findEnfantsByBusId(int busId, String search) throws SQLException {
+        List<Enfant> list = new ArrayList<>();
+        String term = search == null ? "" : search.trim();
+        String like = "%" + term + "%";
+        String sql = """
+                SELECT e.id, e.nom, e.prenom, e.parent_id, e.trajet_id, e.actif, e.on_board
+                FROM enfant e
+                INNER JOIN trajet t ON e.trajet_id = t.id
+                WHERE t.id_bus = ? AND e.actif = 1
+                AND (e.nom LIKE ? OR e.prenom LIKE ? OR ? = '')
+                ORDER BY e.nom, e.prenom
+                """;
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setInt(1, busId);
+            ps.setString(2, like);
+            ps.setString(3, like);
+            ps.setString(4, term);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Enfant e = new Enfant();
+                    e.setEnfantId(rs.getInt("id"));
+                    e.setNom(rs.getString("nom"));
+                    e.setPrenom(rs.getString("prenom"));
+                    e.setParentId(rs.getInt("parent_id"));
+                    e.setTrajetId(rs.getInt("trajet_id"));
+                    e.setActif(rs.getBoolean("actif"));
+                    e.setOnBoard(rs.getBoolean("on_board"));
+                    list.add(e);
+                }
+            }
+        }
+        return list;
+    }
+
+    public void updateOnBoardIfEnfantOnBus(int enfantId, int busId, boolean onBoard) throws SQLException {
+        String sql = """
+                UPDATE enfant e
+                INNER JOIN trajet t ON e.trajet_id = t.id AND t.id_bus = ?
+                SET e.on_board = ?
+                WHERE e.id = ?
+                """;
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setInt(1, busId);
+            ps.setBoolean(2, onBoard);
+            ps.setInt(3, enfantId);
+            if (ps.executeUpdate() != 1) {
+                throw new SQLException("Mise à jour impossible : enfant ou bus invalide");
+            }
+        }
     }
 
     public Enfant getEnfantById(int id) {

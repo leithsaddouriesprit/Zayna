@@ -2,13 +2,25 @@ package tn.esprit.workshop.controlleurs.leith.AI;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.animation.KeyFrame;
+import javafx.animation.PauseTransition;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import tn.esprit.workshop.model.leith.Arret;
 import tn.esprit.workshop.model.leith.Enfant;
 import tn.esprit.workshop.model.leith.PositionBus;
@@ -43,8 +55,11 @@ public class ChatAIController {
 
     private static final String API_CHAT_URL = "http://localhost:8081/ai/chat";
     private static final DateTimeFormatter ISO = DateTimeFormatter.ISO_DATE_TIME;
+    private static final String ASSISTANT_WELCOME = "👋 Bonjour, je suis votre assistant Zayna. Comment puis-je vous aider ?";
+    private static final double BUBBLE_MAX_WIDTH = 360.0;
 
-    @FXML private TextArea taChat;
+    @FXML private ScrollPane scrollMessages;
+    @FXML private VBox boxMessages;
     @FXML private TextField tfMessage;
     @FXML private Button btnSend;
 
@@ -68,9 +83,15 @@ public class ChatAIController {
     private final PositionBusService positionBusService = new PositionBusService();
     private final ArretService arretService = new ArretService();
 
+    private HBox typingIndicatorRow;
+    private Label typingLabel;
+    private Timeline typingDotsTimeline;
+    private final int[] typingDotStep = {0};
+
     @FXML
     public void initialize() {
-        taChat.appendText("AI: Chargement du contexte…\n\n");
+        appendAssistantMessage(ASSISTANT_WELCOME);
+        applyInputAvailability(false);
     }
 
     /**
@@ -97,13 +118,19 @@ public class ChatAIController {
         new Thread(() -> {
             try {
                 if (enfantId == null) {
-                    Platform.runLater(() -> setWelcomeMessage(
-                            "Aucun enfant associé. Sélectionnez ou ajoutez un enfant depuis l'accueil pour utiliser l'assistant.", false));
+                    Platform.runLater(() -> {
+                        appendAssistantMessage(
+                                "Aucun enfant associé. Sélectionnez ou ajoutez un enfant depuis l'accueil pour utiliser l'assistant.");
+                        applyInputAvailability(false);
+                    });
                     return;
                 }
                 Enfant enfant = enfantService.getEnfantById(enfantId);
                 if (enfant == null) {
-                    Platform.runLater(() -> setWelcomeMessage("Enfant introuvable. Sélectionnez un enfant depuis l'accueil.", false));
+                    Platform.runLater(() -> {
+                        appendAssistantMessage("Enfant introuvable. Sélectionnez un enfant depuis l'accueil.");
+                        applyInputAvailability(false);
+                    });
                     return;
                 }
                 cachedEnfant = enfant;
@@ -127,22 +154,139 @@ public class ChatAIController {
                     cachedBusId = null;
                     cachedPosition = null;
                 }
-                String name = (enfant.getPrenom() != null ? enfant.getPrenom() : "").trim() + " " + (enfant.getNom() != null ? enfant.getNom() : "").trim();
-                if (name.isBlank()) name = "Votre enfant";
-                String trajetLabel = cachedTrajet != null && cachedTrajet.getNom() != null ? cachedTrajet.getNom() : "ce trajet";
-                String greeting = "Je suis prêt. Je suis en train de suivre " + name + " (" + trajetLabel + "). Pose ta question.";
-                Platform.runLater(() -> setWelcomeMessage(greeting, true));
+                Platform.runLater(() -> applyInputAvailability(true));
             } catch (Exception e) {
-                Platform.runLater(() -> setWelcomeMessage("Erreur de chargement du contexte. Réessayez.", false));
+                Platform.runLater(() -> {
+                    appendAssistantMessage("Erreur de chargement du contexte. Réessayez.");
+                    applyInputAvailability(false);
+                });
             }
         }).start();
     }
 
-    private void setWelcomeMessage(String message, boolean canSend) {
-        taChat.clear();
-        taChat.appendText("AI: " + message + "\n\n");
-        btnSend.setDisable(!canSend);
-        if (!canSend) tfMessage.setDisable(true);
+    /** Active ou désactive l’envoi ; ne modifie pas les messages déjà affichés (l’accueil reste en place). */
+    private void applyInputAvailability(boolean canSend) {
+        if (btnSend != null) {
+            btnSend.setDisable(!canSend);
+        }
+        if (tfMessage != null) {
+            tfMessage.setDisable(!canSend);
+        }
+    }
+
+    private ImageView createAssistantAvatar() {
+        java.net.URL url = ChatAIController.class.getResource("/images/top.png");
+        if (url == null) {
+            url = ChatAIController.class.getResource("/leith/design/top.png");
+        }
+        ImageView avatar = new ImageView();
+        if (url != null) {
+            avatar.setImage(new Image(url.toExternalForm(), 30, 30, true, true));
+        }
+        avatar.setFitWidth(30);
+        avatar.setFitHeight(30);
+        avatar.setPreserveRatio(true);
+        avatar.getStyleClass().add("chat-msg-assistant-avatar");
+        return avatar;
+    }
+
+    private void appendAssistantMessage(String text) {
+        if (boxMessages == null || text == null) {
+            return;
+        }
+        HBox row = new HBox(10);
+        row.setAlignment(Pos.TOP_LEFT);
+        row.setMaxWidth(Double.MAX_VALUE);
+        row.getStyleClass().add("chat-msg-assistant-row");
+
+        ImageView avatar = createAssistantAvatar();
+        Label bubble = new Label(text);
+        bubble.setWrapText(true);
+        bubble.setMaxWidth(BUBBLE_MAX_WIDTH);
+        bubble.getStyleClass().add("chat-msg-assistant-bubble");
+
+        row.getChildren().addAll(avatar, bubble);
+        boxMessages.getChildren().add(row);
+        scrollChatToBottom();
+    }
+
+    private void appendUserMessage(String text) {
+        if (boxMessages == null || text == null) {
+            return;
+        }
+        HBox row = new HBox(10);
+        row.setAlignment(Pos.CENTER_RIGHT);
+        row.setMaxWidth(Double.MAX_VALUE);
+        row.getStyleClass().add("chat-msg-user-row");
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        Label bubble = new Label("Moi: " + text);
+        bubble.setWrapText(true);
+        bubble.setMaxWidth(BUBBLE_MAX_WIDTH);
+        bubble.getStyleClass().add("chat-msg-user-bubble");
+        row.getChildren().addAll(spacer, bubble);
+        boxMessages.getChildren().add(row);
+        scrollChatToBottom();
+    }
+
+    private void showTypingIndicator() {
+        if (boxMessages == null) {
+            return;
+        }
+        removeTypingIndicator();
+        typingDotStep[0] = 0;
+        HBox row = new HBox(10);
+        row.setAlignment(Pos.TOP_LEFT);
+        row.setMaxWidth(Double.MAX_VALUE);
+        row.getStyleClass().add("chat-msg-assistant-row");
+        ImageView avatar = createAssistantAvatar();
+        typingLabel = new Label("Zayna est en train d'écrire");
+        typingLabel.setWrapText(false);
+        typingLabel.setMaxWidth(BUBBLE_MAX_WIDTH);
+        typingLabel.getStyleClass().addAll("chat-msg-assistant-bubble", "chat-msg-typing");
+        row.getChildren().addAll(avatar, typingLabel);
+        typingIndicatorRow = row;
+        boxMessages.getChildren().add(row);
+        typingDotsTimeline = new Timeline(new KeyFrame(Duration.millis(450), ev -> {
+            if (typingLabel == null) {
+                return;
+            }
+            String[] dots = {"", ".", "..", "..."};
+            typingLabel.setText("Zayna est en train d'écrire" + dots[typingDotStep[0] % dots.length]);
+            typingDotStep[0]++;
+        }));
+        typingDotsTimeline.setCycleCount(Timeline.INDEFINITE);
+        typingDotsTimeline.play();
+        scrollChatToBottom();
+    }
+
+    private void removeTypingIndicator() {
+        if (typingDotsTimeline != null) {
+            typingDotsTimeline.stop();
+            typingDotsTimeline = null;
+        }
+        if (typingIndicatorRow != null && boxMessages != null) {
+            boxMessages.getChildren().remove(typingIndicatorRow);
+        }
+        typingIndicatorRow = null;
+        typingLabel = null;
+    }
+
+    private void scrollChatToBottom() {
+        if (scrollMessages == null) {
+            return;
+        }
+        Platform.runLater(() -> {
+            scrollMessages.applyCss();
+            scrollMessages.layout();
+            scrollMessages.setVvalue(1.0);
+            PauseTransition settle = new PauseTransition(Duration.millis(40));
+            settle.setOnFinished(e -> {
+                scrollMessages.setVvalue(1.0);
+                scrollMessages.requestLayout();
+            });
+            settle.play();
+        });
     }
 
     @FXML
@@ -151,13 +295,14 @@ public class ChatAIController {
         if (msg == null || msg.isBlank()) return;
 
         if (enfantId == null || cachedEnfant == null) {
-            taChat.appendText("AI: Sélectionnez ou ajoutez un enfant depuis l'accueil.\n\n");
+            appendAssistantMessage("Sélectionnez ou ajoutez un enfant depuis l'accueil.");
             return;
         }
 
-        taChat.appendText("Moi: " + msg + "\n");
+        appendUserMessage(msg);
         tfMessage.clear();
         btnSend.setDisable(true);
+        showTypingIndicator();
 
         new Thread(() -> {
             try {
@@ -171,13 +316,17 @@ public class ChatAIController {
                 HttpResponse<String> res = http.send(req, HttpResponse.BodyHandlers.ofString());
                 String body = res.body();
                 Platform.runLater(() -> {
+                    removeTypingIndicator();
                     displayStructuredResponse(body);
                     btnSend.setDisable(false);
+                    scrollChatToBottom();
                 });
             } catch (Exception e) {
                 Platform.runLater(() -> {
-                    taChat.appendText("AI: Erreur -> " + e.getMessage() + "\n\n");
+                    removeTypingIndicator();
+                    appendAssistantMessage("Erreur -> " + e.getMessage());
                     btnSend.setDisable(false);
+                    scrollChatToBottom();
                 });
             }
         }).start();
@@ -312,7 +461,7 @@ public class ChatAIController {
             String intent = root.has("intent") ? root.path("intent").asText("") : "";
 
             StringBuilder out = new StringBuilder();
-            out.append("AI: ").append(reply);
+            out.append(reply);
             if ("MISSING_CONTEXT".equals(intent)) {
                 if (root.has("missing_fields") && root.get("missing_fields").isArray()) {
                     out.append("\n  Champs manquants: ");
@@ -332,10 +481,9 @@ public class ChatAIController {
                     out.append("\n  Position (lat/lng): ").append(facts.path("busLat").asText()).append(", ").append(facts.path("busLng").asText());
                 }
             }
-            out.append("\n\n");
-            taChat.appendText(out.toString());
+            appendAssistantMessage(out.toString().trim());
         } catch (Exception e) {
-            taChat.appendText("AI: " + body + "\n\n");
+            appendAssistantMessage(body);
         }
     }
 
@@ -348,8 +496,9 @@ public class ChatAIController {
     void goBack(ActionEvent event) {
         if (embeddedModeOnClose != null) {
             embeddedModeOnClose.run();
-        } else if (taChat != null && taChat.getScene() != null && taChat.getScene().getWindow() instanceof Stage) {
-            ((Stage) taChat.getScene().getWindow()).close();
+        } else if (scrollMessages != null && scrollMessages.getScene() != null
+                && scrollMessages.getScene().getWindow() instanceof Stage) {
+            ((Stage) scrollMessages.getScene().getWindow()).close();
         }
     }
 }

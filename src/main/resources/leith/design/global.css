@@ -1119,6 +1119,44 @@
     -fx-opacity: 0.95;
 }
 
+/* Admin Home — scroll pane: solid fills only (gradients here break -fx-effect parsing on scrollbar arrows) */
+.admin-home-scroll {
+    -fx-min-height: 0;
+    -fx-background-color: #121212;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+    -fx-control-inner-background: #121212;
+}
+
+.admin-home-scroll > .viewport {
+    -fx-background-color: #121212;
+}
+
+.admin-home-scroll .scroll-bar:vertical,
+.admin-home-scroll .scroll-bar:horizontal {
+    -fx-background-color: rgba(0, 0, 0, 0.35);
+}
+
+.admin-home-scroll .scroll-bar .thumb {
+    -fx-background-color: rgba(255, 255, 255, 0.22);
+    -fx-background-radius: 6;
+}
+
+.admin-home-scroll .scroll-bar .track {
+    -fx-background-color: rgba(0, 0, 0, 0.25);
+}
+
+/* Isolate scrollbar chrome from inherited paints (avoids LinearGradient → Color on arrow effect) */
+.admin-home-scroll .scroll-bar .increment-button,
+.admin-home-scroll .scroll-bar .decrement-button {
+    -fx-background-color: rgba(24, 24, 24, 0.98);
+}
+
+.admin-home-scroll .scroll-bar .increment-arrow,
+.admin-home-scroll .scroll-bar .decrement-arrow {
+    -fx-background-color: rgba(255, 255, 255, 0.42);
+}
+
 /* Admin Home explicit layout */
 .admin-home-board {
     -fx-background-color: linear-gradient(to bottom right, #1A1A1A, #121212);
