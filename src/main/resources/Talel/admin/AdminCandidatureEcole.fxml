@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.workshop.controlleurs.Talel.admin.AdminCandidatureEcoleController"
+      styleClass="admin-content content-area admin-main-panel" spacing="16" stylesheets="@/leith/design/global.css">
+    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+    <Label text="Candidatures école" styleClass="admin-page-title"/>
+    <Label text="Validation des inscriptions responsables d'école" styleClass="admin-page-subtitle"/>
+
+    <HBox spacing="8">
+        <Button text="Actualiser" onAction="#reload" styleClass="btn-secondary"/>
+    </HBox>
+
+    <TableView fx:id="table" VBox.vgrow="ALWAYS" styleClass="table-view admin-table-panel">
+        <columns>
+            <TableColumn fx:id="colNom" text="Nom" prefWidth="100"/>
+            <TableColumn fx:id="colPrenom" text="Prénom" prefWidth="100"/>
+            <TableColumn fx:id="colEcole" text="École" prefWidth="160"/>
+            <TableColumn fx:id="colLat" text="Latitude" prefWidth="90"/>
+            <TableColumn fx:id="colLon" text="Longitude" prefWidth="90"/>
+            <TableColumn fx:id="colStatut" text="Statut" prefWidth="120"/>
+            <TableColumn fx:id="colActions" text="Actions" prefWidth="260"/>
+        </columns>
+    </TableView>
+</VBox>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.workshop.controlleurs.leith.agent.AgentMaitressesListeController"
+      styleClass="card content-area" spacing="12">
+    <stylesheets>
+        <URL value="@../app.css"/>
+        <URL value="@../design/global.css"/>
+    </stylesheets>
+    <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+
+    <Label text="Maîtresses existantes" styleClass="title-md"/>
+
+    <HBox spacing="8">
+        <TextField fx:id="fieldSearch" promptText="Rechercher (nom, prénom, email)" prefWidth="280"/>
+        <Button text="Actualiser" onAction="#reload" styleClass="btn-secondary"/>
+    </HBox>
+
+    <TableView fx:id="table" VBox.vgrow="ALWAYS" styleClass="table-view">
+        <columns>
+            <TableColumn fx:id="colNom" text="Nom" prefWidth="100"/>
+            <TableColumn fx:id="colPrenom" text="Prénom" prefWidth="100"/>
+            <TableColumn fx:id="colEmail" text="Email" prefWidth="200"/>
+            <TableColumn fx:id="colBus" text="Bus" prefWidth="160"/>
+            <TableColumn fx:id="colActions" text="Actions" prefWidth="280"/>
+        </columns>
+    </TableView>
+    <Label fx:id="lblMessage" wrapText="true"/>
+</VBox>

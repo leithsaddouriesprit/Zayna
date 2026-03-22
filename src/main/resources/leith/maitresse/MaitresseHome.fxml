@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import java.net.URL?>
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.workshop.controlleurs.leith.maitresse.MaitresseHomeController"
+      styleClass="card content-area" spacing="16" alignment="TOP_LEFT">
+    <stylesheets>
+        <URL value="@../app.css"/>
+        <URL value="@../design/global.css"/>
+    </stylesheets>
+    <padding><Insets top="28" right="28" bottom="28" left="28"/></padding>
+
+    <Label text="Accueil" styleClass="title-md"/>
+    <Label fx:id="lblWelcome" wrapText="true"
+           style="-fx-text-fill: #E2E8F0; -fx-font-size: 18px; -fx-font-weight: 600;"/>
+    <Label fx:id="lblHint" wrapText="true"
+           style="-fx-text-fill: #94A3B8; -fx-font-size: 13px;"/>
+</VBox>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.workshop.controlleurs.leith.agent.AgentCandidatureEcolePendingController"
+      styleClass="card content-area" spacing="16" alignment="TOP_LEFT">
+    <stylesheets>
+        <URL value="@../app.css"/>
+        <URL value="@../design/global.css"/>
+    </stylesheets>
+    <padding><Insets top="28" right="28" bottom="28" left="28"/></padding>
+
+    <Label text="Candidature responsable d'école" styleClass="title-md"/>
+    <Label fx:id="lblStatut" wrapText="true" style="-fx-text-fill: #E2E8F0; -fx-font-size: 15px;"/>
+    <Label text="Votre demande est en cours de traitement par l'administrateur. Vous pourrez accéder à la console agent une fois la candidature approuvée."
+           wrapText="true" style="-fx-text-fill: #94A3B8;"/>
+
+    <HBox spacing="10">
+        <Button text="Modifier" onAction="#onModifier" styleClass="btn-primary"/>
+        <Button text="Supprimer" onAction="#onSupprimer" styleClass="btn-soft"/>
+    </HBox>
+    <Label fx:id="lblMessage" wrapText="true"/>
+</VBox>

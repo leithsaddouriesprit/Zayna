@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import java.net.URL?>
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      spacing="18" alignment="TOP_LEFT" styleClass="content-area admin-main-panel parent-page">
+    <stylesheets>
+        <URL value="@../design/global.css"/>
+    </stylesheets>
+    <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
+
+    <VBox spacing="12" styleClass="parent-home-card" fillWidth="true" maxWidth="Infinity"
+          style="-fx-background-color: linear-gradient(to bottom right, #454545, #3A3A3A); -fx-background-radius: 16; -fx-border-color: rgba(255,255,255,0.38); -fx-border-radius: 16; -fx-border-width: 1; -fx-padding: 20;">
+        <Label text="Réclamer" styleClass="parent-card-title"/>
+        <Label text="Fonction à venir." wrapText="true" styleClass="parent-card-text"/>
+    </VBox>
+</VBox>

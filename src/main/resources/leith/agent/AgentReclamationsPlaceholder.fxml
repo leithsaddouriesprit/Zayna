@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import java.net.URL?>
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      styleClass="card content-area" spacing="16" alignment="TOP_LEFT">
+    <stylesheets>
+        <URL value="@../app.css"/>
+        <URL value="@../design/global.css"/>
+    </stylesheets>
+    <padding><Insets top="28" right="28" bottom="28" left="28"/></padding>
+
+    <Label text="Gestion réclamations" styleClass="title-md"/>
+    <Label text="Fonction à venir." wrapText="true"
+           style="-fx-text-fill: #94A3B8; -fx-font-size: 15px;"/>
+</VBox>

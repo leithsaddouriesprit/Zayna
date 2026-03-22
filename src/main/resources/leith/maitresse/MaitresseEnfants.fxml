@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.workshop.controlleurs.leith.maitresse.MaitresseEnfantsController"
+      styleClass="card content-area" spacing="12">
+    <stylesheets>
+        <URL value="@../app.css"/>
+        <URL value="@../design/global.css"/>
+    </stylesheets>
+    <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+
+    <Label text="Gestion enfants" styleClass="title-md"/>
+    <Label fx:id="lblEmpty" visible="false" managed="false" wrapText="true"
+           style="-fx-text-fill: #94A3B8;"/>
+
+    <HBox spacing="8" alignment="CENTER_LEFT">
+        <TextField fx:id="fieldSearch" promptText="Rechercher (nom, prénom…)" prefWidth="260" styleClass="text-input"/>
+        <Button fx:id="btnReclamation" text="Réclamation" disable="true" onAction="#onReclamation" styleClass="btn-secondary"/>
+    </HBox>
+
+    <TableView fx:id="table" VBox.vgrow="ALWAYS" styleClass="table-view">
+        <columns>
+            <TableColumn fx:id="colNom" text="Nom" prefWidth="120"/>
+            <TableColumn fx:id="colPrenom" text="Prénom" prefWidth="120"/>
+            <TableColumn fx:id="colTrajet" text="Trajet" prefWidth="140"/>
+            <TableColumn fx:id="colOnBoard" text="À bord" prefWidth="80"/>
+            <TableColumn fx:id="colActions" text="Actions" prefWidth="220"/>
+        </columns>
+    </TableView>
+    <Label fx:id="lblMessage" text=""/>
+</VBox>
