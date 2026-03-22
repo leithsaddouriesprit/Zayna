@@ -11,7 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * HTTP client for zayna-ai-api agent chat (read-only assistant).
+ * Client HTTP vers zayna-ai-api pour le chat agent (lecture + actions confirmées côté UI).
  */
 public class AgentChatApiClient {
 

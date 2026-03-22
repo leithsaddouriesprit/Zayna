@@ -12,4 +12,11 @@ public class AgentChatRequest {
     public Integer userId;
 
     public String sessionId;
+
+    /** Jeton renvoyé avec une proposition d'action ; avec {@link #confirmAction} pour confirmer ou annuler. */
+    @JsonProperty("confirmPendingActionId")
+    public String confirmPendingActionId;
+
+    @JsonProperty("confirmAction")
+    public Boolean confirmAction;
 }

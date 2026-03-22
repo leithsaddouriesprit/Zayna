@@ -8,7 +8,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Read-only agent assistant API. Scope is always derived from {@code userId} → {@code agent_ecole.id_ecole}.
+ * API chat assistant agent : lecture (Level 2) et actions non destructives après confirmation (Level 3).
+ * Le périmètre école est toujours dérivé de {@code userId} → {@code agent_ecole.id_ecole}.
  */
 @RestController
 @RequestMapping("/ai/agent")

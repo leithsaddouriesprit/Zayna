@@ -15,6 +15,9 @@ public class AgentChatDataService {
 
     private static final int LIST_CAP = 25;
 
+    /** Candidatures enfant à parcourir pour la résolution par nom (une école, statut en attente). */
+    private static final int ENFANT_CAND_NAME_SCAN_LIMIT = 150;
+
     private final JdbcTemplate jdbc;
 
     /** Fragment SQL « LIMIT n » avec espace obligatoire (évite LIMIT26 si concaténation au text block). */
@@ -942,6 +945,213 @@ public class AgentChatDataService {
                     like);
         }
         return rows;
+    }
+
+    // --- Level 3 : résolution des cibles d’action (lecture, périmètre école) ---
+
+    public record ResolvedChauffeurCand(int id, String label) {
+    }
+
+    public record ResolvedEnfantCand(int id, String label) {
+    }
+
+    public record ResolvedMaitresse(int id, String label) {
+    }
+
+    public record ResolvedBus(int id, String label) {
+    }
+
+    public List<ResolvedChauffeurCand> findPendingChauffeurCandidaturesByName(int ecoleId, String nameQuery) {
+        if (nameQuery == null || nameQuery.isBlank()) {
+            return List.of();
+        }
+        String like = "%" + nameQuery.trim().toLowerCase(Locale.ROOT) + "%";
+        return jdbc.query(
+                """
+                        SELECT c.id, ch.prenom, ch.nom FROM candidature c
+                        INNER JOIN chauffeur ch ON ch.id = c.chauffeur_id
+                        WHERE c.id_ecole = ? AND c.statut = 'ENVOYEE'
+                        AND (LOWER(CONCAT(ch.prenom,' ',ch.nom)) LIKE ? OR LOWER(ch.nom) LIKE ? OR LOWER(ch.prenom) LIKE ?)
+                        ORDER BY ch.nom, ch.prenom LIMIT 8
+                        """,
+                (rs, rowNum) -> new ResolvedChauffeurCand(rs.getInt("id"),
+                        (nullToEmpty(rs.getString("prenom")) + " " + nullToEmpty(rs.getString("nom"))).trim()),
+                ecoleId, like, like, like);
+    }
+
+    /**
+     * Résout les candidatures enfant en attente ({@code ENVOYEE}) pour l’école, par nom / prénom / les deux,
+     * ordre nom prénom ou prénom nom, avec la même normalisation que le chat agent (accents, casse, espaces).
+     */
+    public List<ResolvedEnfantCand> findPendingEnfantCandidaturesByName(int ecoleId, String nameQuery) {
+        if (nameQuery == null || nameQuery.isBlank()) {
+            return List.of();
+        }
+        String cleaned = stripEnfantCandidatureNameQueryNoise(nameQuery);
+        String qNorm = AgentChatTextNormalizer.forMatching(cleaned);
+        if (qNorm.isBlank()) {
+            return List.of();
+        }
+        List<EnfantCandScanRow> rows = jdbc.query(
+                """
+                        SELECT id, prenom_enfant, nom_enfant FROM candidature_enfant
+                        WHERE id_ecole = ? AND statut = 'ENVOYEE'
+                        ORDER BY date_demande DESC
+                        """ + sqlLimit(ENFANT_CAND_NAME_SCAN_LIMIT),
+                (rs, rowNum) -> new EnfantCandScanRow(
+                        rs.getInt("id"), rs.getString("prenom_enfant"), rs.getString("nom_enfant")),
+                ecoleId);
+        List<ResolvedEnfantCand> matches = new ArrayList<>();
+        for (EnfantCandScanRow row : rows) {
+            if (matchesPendingEnfantCandidatureNameFields(row.prenom(), row.nom(), qNorm)) {
+                String label = (nullToEmpty(row.prenom()) + " " + nullToEmpty(row.nom())).trim();
+                matches.add(new ResolvedEnfantCand(row.id(), label));
+            }
+        }
+        return matches;
+    }
+
+    /**
+     * Retire des mots parasites souvent dictés avec le nom (« nom », « prénom », etc.) sans toucher au reste.
+     */
+    private static String stripEnfantCandidatureNameQueryNoise(String raw) {
+        String t = nullToEmpty(raw).trim();
+        if (t.isEmpty()) {
+            return "";
+        }
+        t = t.replaceAll("(?i)\\b(nom|prenom|prénom|firstname|lastname|name)\\b", " ");
+        return t.replaceAll("\\s+", " ").trim();
+    }
+
+    private record EnfantCandScanRow(int id, String prenom, String nom) {
+    }
+
+    private static boolean matchesPendingEnfantCandidatureNameFields(String prenomRaw, String nomRaw, String qNorm) {
+        String pn = AgentChatTextNormalizer.forMatching(prenomRaw);
+        String nm = AgentChatTextNormalizer.forMatching(nomRaw);
+        if (pn.isEmpty() && nm.isEmpty()) {
+            return false;
+        }
+        String fullPn = (pn + " " + nm).trim();
+        String fullNp = (nm + " " + pn).trim();
+        if (!fullPn.isEmpty() && (fullPn.contains(qNorm) || qNorm.contains(fullPn))) {
+            return true;
+        }
+        if (!fullNp.isEmpty() && (fullNp.contains(qNorm) || qNorm.contains(fullNp))) {
+            return true;
+        }
+        String[] tokens = qNorm.split("\\s+");
+        List<String> tokList = new ArrayList<>();
+        for (String t : tokens) {
+            if (t != null && !t.isBlank()) {
+                tokList.add(t.trim());
+            }
+        }
+        if (tokList.isEmpty()) {
+            return false;
+        }
+        if (tokList.size() == 1) {
+            String t = tokList.get(0);
+            return nm.contains(t) || pn.contains(t);
+        }
+        for (String t : tokList) {
+            if (!nm.contains(t) && !pn.contains(t)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public List<ResolvedMaitresse> findMaitressesByNameForEcole(int ecoleId, String nameQuery) {
+        if (nameQuery == null || nameQuery.isBlank()) {
+            return List.of();
+        }
+        String like = "%" + nameQuery.trim().toLowerCase(Locale.ROOT) + "%";
+        return jdbc.query(
+                """
+                        SELECT id, prenom, nom FROM maitresse
+                        WHERE id_ecole = ?
+                        AND (LOWER(CONCAT(prenom,' ',nom)) LIKE ? OR LOWER(nom) LIKE ? OR LOWER(prenom) LIKE ?)
+                        ORDER BY nom, prenom LIMIT 8
+                        """,
+                (rs, rowNum) -> new ResolvedMaitresse(rs.getInt("id"),
+                        (nullToEmpty(rs.getString("prenom")) + " " + nullToEmpty(rs.getString("nom"))).trim()),
+                ecoleId, like, like, like);
+    }
+
+    public Integer getEnfantCandidatureTrajetId(int candidatureId, int ecoleId) {
+        List<Integer> rows = jdbc.query(
+                "SELECT trajet_id FROM candidature_enfant WHERE id = ? AND id_ecole = ?",
+                (rs, rowNum) -> {
+                    Object o = rs.getObject("trajet_id");
+                    if (o == null) {
+                        return null;
+                    }
+                    int v = ((Number) o).intValue();
+                    return v == 0 ? null : v;
+                },
+                candidatureId,
+                ecoleId);
+        return rows.isEmpty() ? null : rows.get(0);
+    }
+
+    public boolean trajetBelongsToEcole(int trajetId, int ecoleId) {
+        Integer n = jdbc.queryForObject(
+                "SELECT COUNT(*) FROM trajet WHERE id = ? AND id_ecole = ?",
+                Integer.class,
+                trajetId,
+                ecoleId);
+        return n != null && n > 0;
+    }
+
+    /**
+     * Résout un bus actif de l’école par id numérique ou numéro / matricule.
+     */
+    public List<ResolvedBus> resolveBusesInEcole(int ecoleId, String busToken) {
+        if (busToken == null || busToken.isBlank()) {
+            return List.of();
+        }
+        String tok = busToken.trim();
+        List<ResolvedBus> out = new ArrayList<>();
+        try {
+            int bid = Integer.parseInt(tok);
+            out.addAll(jdbc.query(
+                    "SELECT id, numero_bus, matricule FROM bus WHERE id_ecole = ? AND actif = 1 AND id = ?",
+                    (rs, rowNum) -> toResolvedBus(rs),
+                    ecoleId,
+                    bid));
+        } catch (NumberFormatException ignored) {
+            // continue
+        }
+        if (out.isEmpty()) {
+            String like = "%" + tok.toLowerCase(Locale.ROOT) + "%";
+            out.addAll(jdbc.query(
+                    """
+                            SELECT id, numero_bus, matricule FROM bus WHERE id_ecole = ? AND actif = 1
+                            AND (numero_bus = ? OR LOWER(numero_bus) LIKE ? OR LOWER(matricule) LIKE ?) LIMIT 4
+                            """,
+                    (rs, rowNum) -> toResolvedBus(rs),
+                    ecoleId,
+                    tok,
+                    like,
+                    like));
+        }
+        return out;
+    }
+
+    private static ResolvedBus toResolvedBus(java.sql.ResultSet rs) throws java.sql.SQLException {
+        int id = rs.getInt("id");
+        String num = rs.getString("numero_bus");
+        String mat = rs.getString("matricule");
+        String lab = "Bus #" + id + " (n° " + nullToDash(num) + ")";
+        if (mat != null && !mat.isBlank()) {
+            lab += " / " + mat.trim();
+        }
+        return new ResolvedBus(id, lab);
+    }
+
+    private static String nullToEmpty(String s) {
+        return s == null ? "" : s;
     }
 
     public String generalSchoolInfo(int ecoleId) {

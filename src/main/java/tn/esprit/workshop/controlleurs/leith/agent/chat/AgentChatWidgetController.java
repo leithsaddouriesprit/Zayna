@@ -6,6 +6,7 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -27,7 +28,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Agent-area assistant chat: UI + calls zayna-ai-api (read-only). State is backed by {@link AgentChatSession}.
+ * Assistant agent (shell) : UI + appels zayna-ai-api. Lecture (Level 2) et actions confirmées (Level 3).
+ * État : {@link AgentChatSession}.
  */
 public class AgentChatWidgetController {
 
@@ -79,7 +81,11 @@ public class AgentChatWidgetController {
         removeTypingIndicator();
         for (AgentChatMessage m : AgentChatSession.getInstance().getMessagesSnapshot()) {
             if (m.getRole() == AgentChatMessage.Role.ASSISTANT) {
-                appendAssistantRowToUi(m.getText());
+                if (m.hasPendingAction()) {
+                    appendAssistantProposalRowToUi(m.getText(), m.getPendingActionId());
+                } else {
+                    appendAssistantRowToUi(m.getText());
+                }
             } else {
                 appendUserRowToUi(m.getText());
             }
@@ -117,6 +123,36 @@ public class AgentChatWidgetController {
         bubble.setMaxWidth(BUBBLE_MAX_WIDTH);
         bubble.getStyleClass().add("chat-msg-assistant-bubble");
         row.getChildren().addAll(avatar, bubble);
+        boxMessages.getChildren().add(row);
+    }
+
+    /** Proposition d’action (Level 3) : même bulle assistant + Confirmer / Annuler. */
+    private void appendAssistantProposalRowToUi(String text, String pendingActionId) {
+        if (boxMessages == null || text == null || pendingActionId == null || pendingActionId.isBlank()) {
+            return;
+        }
+        HBox row = new HBox(10);
+        row.setAlignment(Pos.TOP_LEFT);
+        row.setMaxWidth(Double.MAX_VALUE);
+        row.getStyleClass().add("chat-msg-assistant-row");
+        ImageView avatar = createAssistantAvatar();
+        Label bubble = new Label(text);
+        bubble.setWrapText(true);
+        bubble.setMaxWidth(BUBBLE_MAX_WIDTH);
+        bubble.getStyleClass().add("chat-msg-assistant-bubble");
+        Button btnConfirm = new Button("Confirmer");
+        Button btnCancel = new Button("Annuler");
+        btnConfirm.getStyleClass().addAll("agent-chat-action-btn", "agent-chat-confirm-btn");
+        btnCancel.getStyleClass().addAll("agent-chat-action-btn", "agent-chat-cancel-btn");
+        final String pid = pendingActionId.trim();
+        btnConfirm.setOnAction(ev -> confirmPendingAction(pid, true, btnConfirm, btnCancel));
+        btnCancel.setOnAction(ev -> confirmPendingAction(pid, false, btnConfirm, btnCancel));
+        HBox actions = new HBox(10, btnConfirm, btnCancel);
+        actions.setAlignment(Pos.CENTER_LEFT);
+        actions.setPadding(new Insets(8, 0, 0, 0));
+        VBox col = new VBox(bubble, actions);
+        col.setMaxWidth(BUBBLE_MAX_WIDTH + 24);
+        row.getChildren().addAll(avatar, col);
         boxMessages.getChildren().add(row);
     }
 
@@ -198,6 +234,91 @@ public class AgentChatWidgetController {
         });
     }
 
+    private void confirmPendingAction(String pendingActionId, boolean confirm, Button btnConfirm, Button btnCancel) {
+        if (pendingActionId == null || pendingActionId.isBlank()) {
+            return;
+        }
+        if (btnConfirm != null) {
+            btnConfirm.setDisable(true);
+        }
+        if (btnCancel != null) {
+            btnCancel.setDisable(true);
+        }
+        Integer userId = AppSession.getInstance().getConnectedUserId();
+        if (userId == null || userId <= 0) {
+            if (btnConfirm != null) {
+                btnConfirm.setDisable(false);
+            }
+            if (btnCancel != null) {
+                btnCancel.setDisable(false);
+            }
+            appendAssistantRowToUi(AgentChatErrorHandler.userMessageForInvalidSession());
+            scrollChatToBottom();
+            return;
+        }
+
+        String userLine = confirm ? "Confirmer" : "Annuler";
+        AgentChatSession.getInstance().addUserMessage(userLine);
+        appendUserRowToUi(userLine);
+        if (btnSend != null) {
+            btnSend.setDisable(true);
+        }
+        if (tfMessage != null) {
+            tfMessage.setDisable(true);
+        }
+        showTypingIndicator();
+
+        final String pid = pendingActionId.trim();
+        new Thread(() -> {
+            String assistantText;
+            boolean needsSecondConfirm = false;
+            String secondPendingId = null;
+            try {
+                AgentChatRequest req = new AgentChatRequest();
+                req.userId = userId;
+                req.sessionId = "javafx-agent-confirm-" + System.currentTimeMillis();
+                req.confirmPendingActionId = pid;
+                req.confirmAction = confirm;
+                AgentChatResponse res = agentChatApiClient.ask(req);
+                needsSecondConfirm = Boolean.TRUE.equals(res.getRequiresConfirmation());
+                secondPendingId = res.getPendingActionId();
+                String r = res.getReply();
+                if (r == null || r.isBlank()) {
+                    assistantText = AgentChatErrorHandler.emptyOrUnreadableReply();
+                } else {
+                    assistantText = r.trim();
+                }
+            } catch (AgentChatApiException ex) {
+                LOG.log(Level.FINE, "Agent chat API confirm error", ex);
+                assistantText = AgentChatErrorHandler.userMessageForNetworkOrUnknown();
+            } catch (Exception ex) {
+                LOG.log(Level.WARNING, "Agent chat confirm unexpected error", ex);
+                assistantText = AgentChatErrorHandler.userMessageForNetworkOrUnknown();
+            }
+            String finalAssistantText = assistantText;
+            boolean finalNeedsSecond = needsSecondConfirm;
+            String finalSecondPending = secondPendingId;
+            Platform.runLater(() -> {
+                removeTypingIndicator();
+                AgentChatSession.getInstance().clearProposalButtons(pid);
+                if (finalNeedsSecond && finalSecondPending != null && !finalSecondPending.isBlank()) {
+                    AgentChatSession.getInstance().addAssistantProposal(
+                            finalAssistantText, finalSecondPending.trim());
+                } else {
+                    AgentChatSession.getInstance().addAssistantMessage(finalAssistantText);
+                }
+                rebuildUIFromSession();
+                if (btnSend != null) {
+                    btnSend.setDisable(false);
+                }
+                if (tfMessage != null) {
+                    tfMessage.setDisable(false);
+                }
+                scrollChatToBottom();
+            });
+        }, "agent-chat-confirm").start();
+    }
+
     @FXML
     void send(ActionEvent event) {
         if (tfMessage == null) {
@@ -224,12 +345,16 @@ public class AgentChatWidgetController {
 
         new Thread(() -> {
             String assistantText;
+            boolean needsConfirm = false;
+            String pendingId = null;
             try {
                 AgentChatRequest req = new AgentChatRequest();
                 req.message = msg;
                 req.userId = userId;
                 req.sessionId = "javafx-agent-" + System.currentTimeMillis();
                 AgentChatResponse res = agentChatApiClient.ask(req);
+                needsConfirm = Boolean.TRUE.equals(res.getRequiresConfirmation());
+                pendingId = res.getPendingActionId();
                 String r = res.getReply();
                 if (r == null || r.isBlank()) {
                     assistantText = AgentChatErrorHandler.emptyOrUnreadableReply();
@@ -244,10 +369,18 @@ public class AgentChatWidgetController {
                 assistantText = AgentChatErrorHandler.userMessageForNetworkOrUnknown();
             }
             String finalAssistantText = assistantText;
+            boolean finalNeedsConfirm = needsConfirm;
+            String finalPendingId = pendingId;
             Platform.runLater(() -> {
                 removeTypingIndicator();
-                AgentChatSession.getInstance().addAssistantMessage(finalAssistantText);
-                appendAssistantRowToUi(finalAssistantText);
+                if (finalNeedsConfirm && finalPendingId != null && !finalPendingId.isBlank()) {
+                    String token = finalPendingId.trim();
+                    AgentChatSession.getInstance().addAssistantProposal(finalAssistantText, token);
+                    appendAssistantProposalRowToUi(finalAssistantText, token);
+                } else {
+                    AgentChatSession.getInstance().addAssistantMessage(finalAssistantText);
+                    appendAssistantRowToUi(finalAssistantText);
+                }
                 if (btnSend != null) {
                     btnSend.setDisable(false);
                 }

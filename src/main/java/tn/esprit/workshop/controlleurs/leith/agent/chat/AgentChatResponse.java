@@ -8,6 +8,8 @@ public class AgentChatResponse {
     private String reply;
     private String intent;
     private String errorCode;
+    private Boolean requiresConfirmation;
+    private String pendingActionId;
 
     public String getReply() {
         return reply;
@@ -31,5 +33,21 @@ public class AgentChatResponse {
 
     public void setErrorCode(String errorCode) {
         this.errorCode = errorCode;
+    }
+
+    public Boolean getRequiresConfirmation() {
+        return requiresConfirmation;
+    }
+
+    public void setRequiresConfirmation(Boolean requiresConfirmation) {
+        this.requiresConfirmation = requiresConfirmation;
+    }
+
+    public String getPendingActionId() {
+        return pendingActionId;
+    }
+
+    public void setPendingActionId(String pendingActionId) {
+        this.pendingActionId = pendingActionId;
     }
 }

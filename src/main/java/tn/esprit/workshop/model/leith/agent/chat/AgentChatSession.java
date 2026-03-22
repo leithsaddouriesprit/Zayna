@@ -33,6 +33,26 @@ public final class AgentChatSession {
         messages.add(new AgentChatMessage(AgentChatMessage.Role.ASSISTANT, text));
     }
 
+    /** Proposition d’action (Level 3) : texte + jeton serveur pour confirmation. */
+    public synchronized void addAssistantProposal(String text, String pendingActionId) {
+        messages.add(new AgentChatMessage(AgentChatMessage.Role.ASSISTANT, text, pendingActionId));
+    }
+
+    /** Retire les boutons de confirmation sur une proposition déjà traitée (historique = texte seul). */
+    public synchronized void clearProposalButtons(String pendingActionId) {
+        if (pendingActionId == null || pendingActionId.isBlank()) {
+            return;
+        }
+        for (int i = 0; i < messages.size(); i++) {
+            AgentChatMessage m = messages.get(i);
+            if (m.getRole() == AgentChatMessage.Role.ASSISTANT
+                    && pendingActionId.equals(m.getPendingActionId())) {
+                messages.set(i, new AgentChatMessage(AgentChatMessage.Role.ASSISTANT, m.getText()));
+                return;
+            }
+        }
+    }
+
     public synchronized boolean isEmpty() {
         return messages.isEmpty();
     }

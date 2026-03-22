@@ -16,4 +16,14 @@ public class AgentChatRequestDto {
 
     /** Optional client session id for logging only (not trusted for auth). */
     public String sessionId;
+
+    /**
+     * Level 3 : jeton renvoyé avec une proposition d'action ({@code ACTION_PROPOSAL}).
+     * Avec {@link #confirmAction} obligatoire : {@code true} = exécuter, {@code false} = annuler.
+     */
+    @JsonProperty("confirmPendingActionId")
+    public String confirmPendingActionId;
+
+    @JsonProperty("confirmAction")
+    public Boolean confirmAction;
 }

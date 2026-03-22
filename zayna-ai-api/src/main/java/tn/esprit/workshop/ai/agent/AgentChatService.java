@@ -1,6 +1,11 @@
 package tn.esprit.workshop.ai.agent;
 
 import org.springframework.stereotype.Service;
+import tn.esprit.workshop.ai.agent.action.AgentActionExecutionException;
+import tn.esprit.workshop.ai.agent.action.AgentChatActionDetector;
+import tn.esprit.workshop.ai.agent.action.AgentChatActionExecutor;
+import tn.esprit.workshop.ai.agent.action.AgentChatActionPayload;
+import tn.esprit.workshop.ai.agent.action.AgentChatPendingActionStore;
 import tn.esprit.workshop.ai.agent.dto.AgentChatRequestDto;
 import tn.esprit.workshop.ai.agent.dto.AgentChatResponseDto;
 
@@ -27,15 +32,26 @@ public class AgentChatService {
 
     private final AgentChatIntentDetector intentDetector;
     private final AgentChatDataService data;
+    private final AgentChatActionDetector actionDetector;
+    private final AgentChatPendingActionStore pendingActionStore;
+    private final AgentChatActionExecutor actionExecutor;
 
-    public AgentChatService(AgentChatIntentDetector intentDetector, AgentChatDataService data) {
+    public AgentChatService(
+            AgentChatIntentDetector intentDetector,
+            AgentChatDataService data,
+            AgentChatActionDetector actionDetector,
+            AgentChatPendingActionStore pendingActionStore,
+            AgentChatActionExecutor actionExecutor) {
         this.intentDetector = intentDetector;
         this.data = data;
+        this.actionDetector = actionDetector;
+        this.pendingActionStore = pendingActionStore;
+        this.actionExecutor = actionExecutor;
     }
 
     public AgentChatResponseDto handle(AgentChatRequestDto req) {
         try {
-            if (req == null || req.message == null || req.message.isBlank()) {
+            if (req == null) {
                 return AgentChatResponseDto.ok("Veuillez poser une question sur votre école.", "EMPTY");
             }
             if (req.userId == null || req.userId <= 0) {
@@ -58,7 +74,54 @@ public class AgentChatService {
                         ERR_ECOLE);
             }
 
-            AgentChatIntentDetector.Detection d = intentDetector.detect(req.message.trim());
+            // --- Level 3 : confirmation / annulation d'une action proposée ---
+            if (req.confirmPendingActionId != null && !req.confirmPendingActionId.isBlank()) {
+                if (req.confirmAction == null) {
+                    return AgentChatResponseDto.ok(
+                            "Indiquez si vous confirmez ou annulez l'action (boutons Confirmer / Annuler).",
+                            "ACTION_CONFIRM_INCOMPLETE");
+                }
+                if (!Boolean.TRUE.equals(req.confirmAction)) {
+                    pendingActionStore.cancelWithoutExecute(
+                            req.confirmPendingActionId.trim(), req.userId, ecoleId);
+                    return AgentChatResponseDto.ok("Action annulée.", "ACTION_CANCELLED");
+                }
+                AgentChatActionPayload payload = pendingActionStore.take(
+                        req.confirmPendingActionId.trim(), req.userId, ecoleId);
+                if (payload == null) {
+                    return AgentChatResponseDto.ok(
+                            "Cette proposition a expiré ou est invalide. Reformulez votre demande.",
+                            "ACTION_EXPIRED");
+                }
+                try {
+                    String out = actionExecutor.execute(ecoleId, payload);
+                    return AgentChatResponseDto.ok(out, payload.type().name());
+                } catch (AgentActionExecutionException ex) {
+                    return AgentChatResponseDto.ok(ex.getMessage(), "ACTION_FAILED");
+                }
+            }
+
+            String msg = req.message != null ? req.message.trim() : "";
+            if (msg.isBlank()) {
+                return AgentChatResponseDto.ok("Veuillez poser une question sur votre école.", "EMPTY");
+            }
+
+            // --- Level 3 : nouvelle détection d'action (avant lecture) ---
+            AgentChatActionDetector.ActionParseResult ar = actionDetector.parse(msg, ecoleId, data);
+            if (ar instanceof AgentChatActionDetector.ActionParseResult.Clarify clarify) {
+                String intentTag = AgentChatActionDetector.MSG_ACTION_FORBIDDEN.equals(clarify.message())
+                        ? "FORBIDDEN"
+                        : "ACTION_CLARIFY";
+                return AgentChatResponseDto.ok(clarify.message(), intentTag);
+            }
+            if (ar instanceof AgentChatActionDetector.ActionParseResult.Proposal proposal) {
+                String token = pendingActionStore.put(req.userId, ecoleId, proposal.payload());
+                String text = AgentChatActionDetector.buildProposalText(proposal.payload());
+                return AgentChatResponseDto.proposal(text, token, "ACTION_PROPOSAL");
+            }
+
+            // --- Level 2 : lecture ---
+            AgentChatIntentDetector.Detection d = intentDetector.detect(msg);
             System.out.println("INTENT = " + d.type());
 
             AgentChatResponseDto response = switch (d.type()) {

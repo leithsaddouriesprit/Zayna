@@ -9,3 +9,30 @@
     -fx-font-size: 13px;
     -fx-font-weight: normal;
 }
+
+/* Level 3 : confirmation d’action sous la bulle assistant */
+.agent-chat-action-btn {
+    -fx-background-color: #2a2a2a;
+    -fx-text-fill: #e8e8e8;
+    -fx-border-color: #444444;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 6px 14px;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+}
+
+.agent-chat-confirm-btn:hover {
+    -fx-background-color: #2d3d28;
+    -fx-border-color: #4a6b3a;
+}
+
+.agent-chat-cancel-btn:hover {
+    -fx-background-color: #3d2a2a;
+    -fx-border-color: #6a4545;
+}
+
+.agent-chat-action-btn:disabled {
+    -fx-opacity: 0.45;
+    -fx-cursor: default;
+}
