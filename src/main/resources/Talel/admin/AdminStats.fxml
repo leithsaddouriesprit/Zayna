@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.workshop.controlleurs.Talel.admin.AdminStatsController"
+      styleClass="admin-content content-area admin-main-panel" spacing="0" stylesheets="@/leith/design/global.css">
+    <padding><Insets top="28" right="32" bottom="28" left="32"/></padding>
+
+    <Label text="Statistiques" styleClass="admin-page-title"/>
+    <Label text="Vue synthétique par école (trajets, enfants, demandes, chauffeurs)" styleClass="admin-page-subtitle"/>
+
+    <!-- Indicateurs clés -->
+    <HBox styleClass="admin-stats-highlights admin-section-panel" alignment="CENTER" spacing="18" maxWidth="Infinity">
+        <VBox styleClass="admin-stats-highlight-card" spacing="10" alignment="CENTER" HBox.hgrow="ALWAYS" maxWidth="Infinity" minWidth="260" minHeight="138" prefHeight="138">
+            <Label text="École avec le plus de trajets" wrapText="true" textAlignment="CENTER" maxWidth="Infinity" styleClass="admin-stat-card-title"/>
+            <Label fx:id="lblTopTrajetsSchool" styleClass="stats-highlight-value" wrapText="true" textAlignment="CENTER" maxWidth="Infinity"/>
+        </VBox>
+        <VBox styleClass="admin-stats-highlight-card" spacing="10" alignment="CENTER" HBox.hgrow="ALWAYS" maxWidth="Infinity" minWidth="260" minHeight="138" prefHeight="138">
+            <Label text="École avec le plus d'enfants" wrapText="true" textAlignment="CENTER" maxWidth="Infinity" styleClass="admin-stat-card-title"/>
+            <Label fx:id="lblTopChildrenSchool" styleClass="stats-highlight-value" wrapText="true" textAlignment="CENTER" maxWidth="Infinity"/>
+        </VBox>
+        <VBox styleClass="admin-stats-highlight-card" spacing="10" alignment="CENTER" HBox.hgrow="ALWAYS" maxWidth="Infinity" minWidth="260" minHeight="138" prefHeight="138">
+            <Label text="École avec le plus de demandes enfant en attente" wrapText="true" textAlignment="CENTER" maxWidth="Infinity" styleClass="admin-stat-card-title"/>
+            <Label fx:id="lblTopPendingChildSchool" styleClass="stats-highlight-value" wrapText="true" textAlignment="CENTER" maxWidth="Infinity"/>
+        </VBox>
+    </HBox>
+
+    <!-- Détail par école -->
+    <VBox styleClass="admin-stats-table-section admin-table-panel" spacing="10" VBox.vgrow="ALWAYS">
+        <Label text="Détail par école" styleClass="admin-stat-card-title"/>
+        <TableView fx:id="tableStats" VBox.vgrow="ALWAYS" styleClass="table-view">
+            <columns>
+                <TableColumn fx:id="colEcole" text="École" prefWidth="200"/>
+                <TableColumn fx:id="colTrajets" text="Trajets" prefWidth="90"/>
+                <TableColumn fx:id="colEnfants" text="Enfants" prefWidth="100"/>
+                <TableColumn fx:id="colBuses" text="Bus" prefWidth="80"/>
+                <TableColumn fx:id="colPendingChild" text="Candidatures enfant ENVOYEE" prefWidth="200"/>
+                <TableColumn fx:id="colAcceptedChauffeurs" text="Chauffeurs acceptés" prefWidth="150"/>
+            </columns>
+        </TableView>
+    </VBox>
+</VBox>

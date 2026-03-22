@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.workshop.controlleurs.Talel.admin.AdminChauffeursController"
+      styleClass="admin-content content-area admin-main-panel" spacing="16" stylesheets="@/leith/design/global.css">
+    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+    <Label text="Chauffeurs" styleClass="admin-page-title"/>
+    <Label text="Candidatures en attente et chauffeurs acceptés / affectés" styleClass="admin-page-subtitle"/>
+
+    <TitledPane text="Candidatures en attente (ENVOYEE)" expanded="true" styleClass="admin-section-panel">
+        <TableView fx:id="tableCandidatures" prefHeight="180" styleClass="table-view admin-table-panel">
+            <columns>
+                <TableColumn fx:id="colCId" text="Id" prefWidth="50"/>
+                <TableColumn fx:id="colCChauffeur" text="Chauffeur" prefWidth="180"/>
+                <TableColumn fx:id="colCStatut" text="Statut" prefWidth="90"/>
+                <TableColumn fx:id="colCReclamations" text="" prefWidth="100"/>
+            </columns>
+        </TableView>
+    </TitledPane>
+
+    <TitledPane text="Chauffeurs acceptés / opérationnels" expanded="true" styleClass="admin-section-panel">
+        <TableView fx:id="tableAccepted" VBox.vgrow="ALWAYS" styleClass="table-view admin-table-panel">
+            <columns>
+                <TableColumn fx:id="colAId" text="Id" prefWidth="50"/>
+                <TableColumn fx:id="colAChauffeur" text="Chauffeur" prefWidth="180"/>
+                <TableColumn fx:id="colABus" text="Bus" prefWidth="100"/>
+                <TableColumn fx:id="colAEcole" text="École" prefWidth="150"/>
+                <TableColumn fx:id="colAReclamations" text="" prefWidth="100"/>
+            </columns>
+        </TableView>
+    </TitledPane>
+
+    <FlowPane alignment="CENTER_LEFT" hgap="20" vgap="8" styleClass="admin-section-panel">
+        <Label fx:id="lblCandidatures" style="-fx-font-weight: bold; -fx-text-fill: #F59E0B;" text="Candidatures: 0"/>
+        <Label fx:id="lblAccepted" style="-fx-font-weight: bold; -fx-text-fill: #22C55E;" text="Acceptés: 0"/>
+        <Label fx:id="lblAssigned" style="-fx-font-weight: bold; -fx-text-fill: #3B82F6;" text="Affectés à un bus: 0"/>
+    </FlowPane>
+</VBox>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.workshop.controlleurs.Talel.admin.AdminHomeController"
+      styleClass="admin-content content-area admin-main-panel" spacing="0" fillWidth="true" stylesheets="@/leith/design/global.css">
+    <padding><Insets top="28" right="32" bottom="28" left="32"/></padding>
+
+    <Label text="Tableau de bord administrateur" styleClass="admin-page-title"/>
+    <Label text="Vue d'ensemble du système de transport scolaire" styleClass="admin-page-subtitle"/>
+
+    <HBox spacing="22" alignment="TOP_LEFT" maxWidth="Infinity" styleClass="admin-home-board" VBox.vgrow="ALWAYS">
+        <VBox spacing="12" alignment="TOP_CENTER" fillWidth="true" maxWidth="Infinity" styleClass="admin-home-col" HBox.hgrow="ALWAYS">
+            <Label text="Utilisateurs" maxWidth="Infinity" alignment="CENTER" styleClass="admin-home-col-title"/>
+            <VBox spacing="6" alignment="CENTER" maxWidth="Infinity" styleClass="admin-home-card">
+                <Label text="Total utilisateurs" wrapText="true" styleClass="admin-home-card-title"/>
+                <Label fx:id="lblTotalUsers" styleClass="admin-home-card-value"/>
+            </VBox>
+            <VBox spacing="6" alignment="CENTER" maxWidth="Infinity" styleClass="admin-home-card">
+                <Label text="Parents" wrapText="true" styleClass="admin-home-card-title"/>
+                <Label fx:id="lblTotalParents" styleClass="admin-home-card-value"/>
+            </VBox>
+            <VBox spacing="6" alignment="CENTER" maxWidth="Infinity" styleClass="admin-home-card">
+                <Label text="Chauffeurs" wrapText="true" styleClass="admin-home-card-title"/>
+                <Label fx:id="lblTotalChauffeurs" styleClass="admin-home-card-value"/>
+            </VBox>
+            <VBox spacing="6" alignment="CENTER" maxWidth="Infinity" styleClass="admin-home-card">
+                <Label text="Agents" wrapText="true" styleClass="admin-home-card-title"/>
+                <Label fx:id="lblTotalAgents" styleClass="admin-home-card-value"/>
+            </VBox>
+            <Region VBox.vgrow="ALWAYS"/>
+        </VBox>
+
+        <VBox spacing="12" alignment="TOP_CENTER" fillWidth="true" maxWidth="Infinity" styleClass="admin-home-col" HBox.hgrow="ALWAYS">
+            <Label text="Transport" maxWidth="Infinity" alignment="CENTER" styleClass="admin-home-col-title"/>
+            <VBox spacing="6" alignment="CENTER" maxWidth="Infinity" styleClass="admin-home-card">
+                <Label text="Trajets" wrapText="true" styleClass="admin-home-card-title"/>
+                <Label fx:id="lblTotalTrajets" styleClass="admin-home-card-value"/>
+            </VBox>
+            <VBox spacing="6" alignment="CENTER" maxWidth="Infinity" styleClass="admin-home-card">
+                <Label text="Bus" wrapText="true" styleClass="admin-home-card-title"/>
+                <Label fx:id="lblTotalBuses" styleClass="admin-home-card-value"/>
+            </VBox>
+            <VBox spacing="6" alignment="CENTER" maxWidth="Infinity" styleClass="admin-home-card">
+                <Label text="Enfants inscrits" wrapText="true" styleClass="admin-home-card-title"/>
+                <Label fx:id="lblTotalChildren" styleClass="admin-home-card-value"/>
+            </VBox>
+            <VBox spacing="6" alignment="CENTER" maxWidth="Infinity" styleClass="admin-home-card">
+                <Label text="Chauffeurs affectés à un bus" wrapText="true" styleClass="admin-home-card-title"/>
+                <Label fx:id="lblAssignedChauffeurs" styleClass="admin-home-card-value"/>
+            </VBox>
+            <Region VBox.vgrow="ALWAYS"/>
+        </VBox>
+
+        <VBox spacing="12" alignment="TOP_CENTER" fillWidth="true" maxWidth="Infinity" styleClass="admin-home-col" HBox.hgrow="ALWAYS">
+            <Label text="Demandes en attente" maxWidth="Infinity" alignment="CENTER" styleClass="admin-home-col-title"/>
+            <VBox spacing="6" alignment="CENTER" maxWidth="Infinity" styleClass="admin-home-card">
+                <Label text="Candidature enfant en attente" wrapText="true" styleClass="admin-home-card-title"/>
+                <Label fx:id="lblPendingChild" styleClass="admin-home-card-value"/>
+            </VBox>
+            <VBox spacing="6" alignment="CENTER" maxWidth="Infinity" styleClass="admin-home-card">
+                <Label text="Candidature chauffeur en attente" wrapText="true" styleClass="admin-home-card-title"/>
+                <Label fx:id="lblPendingChauffeur" styleClass="admin-home-card-value"/>
+            </VBox>
+            <Region VBox.vgrow="ALWAYS"/>
+        </VBox>
+
+        <VBox spacing="12" alignment="TOP_CENTER" fillWidth="true" maxWidth="Infinity" styleClass="admin-home-col" HBox.hgrow="ALWAYS">
+            <Label text="Écoles" maxWidth="Infinity" alignment="CENTER" styleClass="admin-home-col-title"/>
+            <VBox spacing="6" alignment="CENTER" maxWidth="Infinity" styleClass="admin-home-card">
+                <Label text="Écoles" wrapText="true" styleClass="admin-home-card-title"/>
+                <Label fx:id="lblSchools" styleClass="admin-home-card-value"/>
+            </VBox>
+            <Region VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </HBox>
+</VBox>

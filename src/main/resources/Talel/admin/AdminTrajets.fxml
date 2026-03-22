@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.workshop.controlleurs.Talel.admin.AdminTrajetsController"
+      styleClass="admin-content content-area admin-main-panel" spacing="16" stylesheets="@/leith/design/global.css">
+    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+    <Label text="Trajets" styleClass="admin-page-title"/>
+    <Label text="Tous les trajets avec école, bus, chauffeur et nombre d'enfants" styleClass="admin-page-subtitle"/>
+
+    <HBox alignment="CENTER_LEFT" spacing="12" styleClass="admin-section-panel">
+        <Label text="Filtrer par école:" styleClass="text-soft"/>
+        <ComboBox fx:id="comboEcole" promptText="Toutes les écoles" prefWidth="250"/>
+        <Button text="Actualiser" onAction="#onFilter" styleClass="btn-primary"/>
+    </HBox>
+
+    <TableView fx:id="tableTrajets" VBox.vgrow="ALWAYS" styleClass="table-view admin-table-panel">
+        <columns>
+            <TableColumn fx:id="colId" text="Id" prefWidth="50"/>
+            <TableColumn fx:id="colNom" text="Nom trajet" prefWidth="150"/>
+            <TableColumn fx:id="colEcole" text="École" prefWidth="150"/>
+            <TableColumn fx:id="colBus" text="Bus" prefWidth="100"/>
+            <TableColumn fx:id="colChauffeur" text="Chauffeur" prefWidth="180"/>
+            <TableColumn fx:id="colEnfants" text="Enfants" prefWidth="80"/>
+        </columns>
+    </TableView>
+
+    <FlowPane alignment="CENTER_LEFT" hgap="20" vgap="8" styleClass="admin-section-panel">
+        <Label fx:id="lblTotalTrajets" style="-fx-font-weight: bold; -fx-text-fill: #F9FAFB;" text="Trajets: 0"/>
+        <Label fx:id="lblTotalEnfants" style="-fx-font-weight: bold; -fx-text-fill: #22C55E;" text="Enfants (trajets affichés): 0"/>
+    </FlowPane>
+</VBox>

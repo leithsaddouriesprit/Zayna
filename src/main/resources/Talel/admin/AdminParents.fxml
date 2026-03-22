@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.workshop.controlleurs.Talel.admin.AdminParentsController"
+      styleClass="admin-content content-area admin-main-panel" spacing="16" stylesheets="@/leith/design/global.css">
+    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+    <Label text="Parents" styleClass="admin-page-title"/>
+    <Label text="Tous les parents, enfants acceptés et candidatures en attente" styleClass="admin-page-subtitle"/>
+
+    <TableView fx:id="tableParents" VBox.vgrow="ALWAYS" styleClass="table-view admin-table-panel">
+        <columns>
+            <TableColumn fx:id="colId" text="Id" prefWidth="60"/>
+            <TableColumn fx:id="colNom" text="Nom" prefWidth="120"/>
+            <TableColumn fx:id="colPrenom" text="Prénom" prefWidth="120"/>
+            <TableColumn fx:id="colEmail" text="Email" prefWidth="200"/>
+            <TableColumn fx:id="colAccepted" text="Enfants acceptés" prefWidth="120"/>
+            <TableColumn fx:id="colPending" text="En attente" prefWidth="100"/>
+        </columns>
+    </TableView>
+
+    <TitledPane text="Candidatures enfant en attente (ENVOYEE)" expanded="true" styleClass="admin-section-panel">
+        <TableView fx:id="tablePending" styleClass="table-view admin-table-panel">
+            <columns>
+                <TableColumn fx:id="colPId" text="Id" prefWidth="50"/>
+                <TableColumn fx:id="colPParent" text="Parent id" prefWidth="80"/>
+                <TableColumn fx:id="colPEnfant" text="Enfant" prefWidth="200"/>
+                <TableColumn fx:id="colPStatut" text="Statut" prefWidth="80"/>
+            </columns>
+        </TableView>
+    </TitledPane>
+
+    <FlowPane alignment="CENTER_LEFT" hgap="20" vgap="8" styleClass="admin-section-panel">
+        <Label fx:id="lblTotalParents" styleClass="title-md" text="Parents: 0"/>
+        <Label fx:id="lblTotalAccepted" style="-fx-font-weight: bold; -fx-text-fill: #22C55E;" text="Enfants acceptés: 0"/>
+        <Label fx:id="lblTotalPending" style="-fx-font-weight: bold; -fx-text-fill: #F59E0B;" text="En attente: 0"/>
+    </FlowPane>
+</VBox>

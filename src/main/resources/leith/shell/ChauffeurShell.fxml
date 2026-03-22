@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+             fx:controller="tn.esprit.workshop.controlleurs.leith.shell.ChauffeurShellController"
+             styleClass="root app-shell" prefHeight="600" prefWidth="900">
+    <stylesheets>
+        <URL value="@../design/global.css"/>
+    </stylesheets>
+
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="12" minHeight="80.0" prefHeight="80.0" maxHeight="80.0" styleClass="shell-topbar admin-shell-topbar">
+            <Region HBox.hgrow="ALWAYS"/>
+            <ImageView fitHeight="22.0" fitWidth="22.0" preserveRatio="true" styleClass="top-session-icon">
+                <image>
+                    <Image url="@/leith/design/top.png"/>
+                </image>
+            </ImageView>
+            <Label fx:id="lblAccountInfo" text="Compte connecté : -- (Chauffeur)" styleClass="shell-account"/>
+            <Button fx:id="btnLogout" text="Déconnexion" onAction="#logout" styleClass="shell-btn-logout"/>
+        </HBox>
+    </top>
+
+    <left>
+        <VBox spacing="8" styleClass="shell-sidebar sidebar admin-shell-sidebar">
+            <VBox styleClass="admin-brand-box">
+                <ImageView fitHeight="40.0" fitWidth="78.0" preserveRatio="true" styleClass="admin-brand-logo">
+                    <image>
+                        <Image url="@/leith/design/logo.png"/>
+                    </image>
+                </ImageView>
+                <Label text="Chauffeur Console" styleClass="admin-brand-title"/>
+                <Label text="Espace chauffeur" styleClass="admin-brand-subtitle"/>
+            </VBox>
+            <Button fx:id="btnSidebarHome" text="Accueil" onAction="#goHome" maxWidth="Infinity" styleClass="admin-nav-item admin-nav-item-active"/>
+            <Button fx:id="btnSidebarPostuler" text="Postuler" onAction="#openPostuler" maxWidth="Infinity" styleClass="admin-nav-item"/>
+            <Button fx:id="btnSidebarSuivi" text="Suivi candidature" onAction="#openSuiviCandidature" maxWidth="Infinity" styleClass="admin-nav-item"/>
+            <Button fx:id="btnSidebarEspace" text="Espace Chauffeur" onAction="#openEspaceChauffeur" maxWidth="Infinity" styleClass="admin-nav-item"/>
+        </VBox>
+    </left>
+
+    <center>
+        <StackPane fx:id="contentArea" styleClass="content-area" BorderPane.alignment="CENTER">
+            <BorderPane.margin>
+                <Insets left="14.0"/>
+            </BorderPane.margin>
+        </StackPane>
+    </center>
+</BorderPane>

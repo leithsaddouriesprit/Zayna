@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.workshop.controlleurs.Talel.admin.AdminAgentsController"
+      styleClass="admin-content content-area admin-main-panel" spacing="16" stylesheets="@/leith/design/global.css">
+    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+    <Label text="Agents (Responsables école)" styleClass="admin-page-title"/>
+    <Label text="Liste des agents et école associée" styleClass="admin-page-subtitle"/>
+
+    <TableView fx:id="tableAgents" VBox.vgrow="ALWAYS" styleClass="table-view admin-table-panel">
+        <columns>
+            <TableColumn fx:id="colId" text="Id" prefWidth="60"/>
+            <TableColumn fx:id="colNom" text="Nom" prefWidth="120"/>
+            <TableColumn fx:id="colPrenom" text="Prénom" prefWidth="120"/>
+            <TableColumn fx:id="colEcole" text="École" prefWidth="200"/>
+            <TableColumn fx:id="colReclamations" text="" prefWidth="100"/>
+        </columns>
+    </TableView>
+
+    <FlowPane alignment="CENTER_LEFT" hgap="20" vgap="8" styleClass="admin-section-panel">
+        <Label fx:id="lblTotalAgents" style="-fx-font-weight: bold; -fx-text-fill: #F9FAFB;" text="Agents: 0"/>
+        <Label fx:id="lblTotalEcoles" style="-fx-font-weight: bold; -fx-text-fill: #3B82F6;" text="Écoles représentées: 0"/>
+    </FlowPane>
+</VBox>
