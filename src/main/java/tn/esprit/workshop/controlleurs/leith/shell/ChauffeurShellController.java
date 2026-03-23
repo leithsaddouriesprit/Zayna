@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
@@ -16,6 +17,7 @@ import tn.esprit.workshop.model.leith.Candidature;
 import tn.esprit.workshop.services.leith.CandidatureService;
 import tn.esprit.workshop.utilis.AppSession;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -176,6 +178,18 @@ public class ChauffeurShellController {
     @FXML
     void openEspaceChauffeur() {
         loadContent("/leith/EspaceChauffeur.fxml");
+    }
+    // Dans le contrôleur, ajoutez :
+    @FXML
+    private void openReclamation() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/GestionReclamation.fxml"));
+            Parent root = loader.load();
+            contentArea.getChildren().clear();
+            contentArea.getChildren().add(root);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML

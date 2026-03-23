@@ -63,6 +63,13 @@
                     </VBox>
                 </content>
             </TitledPane>
+            <TitledPane text="▾ Réclamations" expanded="true" styleClass="sidebar-group admin-nav-group">
+                <content>
+                    <VBox spacing="6" styleClass="sidebar-group-content">
+                        <ToggleButton text="💬 Gérer les réclamations" onAction="#openReponses" maxWidth="Infinity" styleClass="admin-nav-item admin-nav-subitem" toggleGroup="$navGroup"/>
+                    </VBox>
+                </content>
+            </TitledPane>
         </VBox>
     </left>
 

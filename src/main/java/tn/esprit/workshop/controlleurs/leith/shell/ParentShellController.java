@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
@@ -12,7 +13,8 @@ import javafx.stage.Stage;
 import tn.esprit.workshop.controlleurs.leith.AI.ChatAIController;
 import tn.esprit.workshop.controlleurs.leith.SceneNavigator;
 import tn.esprit.workshop.utilis.AppSession;
-
+import javafx.scene.control.Alert;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -117,7 +119,22 @@ public class ParentShellController {
             chatPanel.setManaged(false);
         }
     }
-
+    @FXML
+    private void openReclamation() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/GestionReclamation.fxml"));
+            Parent root = loader.load();
+            contentArea.getChildren().clear();
+            contentArea.getChildren().add(root);
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Afficher une alerte en cas d'erreur
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erreur");
+            alert.setContentText("Impossible d'ouvrir la gestion des réclamations");
+            alert.showAndWait();
+        }
+    }
     @FXML
     void logout() {
         SceneNavigator.unregisterParentShell();

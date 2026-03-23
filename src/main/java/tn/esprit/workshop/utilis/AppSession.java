@@ -1,5 +1,7 @@
 package tn.esprit.workshop.utilis;
 
+import tn.esprit.workshop.model.Talel.talel2.CategorieUser;
+
 /**
  * Session applicative : parent connecté et enfant sélectionné (pas d'IDs statiques).
  */
@@ -22,6 +24,9 @@ public final class AppSession {
     private Integer connectedUserId;
     /** maitresse.id pour l’espace maîtresse. */
     private Integer maitresseId;
+
+    // ✅ NOUVEAU : stocker le rôle en enum pour la logique métier
+    private CategorieUser connectedUserRoleEnum;
 
     private AppSession() {
     }
@@ -78,12 +83,26 @@ public final class AppSession {
         this.connectedUserName = connectedUserName;
     }
 
+    // ✅ Garder la méthode de Talel (String)
     public String getConnectedUserRole() {
         return connectedUserRole != null ? connectedUserRole : "";
     }
 
     public void setConnectedUserRole(String connectedUserRole) {
         this.connectedUserRole = connectedUserRole;
+    }
+
+    // ✅ NOUVELLE MÉTHODE pour le rôle en enum (pour votre logique)
+    public CategorieUser getConnectedUserRoleEnum() {
+        return connectedUserRoleEnum;
+    }
+
+    public void setConnectedUserRoleEnum(CategorieUser connectedUserRoleEnum) {
+        this.connectedUserRoleEnum = connectedUserRoleEnum;
+        // Optionnel : mettre à jour aussi la version String pour cohérence
+        if (connectedUserRoleEnum != null) {
+            this.connectedUserRole = connectedUserRoleEnum.toString();
+        }
     }
 
     public Integer getConnectedUserId() {

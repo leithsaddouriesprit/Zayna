@@ -311,7 +311,7 @@ public class ConnecterController implements Initializable {
                 AppSession.getInstance().setConnectedUserId(user.getId());
                 AppSession.getInstance().setParentId(parentId);
                 setConnectedUserDisplay(user, "Parent");
-
+                AppSession.getInstance().setConnectedUserRoleEnum(user.getCategories());
                 Stage stage = (Stage) loginButton.getScene().getWindow();
                 if (stage != null) {
                     stage.close();
@@ -332,6 +332,7 @@ public class ConnecterController implements Initializable {
                 AppSession.getInstance().setConnectedUserId(user.getId());
                 AppSession.getInstance().setChauffeurId(chauffeurId);
                 setConnectedUserDisplay(user, "Chauffeur");
+                AppSession.getInstance().setConnectedUserRoleEnum(user.getCategories());
 
                 Stage stage = (Stage) loginButton.getScene().getWindow();
                 if (stage != null) {
@@ -353,6 +354,7 @@ public class ConnecterController implements Initializable {
                 AppSession.getInstance().setAgentId(agentEcole[0]);
                 AppSession.getInstance().setEcoleId(agentEcole[1]);
                 setConnectedUserDisplay(user, "Agent École");
+                AppSession.getInstance().setConnectedUserRoleEnum(user.getCategories());
 
                 Stage stage = (Stage) loginButton.getScene().getWindow();
                 if (stage != null) {
@@ -379,6 +381,7 @@ public class ConnecterController implements Initializable {
                 AppSession.getInstance().setMaitresseId(mIds[0]);
                 AppSession.getInstance().setEcoleId(mIds[1]);
                 setConnectedUserDisplay(user, "Maîtresse");
+                AppSession.getInstance().setConnectedUserRoleEnum(user.getCategories());
 
                 Stage stage = (Stage) loginButton.getScene().getWindow();
                 if (stage != null) {
@@ -392,6 +395,7 @@ public class ConnecterController implements Initializable {
             if (role == CategorieUser.ADMIN) {
                 AppSession.getInstance().setConnectedUserId(user.getId());
                 setConnectedUserDisplay(user, "Administrateur");
+                AppSession.getInstance().setConnectedUserRoleEnum(user.getCategories());
                 SceneNavigator.setPendingAdminUser(user);
                 Stage stage = (Stage) loginButton.getScene().getWindow();
                 if (stage != null) {

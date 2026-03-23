@@ -42,6 +42,7 @@
             </VBox>
             <ToggleButton text="Accueil" onAction="#goHome" maxWidth="Infinity" styleClass="admin-nav-item" selected="true" toggleGroup="$navGroup"/>
             <ToggleButton text="Gestion enfants" onAction="#openEnfants" maxWidth="Infinity" styleClass="admin-nav-item" toggleGroup="$navGroup"/>
+            <ToggleButton text="📝 Réclamation" onAction="#openReclamation" maxWidth="Infinity" styleClass="admin-nav-item" toggleGroup="$navGroup"/>
         </VBox>
     </left>
 

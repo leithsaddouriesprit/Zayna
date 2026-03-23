@@ -26,7 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import tn.esprit.workshop.model.Talel.talel2.User;
+import tn.esprit.workshop.model.Talel.talel2.CategorieUser;
 import tn.esprit.workshop.services.Talel.ServiceAdmin;
+import tn.esprit.workshop.utilis.AppSession;
 import tn.esprit.workshop.services.Talel.ServiceParent;
 import tn.esprit.workshop.services.Talel.ServiceChauffeur;
 import tn.esprit.workshop.services.Talel.ServiceMaitresse;
@@ -74,16 +76,21 @@ public class GestionReclamationController implements Initializable {
     @FXML private TableColumn<Reclamation, Timestamp> colDate;
     // ✅ AJOUTEZ CES DEUX LIGNES
     @FXML private Button traduireReponseButton;
+    @FXML private Button envoyerButton;
     @FXML private Label traductionReponseLabel;
     private final ReclamationService service = new ReclamationService();
     private final ReponseService reponseService = new ReponseService();
-    private final int currentUserId = 1;
     private final TraductionService traductionService = new TraductionService();
     private final FiltrageService filtrageService = new FiltrageService();
     private final ServiceAdmin serviceAdmin = new ServiceAdmin();
-
+    private int currentUserId;
+    private CategorieUser currentUserRole;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        // Récupérer l'utilisateur connecté depuis AppSession
+        currentUserId = AppSession.getInstance().getConnectedUserId();
+        currentUserRole = AppSession.getInstance().getConnectedUserRoleEnum(); // ✅ Utiliser getConnectedUserRoleEnum()
+
         // Types de réclamation
         typeChoice.getItems().addAll("Bus", "École", "Chauffeur", "Cantine", "Trajet", "Autre");
 
@@ -99,6 +106,7 @@ public class GestionReclamationController implements Initializable {
 
         // Style conditionnel pour le statut
         configurerStyleStatut();
+        configurerBoutonsSelonRole();
 
         // Listener pour changer les panels selon le type sélectionné
         typeChoice.getSelectionModel().selectedItemProperty().addListener(
@@ -452,6 +460,11 @@ public class GestionReclamationController implements Initializable {
 
     @FXML
     private void envoyerReclamation() {
+        // Vérifier si l'utilisateur peut créer une réclamation
+        if (currentUserRole == CategorieUser.ADMIN) {
+            showAlert("Accès refusé", "Les administrateurs ne peuvent pas créer de réclamations", Alert.AlertType.WARNING);
+            return;
+        }
         String type = typeChoice.getValue();
         String message = messageField.getText();
 
@@ -621,6 +634,11 @@ public class GestionReclamationController implements Initializable {
     @FXML
     private void modifierReclamation() {
         Reclamation selected = tableReclamation.getSelectionModel().getSelectedItem();
+        // ✅ Vérifier si l'utilisateur peut modifier (seulement ses propres réclamations)
+        if (selected != null && selected.getUserId() != currentUserId) {
+            showAlert("Accès refusé", "Vous ne pouvez modifier que vos propres réclamations", Alert.AlertType.WARNING);
+            return;
+        }
         String type = typeChoice.getValue();
         String message = messageField.getText();
 
@@ -677,7 +695,11 @@ public class GestionReclamationController implements Initializable {
     @FXML
     private void supprimerReclamation() {
         Reclamation selected = tableReclamation.getSelectionModel().getSelectedItem();
-
+// ✅ Vérifier si l'utilisateur peut supprimer (seulement ses propres réclamations)
+        if (selected != null && selected.getUserId() != currentUserId) {
+            showAlert("Accès refusé", "Vous ne pouvez supprimer que vos propres réclamations", Alert.AlertType.WARNING);
+            return;
+        }
         if (selected == null) {
             showAlert("Erreur", "❌ Veuillez sélectionner une réclamation à supprimer !", Alert.AlertType.WARNING);
             return;
@@ -964,8 +986,33 @@ public class GestionReclamationController implements Initializable {
 
         cacherTousLesPanels();
     }
+// ================= CONFIGURATION DES BOUTONS SELON LE RÔLE =================
 
+    private void configurerBoutonsSelonRole() {
+        // Les admins ne peuvent pas créer de réclamation
+        if (currentUserRole == CategorieUser.ADMIN) {
+            // Désactiver les champs de création
+            typeChoice.setDisable(true);
+            messageField.setDisable(true);
+            if (envoyerButton != null) envoyerButton.setDisable(true);
 
+            // Désactiver les panels de détails
+            panelChauffeur.setDisable(true);
+            panelBus.setDisable(true);
+            panelCantine.setDisable(true);
+            panelEcole.setDisable(true);
+            panelAutre.setDisable(true);
+            panelTrajet.setDisable(true);
+        }
+
+        // Les utilisateurs normaux peuvent créer mais pas répondre
+        if (currentUserRole != CategorieUser.ADMIN && currentUserRole != CategorieUser.RESPONSABLEECOLE) {
+            if (traduireReponseButton != null) {
+                traduireReponseButton.setDisable(true);
+            }
+            reponseArea.setEditable(false);
+        }
+    }
     // ================= UTILITAIRE =================
 
     private void showAlert(String title, String content, Alert.AlertType type) {

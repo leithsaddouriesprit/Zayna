@@ -4,12 +4,14 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import tn.esprit.workshop.utilis.AppSession;
 import tn.esprit.workshop.controlleurs.leith.SceneNavigator;
 
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -97,6 +99,29 @@ public class AgentShellController {
         loadContent("/leith/agent/AgentCandidaturesEnfant.fxml");
     }
 
+    @FXML
+    private void openReclamation() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/GestionReclamation.fxml"));
+            Parent root = loader.load();
+            contentArea.getChildren().clear();
+            contentArea.getChildren().add(root);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void openReponses() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/GestionReponse.fxml"));
+            Parent root = loader.load();
+            contentArea.getChildren().clear();
+            contentArea.getChildren().add(root);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     @FXML
     void logout() {
         SceneNavigator.unregisterAgentShell();

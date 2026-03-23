@@ -1,0 +1,228 @@
+/* =========================================================
+   GESTION DES RÉPONSES - THEME SOMBRE + OR
+   ========================================================= */
+
+/* Conteneur principal */
+.reponse-root {
+    -fx-background-color: #000000;
+    -fx-font-family: "Inter", "Segoe UI", "Arial";
+}
+
+/* ScrollPane */
+.reponse-scroll-pane {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+/* Cartes */
+.reponse-card {
+    -fx-background-color: linear-gradient(to bottom right, #1A1A1A, #151515);
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-border-color: rgba(255,255,255,0.12);
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 2);
+}
+
+/* Titres */
+.reponse-title {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 24px;
+    -fx-font-weight: 800;
+}
+
+.reponse-subtitle {
+    -fx-text-fill: #FEC111;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+}
+
+/* Labels */
+.reponse-label {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+}
+
+.reponse-label-secondary {
+    -fx-text-fill: rgba(255,255,255,0.72);
+    -fx-font-size: 12px;
+}
+
+/* Champs de formulaire */
+.reponse-text-field,
+.reponse-text-area,
+.reponse-choice-box {
+    -fx-background-color: #F4F4F4;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: transparent;
+    -fx-text-fill: #111111;
+    -fx-prompt-text-fill: #8C8C8C;
+    -fx-font-size: 13px;
+    -fx-padding: 8 12;
+}
+
+.reponse-text-field:focused,
+.reponse-text-area:focused,
+.reponse-choice-box:focused {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #FEC111;
+    -fx-border-width: 1.2;
+}
+
+.reponse-text-area .content {
+    -fx-background-color: #F4F4F4;
+    -fx-background-radius: 12;
+}
+
+/* Boutons */
+.reponse-btn-primary {
+    -fx-background-color: linear-gradient(to right, #3b82f6, #2563eb);
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+    -fx-background-radius: 30;
+    -fx-border-radius: 30;
+    -fx-border-color: rgba(255,255,255,0.25);
+    -fx-border-width: 1;
+    -fx-padding: 8 18;
+    -fx-cursor: hand;
+}
+
+.reponse-btn-primary:hover {
+    -fx-opacity: 0.94;
+}
+
+.reponse-btn-success {
+    -fx-background-color: linear-gradient(to right, #22c55e, #16a34a);
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+    -fx-background-radius: 30;
+    -fx-border-radius: 30;
+    -fx-border-color: rgba(255,255,255,0.25);
+    -fx-border-width: 1;
+    -fx-padding: 8 18;
+    -fx-cursor: hand;
+}
+
+.reponse-btn-success:hover {
+    -fx-opacity: 0.94;
+}
+
+.reponse-btn-danger {
+    -fx-background-color: linear-gradient(to right, #ef4444, #dc2626);
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+    -fx-background-radius: 30;
+    -fx-border-radius: 30;
+    -fx-border-color: rgba(255,255,255,0.25);
+    -fx-border-width: 1;
+    -fx-padding: 8 18;
+    -fx-cursor: hand;
+}
+
+.reponse-btn-danger:hover {
+    -fx-opacity: 0.94;
+}
+
+.reponse-btn-secondary {
+    -fx-background-color: linear-gradient(to right, #3E3E3E, #343434);
+    -fx-text-fill: #FEC111;
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+    -fx-background-radius: 30;
+    -fx-border-radius: 30;
+    -fx-border-color: rgba(255,255,255,0.18);
+    -fx-border-width: 1;
+    -fx-padding: 8 18;
+    -fx-cursor: hand;
+}
+
+.reponse-btn-secondary:hover {
+    -fx-background-color: linear-gradient(to right, #494949, #3D3D3D);
+}
+
+/* TableView */
+.reponse-table {
+    -fx-background-color: #141414;
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+    -fx-border-color: rgba(255,255,255,0.12);
+    -fx-border-width: 1;
+}
+
+.reponse-table .column-header-background {
+    -fx-background-color: #191919;
+    -fx-background-radius: 14 14 0 0;
+}
+
+.reponse-table .column-header .label {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 13px;
+    -fx-font-weight: 800;
+}
+
+.reponse-table .table-row-cell:selected {
+    -fx-background-color: rgba(254,193,17,0.22);
+}
+
+.reponse-table .table-cell {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 12px;
+}
+
+/* Box réponse existante */
+.reponse-existing-box {
+    -fx-background-color: rgba(254,193,17,0.08);
+    -fx-background-radius: 15;
+    -fx-border-radius: 15;
+    -fx-border-color: rgba(254,193,17,0.35);
+    -fx-border-width: 1;
+    -fx-padding: 12;
+}
+
+.reponse-existing-label {
+    -fx-text-fill: #FEC111;
+    -fx-font-weight: 800;
+    -fx-font-size: 12px;
+}
+
+.reponse-author-label {
+    -fx-text-fill: #FEC111;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+/* Box traduction */
+.reponse-translation-box {
+    -fx-background-color: rgba(255,255,255,0.04);
+    -fx-background-radius: 15;
+    -fx-border-radius: 15;
+    -fx-border-color: rgba(255,255,255,0.10);
+    -fx-border-width: 1;
+    -fx-padding: 12;
+}
+
+.reponse-translation-label {
+    -fx-text-fill: rgba(255,255,255,0.72);
+    -fx-font-style: italic;
+    -fx-font-size: 11px;
+    -fx-padding: 8;
+    -fx-background-color: rgba(255,255,255,0.02);
+    -fx-background-radius: 8;
+}
+
+/* Message de statut */
+.reponse-status {
+    -fx-background-color: rgba(255,255,255,0.05);
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-border-color: rgba(255,255,255,0.12);
+    -fx-border-width: 1;
+    -fx-padding: 8 16;
+    -fx-text-fill: rgba(255,255,255,0.84);
+    -fx-font-size: 11px;
+}

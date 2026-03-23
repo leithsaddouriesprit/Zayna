@@ -1,0 +1,286 @@
+/* =========================================================
+   GESTION DES RÉCLAMATIONS - THEME SOMBRE + OR
+   ========================================================= */
+
+/* Conteneur principal */
+.reclamation-root {
+    -fx-background-color: #000000;
+    -fx-font-family: "Inter", "Segoe UI", "Arial";
+}
+
+/* ScrollPane */
+.reclamation-scroll-pane {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+/* Cartes */
+.reclamation-card {
+    -fx-background-color: linear-gradient(to bottom right, #1A1A1A, #151515);
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-border-color: rgba(255,255,255,0.12);
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 2);
+}
+
+/* Titres */
+.reclamation-title {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 24px;
+    -fx-font-weight: 800;
+}
+
+.reclamation-subtitle {
+    -fx-text-fill: #FEC111;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+}
+
+/* Labels */
+.reclamation-label {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+}
+
+.reclamation-label-secondary {
+    -fx-text-fill: rgba(255,255,255,0.72);
+    -fx-font-size: 12px;
+}
+
+/* Champs de formulaire */
+.reclamation-text-field,
+.reclamation-text-area,
+.reclamation-choice-box {
+    -fx-background-color: #F4F4F4;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: transparent;
+    -fx-text-fill: #111111;
+    -fx-prompt-text-fill: #8C8C8C;
+    -fx-font-size: 13px;
+    -fx-padding: 10 12;
+}
+
+.reclamation-text-field:focused,
+.reclamation-text-area:focused,
+.reclamation-choice-box:focused {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #FEC111;
+    -fx-border-width: 1.2;
+}
+
+.reclamation-text-area .content {
+    -fx-background-color: #F4F4F4;
+    -fx-background-radius: 12;
+}
+
+/* Panels dynamiques */
+.reclamation-dynamic-panel {
+    -fx-background-color: rgba(255,255,255,0.04);
+    -fx-background-radius: 15;
+    -fx-border-radius: 15;
+    -fx-border-color: rgba(255,255,255,0.10);
+    -fx-border-width: 1;
+    -fx-padding: 15;
+}
+
+/* Boutons */
+.reclamation-btn-primary {
+    -fx-background-color: linear-gradient(to right, #FEC111, #E7B541);
+    -fx-text-fill: #1A1A1A;
+    -fx-font-size: 13px;
+    -fx-font-weight: 800;
+    -fx-background-radius: 30;
+    -fx-border-radius: 30;
+    -fx-border-color: rgba(255,255,255,0.25);
+    -fx-border-width: 1;
+    -fx-padding: 10 24;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 8, 0.15, 0, 2);
+}
+
+.reclamation-btn-primary:hover {
+    -fx-opacity: 0.94;
+}
+
+.reclamation-btn-secondary {
+    -fx-background-color: linear-gradient(to right, #3E3E3E, #343434);
+    -fx-text-fill: #FEC111;
+    -fx-font-size: 13px;
+    -fx-font-weight: 800;
+    -fx-background-radius: 30;
+    -fx-border-radius: 30;
+    -fx-border-color: rgba(255,255,255,0.18);
+    -fx-border-width: 1;
+    -fx-padding: 10 24;
+    -fx-cursor: hand;
+}
+
+.reclamation-btn-secondary:hover {
+    -fx-background-color: linear-gradient(to right, #494949, #3D3D3D);
+}
+
+.reclamation-btn-success {
+    -fx-background-color: linear-gradient(to right, #22c55e, #16a34a);
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 13px;
+    -fx-font-weight: 800;
+    -fx-background-radius: 30;
+    -fx-border-radius: 30;
+    -fx-border-color: rgba(255,255,255,0.25);
+    -fx-border-width: 1;
+    -fx-padding: 10 30;
+    -fx-cursor: hand;
+}
+
+.reclamation-btn-success:hover {
+    -fx-opacity: 0.94;
+}
+
+.reclamation-btn-danger {
+    -fx-background-color: linear-gradient(to right, #ef4444, #dc2626);
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 13px;
+    -fx-font-weight: 800;
+    -fx-background-radius: 30;
+    -fx-border-radius: 30;
+    -fx-border-color: rgba(255,255,255,0.25);
+    -fx-border-width: 1;
+    -fx-padding: 10 24;
+    -fx-cursor: hand;
+}
+
+.reclamation-btn-danger:hover {
+    -fx-opacity: 0.94;
+}
+
+.reclamation-btn-purple {
+    -fx-background-color: linear-gradient(to right, #8b5cf6, #7c3aed);
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 13px;
+    -fx-font-weight: 800;
+    -fx-background-radius: 30;
+    -fx-border-radius: 30;
+    -fx-border-color: rgba(255,255,255,0.25);
+    -fx-border-width: 1;
+    -fx-padding: 10 24;
+    -fx-cursor: hand;
+}
+
+.reclamation-btn-purple:hover {
+    -fx-opacity: 0.94;
+}
+
+/* TableView */
+.reclamation-table {
+    -fx-background-color: #141414;
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+    -fx-border-color: rgba(255,255,255,0.12);
+    -fx-border-width: 1;
+}
+
+.reclamation-table .column-header-background {
+    -fx-background-color: #191919;
+    -fx-background-radius: 14 14 0 0;
+}
+
+.reclamation-table .column-header,
+.reclamation-table .filler {
+    -fx-background-color: #191919;
+    -fx-border-color: transparent transparent rgba(255,255,255,0.12) transparent;
+}
+
+.reclamation-table .column-header .label {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 13px;
+    -fx-font-weight: 800;
+    -fx-padding: 12 8;
+}
+
+.reclamation-table .table-row-cell {
+    -fx-background-color: #141414;
+    -fx-border-color: transparent transparent rgba(255,255,255,0.05) transparent;
+    -fx-text-fill: #FFFFFF;
+}
+
+.reclamation-table .table-row-cell:odd {
+    -fx-background-color: #171717;
+}
+
+.reclamation-table .table-row-cell:selected {
+    -fx-background-color: rgba(254,193,17,0.22);
+}
+
+.reclamation-table .table-cell {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 12px;
+    -fx-padding: 10 8;
+}
+
+/* Badge pour compteur */
+.reclamation-badge {
+    -fx-background-color: linear-gradient(to right, #FEC111, #E7B541);
+    -fx-background-radius: 20;
+    -fx-padding: 5 15;
+    -fx-text-fill: #1A1A1A;
+    -fx-font-weight: 800;
+    -fx-font-size: 12px;
+}
+
+/* Message de statut */
+.reclamation-status {
+    -fx-background-color: rgba(255,255,255,0.05);
+    -fx-background-radius: 30;
+    -fx-border-radius: 30;
+    -fx-border-color: rgba(255,255,255,0.12);
+    -fx-border-width: 1;
+    -fx-padding: 12 20;
+    -fx-text-fill: rgba(255,255,255,0.84);
+    -fx-font-size: 13px;
+}
+
+/* Box de traduction */
+.reclamation-translation-box {
+    -fx-background-color: rgba(255,255,255,0.04);
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: rgba(255,255,255,0.10);
+    -fx-border-width: 1;
+    -fx-padding: 12;
+}
+
+.reclamation-translation-label {
+    -fx-text-fill: rgba(255,255,255,0.72);
+    -fx-font-style: italic;
+    -fx-font-size: 12px;
+    -fx-padding: 8;
+    -fx-background-color: rgba(255,255,255,0.02);
+    -fx-background-radius: 8;
+}
+/* Amélioration de l'espacement dans la TableView */
+.reclamation-table {
+    -fx-background-color: #141414;
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+    -fx-border-color: rgba(255,255,255,0.12);
+    -fx-border-width: 1;
+}
+
+.reclamation-table .table-row-cell {
+    -fx-padding: 12 0;
+    -fx-cell-size: 48px;
+    -fx-min-height: 48px;
+}
+
+.reclamation-table .table-cell {
+    -fx-padding: 12 10;
+    -fx-font-size: 13px;
+}
+
+.reclamation-table .column-header .label {
+    -fx-padding: 14 10;
+    -fx-font-size: 13px;
+}

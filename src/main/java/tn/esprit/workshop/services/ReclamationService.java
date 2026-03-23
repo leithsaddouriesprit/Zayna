@@ -9,14 +9,18 @@ import java.util.List;
 
 public class ReclamationService {
 
-    private static final Connection cnx = MyBDConnexion.getInstance().getConnection();
+    // ✅ Méthode pour obtenir la connexion
+    private Connection getConnection() throws SQLException {
+        return MyBDConnexion.getInstance().getConnection();
+    }
 
     // CREATE
     public void insertOne(Reclamation r) throws SQLException {
         String sql = "INSERT INTO reclamation (user_id, type, description, statut, " +
                 "chauffeur_nom, chauffeur_prenom, bus_matricule, cantine_type, ecole_nom, autre_precision) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (Connection cnx = getConnection();
+             PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setInt(1, r.getUserId());
             ps.setString(2, r.getType());
             ps.setString(3, r.getDescription());
@@ -35,7 +39,8 @@ public class ReclamationService {
     public List<Reclamation> selectAll() throws SQLException {
         List<Reclamation> list = new ArrayList<>();
         String sql = "SELECT * FROM reclamation ORDER BY date_reclamation DESC";
-        try (Statement st = cnx.createStatement();
+        try (Connection cnx = getConnection();
+             Statement st = cnx.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
             while (rs.next()) {
                 list.add(extractReclamationFromResultSet(rs));
@@ -47,7 +52,8 @@ public class ReclamationService {
     // READ BY ID
     public Reclamation getById(int id) throws SQLException {
         String sql = "SELECT * FROM reclamation WHERE id = ?";
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (Connection cnx = getConnection();
+             PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -62,7 +68,8 @@ public class ReclamationService {
     public List<Reclamation> getByUserId(int userId) throws SQLException {
         List<Reclamation> list = new ArrayList<>();
         String sql = "SELECT * FROM reclamation WHERE user_id = ? ORDER BY date_reclamation DESC";
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (Connection cnx = getConnection();
+             PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setInt(1, userId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -78,10 +85,11 @@ public class ReclamationService {
         String sql = "UPDATE reclamation SET type = ?, description = ?, statut = ?, " +
                 "chauffeur_nom = ?, chauffeur_prenom = ?, bus_matricule = ?, " +
                 "cantine_type = ?, ecole_nom = ?, autre_precision = ? WHERE id = ?";
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (Connection cnx = getConnection();
+             PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setString(1, r.getType());
             ps.setString(2, r.getDescription());
-            ps.setString(3, r.getStatut());  // ✅ Le statut doit être mis à jour ici
+            ps.setString(3, r.getStatut());
             ps.setString(4, r.getChauffeurNom());
             ps.setString(5, r.getChauffeurPrenom());
             ps.setString(6, r.getBusMatricule());
@@ -91,34 +99,31 @@ public class ReclamationService {
             ps.setInt(10, r.getId());
 
             int rowsAffected = ps.executeUpdate();
-            System.out.println("Lignes mises à jour: " + rowsAffected); // Pour déboguer
+            System.out.println("Lignes mises à jour: " + rowsAffected);
         }
     }
 
     // DELETE
-    // ✅ DELETE BY ID (recommandé)
     public void deleteOne(int id) throws SQLException {
         String sql = "DELETE FROM reclamation WHERE id = ?";
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (Connection cnx = getConnection();
+             PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setInt(1, id);
             int rowsAffected = ps.executeUpdate();
             System.out.println("Réclamation supprimée, lignes affectées : " + rowsAffected);
         }
     }
 
-    // ✅ DELETE BY OBJECT (optionnel)
     public void deleteOne(Reclamation r) throws SQLException {
-        deleteOne(r.getId());  // Délègue à la méthode avec int
+        deleteOne(r.getId());
     }
-
-
-
 
     // Rechercher par statut
     public List<Reclamation> rechercherParStatut(String statut) throws SQLException {
         List<Reclamation> list = new ArrayList<>();
         String sql = "SELECT * FROM reclamation WHERE statut = ? ORDER BY date_reclamation DESC";
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (Connection cnx = getConnection();
+             PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setString(1, statut);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -133,7 +138,8 @@ public class ReclamationService {
     public List<Reclamation> rechercherParMotCle(String keyword) throws SQLException {
         List<Reclamation> result = new ArrayList<>();
         String sql = "SELECT * FROM reclamation WHERE type LIKE ? OR description LIKE ? ORDER BY date_reclamation DESC";
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (Connection cnx = getConnection();
+             PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
             ps.setString(2, "%" + keyword + "%");
             try (ResultSet rs = ps.executeQuery()) {
@@ -152,7 +158,8 @@ public class ReclamationService {
         String sql = "INSERT INTO reclamation (user_id, type, description, statut, " +
                 "chauffeur_nom, chauffeur_prenom, bus_matricule, cantine_type, ecole_nom, autre_precision) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement ps = cnx.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection cnx = getConnection();
+             PreparedStatement ps = cnx.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, userId);
             ps.setString(2, type);
             ps.setString(3, description);
@@ -183,15 +190,27 @@ public class ReclamationService {
         r.setDescription(rs.getString("description"));
         r.setDateReclamation(rs.getTimestamp("date_reclamation"));
         r.setStatut(rs.getString("statut"));
-
-        // Nouveaux champs
         r.setChauffeurNom(rs.getString("chauffeur_nom"));
         r.setChauffeurPrenom(rs.getString("chauffeur_prenom"));
         r.setBusMatricule(rs.getString("bus_matricule"));
         r.setCantineType(rs.getString("cantine_type"));
         r.setEcoleNom(rs.getString("ecole_nom"));
         r.setAutrePrecision(rs.getString("autre_precision"));
-
         return r;
+    }
+    // Récupérer les réclamations par école
+    public List<Reclamation> getByEcoleId(int ecoleId) throws SQLException {
+        List<Reclamation> list = new ArrayList<>();
+        String sql = "SELECT * FROM reclamation WHERE ecole_nom = (SELECT nom FROM ecole WHERE id = ?) ORDER BY date_reclamation DESC";
+        try (Connection cnx = getConnection();
+             PreparedStatement ps = cnx.prepareStatement(sql)) {
+            ps.setInt(1, ecoleId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(extractReclamationFromResultSet(rs));
+                }
+            }
+        }
+        return list;
     }
 }

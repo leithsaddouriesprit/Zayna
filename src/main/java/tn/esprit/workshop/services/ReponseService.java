@@ -9,15 +9,20 @@ import java.util.List;
 
 public class ReponseService {
 
-    Connection cnx = MyBDConnexion.getInstance().getConnection();
+    // ✅ Méthode pour obtenir la connexion
+    private Connection getConnection() throws SQLException {
+        return MyBDConnexion.getInstance().getConnection();
+    }
 
     // CREATE
     public void insertOne(Reponse r) throws SQLException {
-        String sql = "INSERT INTO reponse (reclamation_id, message, date_reponse) VALUES (?, ?, ?)";
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        String sql = "INSERT INTO reponse (reclamation_id, user_id, message, date_reponse) VALUES (?, ?, ?, ?)";
+        try (Connection cnx = getConnection();
+             PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setInt(1, r.getReclamationId());
-            ps.setString(2, r.getMessage());
-            ps.setTimestamp(3, Timestamp.valueOf(r.getDate()));
+            ps.setInt(2, r.getUserId());
+            ps.setString(3, r.getMessage());
+            ps.setTimestamp(4, Timestamp.valueOf(r.getDate()));
             ps.executeUpdate();
         }
     }
@@ -26,7 +31,8 @@ public class ReponseService {
     public List<Reponse> getAll() throws SQLException {
         List<Reponse> reponses = new ArrayList<>();
         String sql = "SELECT * FROM reponse";
-        try (Statement st = cnx.createStatement();
+        try (Connection cnx = getConnection();
+             Statement st = cnx.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
 
             while (rs.next()) {
@@ -42,10 +48,12 @@ public class ReponseService {
         }
         return reponses;
     }
+
     // Rechercher une réponse par id de réclamation
     public Reponse getByReclamationId(int reclamationId) throws SQLException {
-        String sql = "SELECT * FROM reponse WHERE reclamation_id = ?"; // ✅
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        String sql = "SELECT * FROM reponse WHERE reclamation_id = ?";
+        try (Connection cnx = getConnection();
+             PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setInt(1, reclamationId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -60,10 +68,12 @@ public class ReponseService {
         }
         return null;
     }
-    // Dans ReponseService.java - Version améliorée
+
+    // Version améliorée
     public Reponse getReponseByReclamationId(int reclamationId) throws SQLException {
         String sql = "SELECT * FROM reponse WHERE reclamation_id = ?";
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (Connection cnx = getConnection();
+             PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setInt(1, reclamationId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -79,25 +89,29 @@ public class ReponseService {
         }
         return null;
     }
- // Version simplifiée pour retourner juste le message (si vous préférez garder l'existant)
+
+    // Version simplifiée pour retourner juste le message
     public String getReponseMessageByReclamationId(int reclamationId) throws SQLException {
         Reponse r = getReponseByReclamationId(reclamationId);
         return r != null ? r.getMessage() : null;
     }
 
-    // Dans ReponseService.java
+    // Supprimer par id de réclamation
     public void deleteByReclamationId(int reclamationId) throws SQLException {
         String sql = "DELETE FROM reponse WHERE reclamation_id = ?";
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (Connection cnx = getConnection();
+             PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setInt(1, reclamationId);
             int rowsAffected = ps.executeUpdate();
             System.out.println("Réponses supprimées : " + rowsAffected);
         }
     }
+
     // READ BY ID
     public Reponse getById(int id) throws SQLException {
         String sql = "SELECT * FROM reponse WHERE id = ?";
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (Connection cnx = getConnection();
+             PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -115,10 +129,11 @@ public class ReponseService {
 
     // UPDATE
     public void update(Reponse r) throws SQLException {
-        String sql = "UPDATE reponse SET reclamation_id = ?, message = ?, date_reponse = ? WHERE id = ?";
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        String sql = "UPDATE reponse SET reclamation_id = ?, user_id = ?, message = ?, date_reponse = ? WHERE id = ?";
+        try (Connection cnx = getConnection();
+             PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setInt(1, r.getReclamationId());
-            ps.setInt(2,r.getUserId());
+            ps.setInt(2, r.getUserId());
             ps.setString(3, r.getMessage());
             ps.setTimestamp(4, Timestamp.valueOf(r.getDate()));
             ps.setInt(5, r.getId());
@@ -129,17 +144,19 @@ public class ReponseService {
     // DELETE
     public void delete(int id) throws SQLException {
         String sql = "DELETE FROM reponse WHERE id = ?";
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (Connection cnx = getConnection();
+             PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
         }
     }
 
-    // SEARCH by message (exemple)
+    // SEARCH by message
     public List<Reponse> searchByMessage(String keyword) throws SQLException {
         List<Reponse> reponses = new ArrayList<>();
         String sql = "SELECT * FROM reponse WHERE message LIKE ?";
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (Connection cnx = getConnection();
+             PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {

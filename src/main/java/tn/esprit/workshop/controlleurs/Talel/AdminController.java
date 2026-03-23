@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -22,7 +23,7 @@ import tn.esprit.workshop.services.Talel.ServiceAdmin;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
-
+import java.io.IOException; //ajouté par sinda
 public class AdminController implements Initializable {
 
     // ==================== COMPOSANTS FXML ====================
@@ -632,5 +633,28 @@ public class AdminController implements Initializable {
         alert.setHeaderText(header);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    // ==================== GESTION DES RÉCLAMATIONS // AJOUTE PAR SINDA ====================
+
+    @FXML
+    private void handleReclamations() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/GestionReponse.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = new Stage();
+            stage.setTitle("Gestion des Réponses - Administration");
+            stage.setScene(new Scene(root));
+            stage.show();
+
+            System.out.println("✅ Interface des réponses ouverte");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Erreur",
+                    "Impossible d'ouvrir la gestion des réponses",
+                    e.getMessage());
+        }
     }
 }

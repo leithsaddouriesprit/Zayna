@@ -8,6 +8,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import tn.esprit.workshop.model.Reclamation;
+import tn.esprit.workshop.model.Reponse;
+import tn.esprit.workshop.model.Talel.talel2.CategorieUser;
 import tn.esprit.workshop.services.ReclamationService;
 import tn.esprit.workshop.services.ReponseService;
 
@@ -22,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import tn.esprit.workshop.services.TraductionService;
+import tn.esprit.workshop.utilis.AppSession;
 
 
 public class GestionReponseController implements Initializable {
@@ -400,6 +403,12 @@ public class GestionReponseController implements Initializable {
 
     @FXML
     private void repondreReclamation() {
+        // ✅ Vérifier si l'utilisateur peut répondre
+        CategorieUser currentUserRole = AppSession.getInstance().getConnectedUserRoleEnum();
+        if (currentUserRole != CategorieUser.ADMIN && currentUserRole != CategorieUser.RESPONSABLEECOLE) {
+            showAlert("Accès refusé", "Seuls les administrateurs et responsables d'école peuvent répondre", Alert.AlertType.WARNING);
+            return;
+        }
         if (!validerSelectionEtReponse()) return;
 
         String reponseTexte = reponseField.getText().trim();
@@ -444,6 +453,12 @@ public class GestionReponseController implements Initializable {
 
     @FXML
     private void modifierReponse() {
+        // ✅ Vérifier si l'utilisateur peut modifier
+        CategorieUser currentUserRole = AppSession.getInstance().getConnectedUserRoleEnum();
+        if (currentUserRole != CategorieUser.ADMIN && currentUserRole != CategorieUser.RESPONSABLEECOLE) {
+            showAlert("Accès refusé", "Seuls les administrateurs et responsables d'école peuvent modifier", Alert.AlertType.WARNING);
+            return;
+        }
         if (reponseExistante == null) {
             showAlert("Erreur", "❌ Aucune réponse à modifier !", Alert.AlertType.WARNING);
             return;
@@ -481,6 +496,12 @@ public class GestionReponseController implements Initializable {
 
     @FXML
     private void supprimerReponse() {
+        // ✅ Vérifier si l'utilisateur peut supprimer
+        CategorieUser currentUserRole = AppSession.getInstance().getConnectedUserRoleEnum();
+        if (currentUserRole != CategorieUser.ADMIN && currentUserRole != CategorieUser.RESPONSABLEECOLE) {
+            showAlert("Accès refusé", "Seuls les administrateurs et responsables d'école peuvent supprimer", Alert.AlertType.WARNING);
+            return;
+        }
         try {
             // Vérifications
             if (reponseExistante == null) {
@@ -605,8 +626,16 @@ public class GestionReponseController implements Initializable {
 
     private void afficherToutesReclamations() {
         try {
-            List<Reclamation> reclamations = reclamationService.selectAll();
+            List<Reclamation> reclamations;
+            CategorieUser currentUserRole = AppSession.getInstance().getConnectedUserRoleEnum();
 
+            // ✅ Si c'est un Responsable École, filtrer par son école
+            if (currentUserRole == CategorieUser.RESPONSABLEECOLE) {
+                Integer ecoleId = AppSession.getInstance().getEcoleId();
+                reclamations = reclamationService.getByEcoleId(ecoleId); // À créer dans ReclamationService
+            } else {
+                reclamations = reclamationService.selectAll();
+            }
             // ✅ Forcer la mise à jour des données
             ObservableList<Reclamation> data = FXCollections.observableArrayList(reclamations);
             tableReclamation.setItems(data);
