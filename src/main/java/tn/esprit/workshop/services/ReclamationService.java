@@ -1,6 +1,7 @@
 package tn.esprit.workshop.services;
 
 import tn.esprit.workshop.model.Reclamation;
+import tn.esprit.workshop.model.Talel.talel2.CategorieUser;
 import tn.esprit.workshop.utilis.MyBDConnexion;
 
 import java.sql.*;
@@ -151,15 +152,29 @@ public class ReclamationService {
         return result;
     }
 
-    // Ajouter et retourner ID
+    // Version avec 10 paramètres (pour les appels existants)
     public int ajouterReclamationEtRetournerId(int userId, String type, String description, String statut,
                                                String chauffeurNom, String chauffeurPrenom, String busMatricule,
                                                String cantineType, String ecoleNom, String autrePrecision) throws SQLException {
+        return ajouterReclamationEtRetournerId(userId, type, description, statut,
+                chauffeurNom, chauffeurPrenom, busMatricule, cantineType, ecoleNom, autrePrecision,
+                0, 0, 0, 0, 0);
+    }
+
+    // Version avec 15 paramètres (complète)
+    public int ajouterReclamationEtRetournerId(int userId, String type, String description, String statut,
+                                               String chauffeurNom, String chauffeurPrenom, String busMatricule,
+                                               String cantineType, String ecoleNom, String autrePrecision,
+                                               int idChauffeur, int idBus, int idEcole, int idMaitresse, int idParent) throws SQLException {
+
         String sql = "INSERT INTO reclamation (user_id, type, description, statut, " +
-                "chauffeur_nom, chauffeur_prenom, bus_matricule, cantine_type, ecole_nom, autre_precision) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "chauffeur_nom, chauffeur_prenom, bus_matricule, cantine_type, ecole_nom, autre_precision, " +
+                "id_chauffeur, id_bus, id_ecole, id_maitresse, id_parent) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
         try (Connection cnx = getConnection();
              PreparedStatement ps = cnx.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
             ps.setInt(1, userId);
             ps.setString(2, type);
             ps.setString(3, description);
@@ -170,6 +185,12 @@ public class ReclamationService {
             ps.setString(8, cantineType);
             ps.setString(9, ecoleNom);
             ps.setString(10, autrePrecision);
+            ps.setInt(11, idChauffeur);
+            ps.setInt(12, idBus);
+            ps.setInt(13, idEcole);
+            ps.setInt(14, idMaitresse);
+            ps.setInt(15, idParent);
+
             ps.executeUpdate();
 
             try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -190,18 +211,92 @@ public class ReclamationService {
         r.setDescription(rs.getString("description"));
         r.setDateReclamation(rs.getTimestamp("date_reclamation"));
         r.setStatut(rs.getString("statut"));
+
+        // Champs texte
         r.setChauffeurNom(rs.getString("chauffeur_nom"));
         r.setChauffeurPrenom(rs.getString("chauffeur_prenom"));
         r.setBusMatricule(rs.getString("bus_matricule"));
         r.setCantineType(rs.getString("cantine_type"));
         r.setEcoleNom(rs.getString("ecole_nom"));
         r.setAutrePrecision(rs.getString("autre_precision"));
+
+        // Clés étrangères (avec try-catch pour éviter les erreurs si colonnes n'existent pas)
+        try {
+            r.setIdChauffeur(rs.getInt("id_chauffeur"));
+        } catch (SQLException e) { r.setIdChauffeur(0); }
+
+        try {
+            r.setIdBus(rs.getInt("id_bus"));
+        } catch (SQLException e) { r.setIdBus(0); }
+
+        try {
+            r.setIdEcole(rs.getInt("id_ecole"));
+        } catch (SQLException e) { r.setIdEcole(0); }
+
+        try {
+            r.setIdMaitresse(rs.getInt("id_maitresse"));
+        } catch (SQLException e) { r.setIdMaitresse(0); }
+
+        try {
+            r.setIdParent(rs.getInt("id_parent"));
+        } catch (SQLException e) { r.setIdParent(0); }
+
         return r;
     }
-    // Récupérer les réclamations par école
+
+    // Récupérer les réclamations selon le rôle
+    public List<Reclamation> getReclamationsByRole(CategorieUser role, int roleId, int ecoleId) throws SQLException {
+        List<Reclamation> list = new ArrayList<>();
+        String sql;
+
+        switch (role) {
+            case PARENT:
+                sql = "SELECT r.* FROM reclamation r " +
+                        "JOIN parent p ON r.user_id = p.user_id " +
+                        "WHERE p.id = ? ORDER BY r.date_reclamation DESC";
+                break;
+            case CHAUFFEUR:
+                sql = "SELECT r.* FROM reclamation r " +
+                        "JOIN chauffeur c ON r.user_id = c.user_id " +
+                        "WHERE c.id = ? ORDER BY r.date_reclamation DESC";
+                break;
+            case MAITRESSE:
+                sql = "SELECT r.* FROM reclamation r " +
+                        "JOIN maitresse m ON r.user_id = m.user_id " +
+                        "WHERE m.id = ? ORDER BY r.date_reclamation DESC";
+                break;
+            case RESPONSABLEECOLE:
+                sql = "SELECT r.* FROM reclamation r " +
+                        "WHERE r.id_ecole = ? ORDER BY r.date_reclamation DESC";
+                break;
+            case ADMIN:
+            default:
+                sql = "SELECT * FROM reclamation ORDER BY date_reclamation DESC";
+                break;
+        }
+
+        try (Connection cnx = getConnection();
+             PreparedStatement ps = cnx.prepareStatement(sql)) {
+
+            if (role == CategorieUser.PARENT || role == CategorieUser.CHAUFFEUR || role == CategorieUser.MAITRESSE) {
+                ps.setInt(1, roleId);
+            } else if (role == CategorieUser.RESPONSABLEECOLE) {
+                ps.setInt(1, ecoleId);
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(extractReclamationFromResultSet(rs));
+                }
+            }
+        }
+        return list;
+    }
+
+    // Récupérer les réclamations d'une école spécifique
     public List<Reclamation> getByEcoleId(int ecoleId) throws SQLException {
         List<Reclamation> list = new ArrayList<>();
-        String sql = "SELECT * FROM reclamation WHERE ecole_nom = (SELECT nom FROM ecole WHERE id = ?) ORDER BY date_reclamation DESC";
+        String sql = "SELECT * FROM reclamation WHERE id_ecole = ? ORDER BY date_reclamation DESC";
         try (Connection cnx = getConnection();
              PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setInt(1, ecoleId);

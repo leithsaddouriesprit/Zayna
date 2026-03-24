@@ -51,21 +51,18 @@
 
                 <!-- ========== STATISTIQUES (CARTES) ========== -->
                 <HBox spacing="20" alignment="CENTER">
-                    <!-- Carte Total -->
                     <VBox spacing="8" styleClass="stat-card" HBox.hgrow="ALWAYS" alignment="CENTER">
                         <Label text="📊" style="-fx-font-size: 32px;"/>
                         <Label text="Total" styleClass="stat-card-title"/>
                         <Label fx:id="totalReclamations" text="0" styleClass="stat-card-value" style="-fx-text-fill: #FEC111;"/>
                     </VBox>
 
-                    <!-- Carte En attente -->
                     <VBox spacing="8" styleClass="stat-card" HBox.hgrow="ALWAYS" alignment="CENTER">
                         <Label text="⏳" style="-fx-font-size: 32px;"/>
                         <Label text="En attente" styleClass="stat-card-title"/>
                         <Label fx:id="enAttenteCount" text="0" styleClass="stat-card-value" style="-fx-text-fill: #FEC111;"/>
                     </VBox>
 
-                    <!-- Carte Traitées -->
                     <VBox spacing="8" styleClass="stat-card" HBox.hgrow="ALWAYS" alignment="CENTER">
                         <Label text="✅" style="-fx-font-size: 32px;"/>
                         <Label text="Traitées" styleClass="stat-card-title"/>
@@ -98,29 +95,39 @@
 
                         <!-- Détails dynamiques -->
                         <Label text="Détails" styleClass="section-title" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                        <StackPane GridPane.rowIndex="2" GridPane.columnIndex="1" prefHeight="130" styleClass="surface-panel-soft" style="-fx-padding: 12;">
+                        <StackPane GridPane.rowIndex="2" GridPane.columnIndex="1" prefHeight="200" styleClass="surface-panel-soft" style="-fx-padding: 12;">
 
+                            <!-- Panel Chauffeur -->
                             <VBox fx:id="panelChauffeur" spacing="10" managed="false" visible="false">
-                                <TextField fx:id="chauffeurNomField" promptText="Nom du chauffeur" styleClass="text-field"/>
-                                <TextField fx:id="chauffeurPrenomField" promptText="Prénom du chauffeur" styleClass="text-field"/>
+                                <Label text="Sélectionner le chauffeur :" styleClass="reclamation-label-secondary" style="-fx-text-fill: #FEC111;"/>
+                                <ChoiceBox fx:id="chauffeurChoice" prefWidth="300" styleClass="combo-box"/>
                             </VBox>
 
+                            <!-- Panel Bus -->
                             <VBox fx:id="panelBus" spacing="10" managed="false" visible="false">
-                                <TextField fx:id="busMatriculeField" promptText="Matricule du bus" styleClass="text-field"/>
+                                <Label text="Sélectionner le bus :" styleClass="reclamation-label-secondary" style="-fx-text-fill: #FEC111;"/>
+                                <ChoiceBox fx:id="busChoice" prefWidth="300" styleClass="combo-box"/>
                             </VBox>
 
+                            <!-- Panel Cantine -->
                             <VBox fx:id="panelCantine" spacing="10" managed="false" visible="false">
+                                <Label text="Type de problème :" styleClass="reclamation-label-secondary" style="-fx-text-fill: #FEC111;"/>
                                 <ChoiceBox fx:id="cantineTypeChoice" prefWidth="280" styleClass="combo-box"/>
                             </VBox>
 
+                            <!-- Panel École -->
                             <VBox fx:id="panelEcole" spacing="10" managed="false" visible="false">
-                                <TextField fx:id="ecoleNomField" promptText="Nom de l'école" styleClass="text-field"/>
+                                <Label text="Sélectionner l'école :" styleClass="reclamation-label-secondary" style="-fx-text-fill: #FEC111;"/>
+                                <ChoiceBox fx:id="ecoleChoice" prefWidth="300" styleClass="combo-box"/>
                             </VBox>
 
+                            <!-- Panel Autre -->
                             <VBox fx:id="panelAutre" spacing="10" managed="false" visible="false">
+                                <Label text="Précision :" styleClass="reclamation-label-secondary" style="-fx-text-fill: #FEC111;"/>
                                 <TextField fx:id="autrePrecisionField" promptText="Précision" styleClass="text-field"/>
                             </VBox>
 
+                            <!-- Panel Trajet -->
                             <VBox fx:id="panelTrajet" spacing="10" managed="false" visible="false" alignment="CENTER">
                                 <Label text="✓ Aucun détail requis" style="-fx-text-fill: #FEC111; -fx-font-weight: bold;"/>
                             </VBox>
@@ -183,6 +190,7 @@
                         </columnResizePolicy>
                     </TableView>
                 </VBox>
+
                 <!-- ========== SECTION RÉPONSE ADMIN ========== -->
                 <VBox spacing="12" styleClass="surface-panel" style="-fx-padding: 20; -fx-border-color: #FEC111; -fx-border-width: 0 0 0 3; -fx-border-radius: 12;">
 

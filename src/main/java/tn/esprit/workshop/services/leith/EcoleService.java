@@ -46,4 +46,21 @@ public class EcoleService {
         }
         return null;
     }
+    // Dans EcoleService.java
+    public List<Ecole> getAll() throws SQLException {
+        List<Ecole> list = new ArrayList<>();
+        String sql = "SELECT * FROM ecole";
+        try (Connection cnx = MyBDConnexion.getInstance().getConnection();
+             Statement st = cnx.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                Ecole e = new Ecole();
+                e.setId(rs.getInt("id"));
+                e.setNomEcole(rs.getString("nom"));  // ou getNomEcole() selon votre modèle
+                // ... autres champs
+                list.add(e);
+            }
+        }
+        return list;
+    }
 }

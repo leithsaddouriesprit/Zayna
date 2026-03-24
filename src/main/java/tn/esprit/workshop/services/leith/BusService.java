@@ -168,5 +168,21 @@ public class BusService implements CRUD<Bus> {
         }
         return null;
     }
-
+    // Dans BusService.java
+    public List<Bus> getAll() throws SQLException {
+        List<Bus> list = new ArrayList<>();
+        String sql = "SELECT * FROM bus";
+        try (Connection cnx = MyBDConnexion.getInstance().getConnection();
+             Statement st = cnx.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                Bus b = new Bus();
+                b.setNumeroBus(rs.getString("id"));
+                b.setMatricule(rs.getString("matricule"));
+                // ... autres champs
+                list.add(b);
+            }
+        }
+        return list;
+    }
 }

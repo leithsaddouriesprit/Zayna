@@ -95,6 +95,7 @@
                                        minHeight="300"
                                        styleClass="reponse-table">
                                 <columns>
+                                    <TableColumn fx:id="colAuteur" text="Auteur" prefWidth="120"/>
                                     <TableColumn fx:id="colType" text="Type" prefWidth="80"/>
                                     <TableColumn fx:id="colDescription" text="Message" prefWidth="200"/>
                                     <TableColumn fx:id="colDetails" text="Détails" prefWidth="120"/>
@@ -124,6 +125,10 @@
                                     <ColumnConstraints minWidth="80" prefWidth="80"/>
                                     <ColumnConstraints hgrow="ALWAYS"/>
                                 </columnConstraints>
+                                <Label text="👤 Auteur:" GridPane.rowIndex="0" GridPane.columnIndex="0"
+                                       style="-fx-font-weight: bold; -fx-text-fill: #64748b;"/>
+                                <Label fx:id="detailAuteurLabel" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                                       style="-fx-text-fill: #FEC111; -fx-font-weight: bold;"/>
 
                                 <Label text="👤 Utilisateur:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="text-muted"/>
                                 <Label fx:id="detailUserLabel" GridPane.rowIndex="0" GridPane.columnIndex="1" style="-fx-text-fill: #FEC111; -fx-font-weight: bold;"/>

@@ -10,6 +10,7 @@ import javafx.scene.layout.VBox;
 import tn.esprit.workshop.model.Reclamation;
 import tn.esprit.workshop.model.Reponse;
 import tn.esprit.workshop.model.Talel.talel2.CategorieUser;
+import tn.esprit.workshop.model.Talel.talel2.User;
 import tn.esprit.workshop.services.ReclamationService;
 import tn.esprit.workshop.services.ReponseService;
 
@@ -19,10 +20,9 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
+
+import tn.esprit.workshop.services.Talel.ServiceAdmin;
 import tn.esprit.workshop.services.TraductionService;
 import tn.esprit.workshop.utilis.AppSession;
 
@@ -53,6 +53,7 @@ public class GestionReponseController implements Initializable {
     @FXML private TextArea reponseExistanteArea;
     @FXML private Label reponseDateLabel;
     @FXML private Label reponseAuteurLabel;
+    @FXML private Label detailAuteurLabel;  // ✅ NOUVEAU
 
     // Formulaire de réponse
     @FXML private TextArea reponseField;
@@ -62,11 +63,13 @@ public class GestionReponseController implements Initializable {
     @FXML private ChoiceBox<String> langueCibleChoice;
     @FXML private Label traductionMessageLabel;
     @FXML private Button traduireMessageButton;
+    @FXML private TableColumn<Reclamation, String> colAuteur;  // ✅ NOUVEAU
 
     // Map pour stocker les codes ISO des langues
     private Map<String, String> languesMap;
     private final ReclamationService reclamationService = new ReclamationService();
     private final ReponseService reponseService = new ReponseService();
+    private final ServiceAdmin serviceAdmin = new ServiceAdmin();
 
     private Reclamation reclamationSelectionnee;
     private Reponse reponseExistante;
@@ -107,7 +110,21 @@ public class GestionReponseController implements Initializable {
     }
     private void configurerColonnes() {
         // Masquer l'ID
-
+        // ✅ Colonne Auteur
+        colAuteur.setCellValueFactory(cellData -> {
+            Reclamation r = cellData.getValue();
+            try {
+                User user = serviceAdmin.getUtilisateurById(r.getUserId());
+                if (user != null) {
+                    return new javafx.beans.property.SimpleStringProperty(
+                            user.getNom() + " (" + user.getCategories() + ")"
+                    );
+                }
+            } catch (Exception e) {
+                return new javafx.beans.property.SimpleStringProperty("Utilisateur #" + r.getUserId());
+            }
+            return new javafx.beans.property.SimpleStringProperty("Utilisateur #" + r.getUserId());
+        });
 
         colType.setCellValueFactory(new PropertyValueFactory<>("type"));
         colDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
@@ -341,7 +358,21 @@ public class GestionReponseController implements Initializable {
     private void afficherDetailsReclamation(Reclamation r) {
         if (detailTypeLabel != null) detailTypeLabel.setText(r.getType());
         if (detailMessageArea != null) detailMessageArea.setText(r.getDescription());
-
+        // ✅ Afficher l'auteur de la réclamation
+        if (detailAuteurLabel != null) {
+            try {
+                User user = serviceAdmin.getUtilisateurById(r.getUserId());
+                if (user != null) {
+                    String nom = user.getNom();
+                    String categorie = user.getCategories().toString();
+                    detailAuteurLabel.setText(nom + " (" + categorie + ")");
+                } else {
+                    detailAuteurLabel.setText("Utilisateur #" + r.getUserId());
+                }
+            } catch (Exception e) {
+                detailAuteurLabel.setText("Utilisateur #" + r.getUserId());
+            }
+        }
         // ✅ Réinitialiser le label de traduction
         if (traductionMessageLabel != null) {
             traductionMessageLabel.setText("");
@@ -358,9 +389,6 @@ public class GestionReponseController implements Initializable {
             detailDateLabel.setText(format.format(r.getDateReclamation()));
         }
 
-        if (detailUserLabel != null) {
-            detailUserLabel.setText("Utilisateur #" + r.getUserId());
-        }
     }
 
 
@@ -403,35 +431,43 @@ public class GestionReponseController implements Initializable {
 
     @FXML
     private void repondreReclamation() {
-        // ✅ Vérifier si l'utilisateur peut répondre
+        // Vérifier les droits
         CategorieUser currentUserRole = AppSession.getInstance().getConnectedUserRoleEnum();
         if (currentUserRole != CategorieUser.ADMIN && currentUserRole != CategorieUser.RESPONSABLEECOLE) {
             showAlert("Accès refusé", "Seuls les administrateurs et responsables d'école peuvent répondre", Alert.AlertType.WARNING);
             return;
         }
+
+        // ✅ Vérification pour responsable école
+        if (currentUserRole == CategorieUser.RESPONSABLEECOLE) {
+            int ecoleIdResponsable = AppSession.getInstance().getEcoleId();
+            int ecoleIdReclamation = reclamationSelectionnee.getIdEcole();
+            if (ecoleIdReclamation != ecoleIdResponsable) {
+                showAlert("Accès refusé", "Vous ne pouvez répondre qu'aux réclamations de votre école.", Alert.AlertType.WARNING);
+                return;
+            }
+        }
+
         if (!validerSelectionEtReponse()) return;
 
         String reponseTexte = reponseField.getText().trim();
 
         try {
+            // ✅ Récupérer l'ID de l'utilisateur connecté
+            int userId = AppSession.getInstance().getConnectedUserId();
+
             if (reponseExistante != null) {
-                Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-                confirm.setTitle("Confirmation");
-                confirm.setHeaderText("Une réponse existe déjà");
-                confirm.setContentText("Voulez-vous remplacer la réponse existante ?");
-
-                if (confirm.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) {
-                    return;
-                }
-
+                // Modifier la réponse existante
                 reponseExistante.setMessage(reponseTexte);
                 reponseExistante.setDate(LocalDateTime.now());
+                reponseExistante.setUserId(userId);  // ✅ NOUVEAU
                 reponseService.update(reponseExistante);
                 showAlert("Succès", "✅ Réponse modifiée avec succès !", Alert.AlertType.INFORMATION);
-
             } else {
+                // Créer une nouvelle réponse
                 Reponse nouvelleReponse = new Reponse(
                         reclamationSelectionnee.getId(),
+                        userId,  // ✅ NOUVEAU : ID de l'utilisateur connecté
                         reponseTexte,
                         LocalDateTime.now()
                 );
@@ -439,6 +475,7 @@ public class GestionReponseController implements Initializable {
                 showAlert("Succès", "✅ Réponse envoyée avec succès !", Alert.AlertType.INFORMATION);
             }
 
+            // Mettre à jour le statut de la réclamation
             reclamationSelectionnee.setStatut("TRAITEE");
             reclamationService.updateOne(reclamationSelectionnee);
 
@@ -450,7 +487,6 @@ public class GestionReponseController implements Initializable {
             e.printStackTrace();
         }
     }
-
     @FXML
     private void modifierReponse() {
         // ✅ Vérifier si l'utilisateur peut modifier
@@ -626,23 +662,30 @@ public class GestionReponseController implements Initializable {
 
     private void afficherToutesReclamations() {
         try {
-            List<Reclamation> reclamations;
             CategorieUser currentUserRole = AppSession.getInstance().getConnectedUserRoleEnum();
+            List<Reclamation> reclamations;
 
-            // ✅ Si c'est un Responsable École, filtrer par son école
+            // ✅ FILTRAGE SELON LE RÔLE
             if (currentUserRole == CategorieUser.RESPONSABLEECOLE) {
-                Integer ecoleId = AppSession.getInstance().getEcoleId();
-                reclamations = reclamationService.getByEcoleId(ecoleId); // À créer dans ReclamationService
-            } else {
-                reclamations = reclamationService.selectAll();
+                // Responsable École : ne voit que les réclamations de SON école
+                int ecoleId = AppSession.getInstance().getEcoleId();
+                reclamations = reclamationService.getByEcoleId(ecoleId);
+                statusLabel.setText("Affichage des réclamations de votre école");
             }
-            // ✅ Forcer la mise à jour des données
+            else if (currentUserRole == CategorieUser.ADMIN) {
+                // Admin : voit toutes les réclamations
+                reclamations = reclamationService.selectAll();
+                statusLabel.setText("Affichage de toutes les réclamations");
+            }
+            else {
+                // Autres rôles (ne devraient pas accéder à cette interface)
+                reclamations = new ArrayList<>();
+                statusLabel.setText("Vous n'avez pas accès à cette interface");
+            }
+
             ObservableList<Reclamation> data = FXCollections.observableArrayList(reclamations);
             tableReclamation.setItems(data);
             mettreAJourStatistiques(reclamations);
-
-
-            // ✅ Forcer le rafraîchissement visuel
             tableReclamation.refresh();
 
             if (!reclamations.isEmpty()) {

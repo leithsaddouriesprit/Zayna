@@ -6,8 +6,12 @@ import javafx.fxml.Initializable;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.util.StringConverter;
 import tn.esprit.workshop.model.Reclamation;
 import tn.esprit.workshop.model.Reponse;
+import tn.esprit.workshop.model.leith.Bus;
+import tn.esprit.workshop.model.tous.Chauffeur;
+import tn.esprit.workshop.model.tous.Ecole;
 import tn.esprit.workshop.services.FiltrageService;
 import tn.esprit.workshop.services.ReclamationService;
 import tn.esprit.workshop.services.ReponseService;
@@ -28,12 +32,13 @@ import java.util.ResourceBundle;
 import tn.esprit.workshop.model.Talel.talel2.User;
 import tn.esprit.workshop.model.Talel.talel2.CategorieUser;
 import tn.esprit.workshop.services.Talel.ServiceAdmin;
+import tn.esprit.workshop.services.leith.BusService;
+import tn.esprit.workshop.services.leith.ChauffeurService;
+import tn.esprit.workshop.services.leith.EcoleService;
 import tn.esprit.workshop.utilis.AppSession;
-import tn.esprit.workshop.services.Talel.ServiceParent;
-import tn.esprit.workshop.services.Talel.ServiceChauffeur;
-import tn.esprit.workshop.services.Talel.ServiceMaitresse;
-import tn.esprit.workshop.services.Talel.ServiceResponsableEcole;
+
 public class GestionReclamationController implements Initializable {
+
     @FXML private Label compteurReclamations;
     @FXML private ChoiceBox<String> typeChoice;
     @FXML private TextArea messageField;
@@ -42,7 +47,7 @@ public class GestionReclamationController implements Initializable {
     @FXML private TextField searchField;
     @FXML private Label statusLabel;
     @FXML private Label statutReponseLabel;
-    @FXML private Label traductionLabel; // Ajoutez ce champ
+    @FXML private Label traductionLabel;
     @FXML private ChoiceBox<String> langueCibleChoice;
     private Map<String, String> languesMap;
     private Reponse reponseCourante;
@@ -50,7 +55,11 @@ public class GestionReclamationController implements Initializable {
     @FXML private Label enAttenteCount;
     @FXML private Label traiteesCount;
     @FXML private Label detailUserTypeLabel;
+
     // Nouveaux champs FXML
+    @FXML private ChoiceBox<Chauffeur> chauffeurChoice;
+    @FXML private ChoiceBox<Bus> busChoice;
+    @FXML private ChoiceBox<Ecole> ecoleChoice;
     @FXML private VBox panelChauffeur;
     @FXML private VBox panelBus;
     @FXML private VBox panelCantine;
@@ -74,10 +83,13 @@ public class GestionReclamationController implements Initializable {
     @FXML private TableColumn<Reclamation, String> colDetails;
     @FXML private TableColumn<Reclamation, String> colStatut;
     @FXML private TableColumn<Reclamation, Timestamp> colDate;
-    // ✅ AJOUTEZ CES DEUX LIGNES
     @FXML private Button traduireReponseButton;
     @FXML private Button envoyerButton;
     @FXML private Label traductionReponseLabel;
+
+    private final ChauffeurService chauffeurService = new ChauffeurService();
+    private final BusService busService = new BusService();
+    private final EcoleService ecoleService = new EcoleService();
     private final ReclamationService service = new ReclamationService();
     private final ReponseService reponseService = new ReponseService();
     private final TraductionService traductionService = new TraductionService();
@@ -85,11 +97,12 @@ public class GestionReclamationController implements Initializable {
     private final ServiceAdmin serviceAdmin = new ServiceAdmin();
     private int currentUserId;
     private CategorieUser currentUserRole;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // Récupérer l'utilisateur connecté depuis AppSession
         currentUserId = AppSession.getInstance().getConnectedUserId();
-        currentUserRole = AppSession.getInstance().getConnectedUserRoleEnum(); // ✅ Utiliser getConnectedUserRoleEnum()
+        currentUserRole = AppSession.getInstance().getConnectedUserRoleEnum();
 
         // Types de réclamation
         typeChoice.getItems().addAll("Bus", "École", "Chauffeur", "Cantine", "Trajet", "Autre");
@@ -108,6 +121,11 @@ public class GestionReclamationController implements Initializable {
         configurerStyleStatut();
         configurerBoutonsSelonRole();
 
+        // Remplir les ChoiceBox
+        remplirChoixChauffeur();
+        remplirChoixBus();
+        remplirChoixEcole();
+
         // Listener pour changer les panels selon le type sélectionné
         typeChoice.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldVal, newVal) -> changerPanelSelonType(newVal)
@@ -120,7 +138,6 @@ public class GestionReclamationController implements Initializable {
                         remplirFormulaireAvecReclamation(newSelection);
                         chargerReponse(newSelection.getId());
                         afficherDetailsReclamation(newSelection);
-
                     }
                 }
         );
@@ -129,16 +146,13 @@ public class GestionReclamationController implements Initializable {
         // Charger les réclamations
         afficherReclamations();
 
-        // ✅ INITIALISER LES STATISTIQUES À 0 AU CAS OÙ
+        // INITIALISER LES STATISTIQUES À 0
         if (totalReclamations == null) totalReclamations.setText("0");
         if (enAttenteCount == null) enAttenteCount.setText("0");
         if (traiteesCount == null) traiteesCount.setText("0");
-
     }
 
-
     private void initialiserLangues() {
-        // ✅ Créer la map avec les noms affichés et les codes ISO
         languesMap = new LinkedHashMap<>();
         languesMap.put("Anglais", "en");
         languesMap.put("Français", "fr");
@@ -150,15 +164,13 @@ public class GestionReclamationController implements Initializable {
         languesMap.put("Japonais", "ja");
         languesMap.put("Russe", "ru");
         languesMap.put("Portugais", "pt");
-        // ✅ Remplir le ChoiceBox avec les NOMS (pas les codes)
+
         langueCibleChoice.getItems().clear();
         langueCibleChoice.getItems().addAll(languesMap.keySet());
 
-        // ✅ Sélectionner une valeur par défaut
         if (!languesMap.isEmpty()) {
             langueCibleChoice.setValue("Anglais");
         }
-
         System.out.println("Langues initialisées: " + languesMap.size());
     }
 
@@ -227,13 +239,9 @@ public class GestionReclamationController implements Initializable {
     // ================= CONFIGURATION =================
 
     private void configurerColonnes() {
-
         colType.setCellValueFactory(new PropertyValueFactory<>("type"));
-
-        // Afficher la description
         colDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
 
-        // ✅ Pour la colonne Détails : extraire les détails selon le type
         colDetails.setCellValueFactory(cellData -> {
             Reclamation r = cellData.getValue();
             String details = "";
@@ -261,14 +269,12 @@ public class GestionReclamationController implements Initializable {
                     details = "-";
                     break;
             }
-
             return new javafx.beans.property.SimpleStringProperty(details);
         });
 
         colStatut.setCellValueFactory(new PropertyValueFactory<>("statut"));
         colDate.setCellValueFactory(new PropertyValueFactory<>("dateReclamation"));
 
-        // Format de la date
         colDate.setCellFactory(column -> new TableCell<>() {
             private final SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
@@ -285,7 +291,6 @@ public class GestionReclamationController implements Initializable {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-
                 if (empty || item == null) {
                     setText(null);
                     setStyle("");
@@ -296,37 +301,11 @@ public class GestionReclamationController implements Initializable {
                                 setStyle("-fx-text-fill: orange; -fx-font-weight: bold;");
                         case "TRAITEE" ->
                                 setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
-                        default ->
-                                setStyle("");
+                        default -> setStyle("");
                     }
                 }
             }
         });
-    }
-
-    // Nouvelle méthode pour extraire les détails
-    private String getDetailsFromReclamation(Reclamation r) {
-        if (r.getType() == null) return "";
-
-        switch (r.getType()) {
-            case "Chauffeur":
-                if (r.getChauffeurPrenom() != null || r.getChauffeurNom() != null) {
-                    return (r.getChauffeurPrenom() != null ? r.getChauffeurPrenom() + " " : "") +
-                            (r.getChauffeurNom() != null ? r.getChauffeurNom() : "");
-                }
-                break;
-            case "Bus":
-                return r.getBusMatricule() != null ? r.getBusMatricule() : "";
-            case "Cantine":
-                return r.getCantineType() != null ? r.getCantineType() : "";
-            case "École":
-                return r.getEcoleNom() != null ? r.getEcoleNom() : "";
-            case "Autre":
-                return r.getAutrePrecision() != null ? r.getAutrePrecision() : "";
-            case "Trajet":
-                return "-";
-        }
-        return "";
     }
 
     // ================= CHARGER REPONSE =================
@@ -340,12 +319,8 @@ public class GestionReclamationController implements Initializable {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
                 statutReponseLabel.setText("Répondu le " + reponse.getDate().format(formatter));
 
-                // ✅ Afficher qui a répondu
                 try {
-                    // Récupérer l'ID de l'utilisateur depuis la réponse
-                    // NOTE: Vous devez avoir un champ user_id dans la table reponse
-                    // Si ce champ n'existe pas, vous ne pourrez pas afficher qui a répondu
-                    int userId = reponse.getUserId(); // Vous devez avoir getUserId() dans Reponse
+                    int userId = reponse.getUserId();
                     User user = serviceAdmin.getUtilisateurById(userId);
                     if (user != null) {
                         reponseAuteurLabel.setText("Par: " + user.getNom());
@@ -378,6 +353,7 @@ public class GestionReclamationController implements Initializable {
             e.printStackTrace();
         }
     }
+
     // ================= AFFICHER DÉTAILS =================
 
     private void afficherDetailsReclamation(Reclamation r) {
@@ -393,9 +369,7 @@ public class GestionReclamationController implements Initializable {
             try {
                 User user = serviceAdmin.getUtilisateurById(r.getUserId());
                 if (user != null) {
-                    // ✅ Utiliser getNom() (pas de prénom)
                     detailUserLabel.setText(user.getNom());
-                    // ✅ Afficher la catégorie si le label existe
                     if (detailUserTypeLabel != null) {
                         detailUserTypeLabel.setText(user.getCategories().toString());
                     }
@@ -413,7 +387,6 @@ public class GestionReclamationController implements Initializable {
         }
     }
 
-    // ✅ MÉTHODE UTILITAIRE POUR LES DÉTAILS SPÉCIFIQUES
     private String getDetailsComplets(Reclamation r) {
         if (r.getType() == null) return "Aucun détail";
 
@@ -444,7 +417,6 @@ public class GestionReclamationController implements Initializable {
         typeChoice.setValue(r.getType());
         messageField.setText(r.getDescription());
 
-        // Remplir les champs spécifiques
         chauffeurNomField.setText(r.getChauffeurNom());
         chauffeurPrenomField.setText(r.getChauffeurPrenom());
         busMatriculeField.setText(r.getBusMatricule());
@@ -452,7 +424,6 @@ public class GestionReclamationController implements Initializable {
         ecoleNomField.setText(r.getEcoleNom());
         autrePrecisionField.setText(r.getAutrePrecision());
 
-        // Afficher le bon panel
         changerPanelSelonType(r.getType());
     }
 
@@ -460,13 +431,57 @@ public class GestionReclamationController implements Initializable {
 
     @FXML
     private void envoyerReclamation() {
-        // Vérifier si l'utilisateur peut créer une réclamation
         if (currentUserRole == CategorieUser.ADMIN) {
             showAlert("Accès refusé", "Les administrateurs ne peuvent pas créer de réclamations", Alert.AlertType.WARNING);
             return;
         }
+
         String type = typeChoice.getValue();
         String message = messageField.getText();
+
+        // Variables pour les IDs
+        int idChauffeur = 0;
+        int idBus = 0;
+        int idEcole = 0;
+        int idMaitresse = 0;
+        int idParent = 0;
+
+        // Variables pour les noms (copie pour historique)
+        String chauffeurNom = "";
+        String chauffeurPrenom = "";
+        String busMatricule = "";
+        String ecoleNom = "";
+        String cantineType = "";
+        String autrePrecision = "";
+
+        // Traitement selon le type avec les ChoiceBox
+        if (type != null && type.equals("Chauffeur") && chauffeurChoice != null && chauffeurChoice.getValue() != null) {
+            Chauffeur selectedChauffeur = chauffeurChoice.getValue();
+            idChauffeur = selectedChauffeur.getId();
+            chauffeurNom = selectedChauffeur.getNom();
+            chauffeurPrenom = selectedChauffeur.getPrenom();
+        }
+
+        if (type != null && type.equals("Bus") && busChoice != null && busChoice.getValue() != null) {
+            Bus selectedBus = busChoice.getValue();
+            idBus = selectedBus.getBusId();
+            busMatricule = selectedBus.getMatricule();
+        }
+
+        if (type != null && type.equals("École") && ecoleChoice != null && ecoleChoice.getValue() != null) {
+            Ecole selectedEcole = ecoleChoice.getValue();
+            idEcole = selectedEcole.getId();
+            ecoleNom = selectedEcole.getNomEcole();
+        }
+
+        // Récupérer les valeurs des autres champs
+        if (cantineTypeChoice != null) {
+            cantineType = cantineTypeChoice.getValue();
+        }
+
+        if (autrePrecisionField != null) {
+            autrePrecision = autrePrecisionField.getText();
+        }
 
         // Validations
         if (type == null || type.isEmpty()) {
@@ -492,47 +507,43 @@ public class GestionReclamationController implements Initializable {
             return;
         }
 
-        // Récupérer les valeurs des champs spécifiques
-        String chauffeurNom = chauffeurNomField.getText();
-        String chauffeurPrenom = chauffeurPrenomField.getText();
-        String busMatricule = busMatriculeField.getText();
-        String cantineType = cantineTypeChoice.getValue();
-        String ecoleNom = ecoleNomField.getText();
-        String autrePrecision = autrePrecisionField.getText();
-
         // Validation spécifique selon le type
-        if (type.equals("Chauffeur") && (chauffeurNom.trim().isEmpty() || chauffeurPrenom.trim().isEmpty())) {
-            showAlert("Erreur", "❌ Veuillez saisir le nom et prénom du chauffeur", Alert.AlertType.WARNING);
+        if (type.equals("Chauffeur") && chauffeurChoice != null && chauffeurChoice.getValue() == null) {
+            showAlert("Erreur", "❌ Veuillez sélectionner un chauffeur", Alert.AlertType.WARNING);
+            chauffeurChoice.requestFocus();
             return;
         }
 
-        if (type.equals("Bus") && busMatricule.trim().isEmpty()) {
-            showAlert("Erreur", "❌ Veuillez saisir le matricule du bus", Alert.AlertType.WARNING);
+        if (type.equals("Bus") && busChoice != null && busChoice.getValue() == null) {
+            showAlert("Erreur", "❌ Veuillez sélectionner un bus", Alert.AlertType.WARNING);
+            busChoice.requestFocus();
             return;
         }
 
         if (type.equals("Cantine") && (cantineType == null || cantineType.isEmpty())) {
             showAlert("Erreur", "❌ Veuillez sélectionner le type de problème", Alert.AlertType.WARNING);
+            cantineTypeChoice.requestFocus();
             return;
         }
 
-        if (type.equals("École") && ecoleNom.trim().isEmpty()) {
-            showAlert("Erreur", "❌ Veuillez saisir le nom de l'école", Alert.AlertType.WARNING);
+        if (type.equals("École") && ecoleChoice != null && ecoleChoice.getValue() == null) {
+            showAlert("Erreur", "❌ Veuillez sélectionner une école", Alert.AlertType.WARNING);
+            ecoleChoice.requestFocus();
             return;
         }
 
-        if (type.equals("Autre") && autrePrecision.trim().isEmpty()) {
+        if (type.equals("Autre") && (autrePrecision == null || autrePrecision.trim().isEmpty())) {
             showAlert("Erreur", "❌ Veuillez préciser votre demande", Alert.AlertType.WARNING);
+            autrePrecisionField.requestFocus();
             return;
         }
-        // ✅ FILTRAGE : Vérifier les mots grossiers
+
+        // FILTRAGE
         FiltrageService.ResultatFiltrage resultatFiltrage = filtrageService.analyser(message);
         if (resultatFiltrage.contientGrossieretes()) {
-            // Créer une alerte personnalisée
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("⚠️ Langage inapproprié");
             alert.setHeaderText("Des mots inappropriés ont été détectés");
-            // Créer un contenu plus détaillé
             VBox content = new VBox(10);
             content.setPadding(new Insets(20));
 
@@ -553,7 +564,6 @@ public class GestionReclamationController implements Initializable {
             content.getChildren().addAll(originalLabel, originalArea, filtreLabel, filtreArea);
             alert.getDialogPane().setContent(content);
 
-            // Boutons personnalisés
             ButtonType btnFiltre = new ButtonType("✅ Utiliser la version filtrée", ButtonBar.ButtonData.OK_DONE);
             ButtonType btnModifier = new ButtonType("✏️ Modifier mon message", ButtonBar.ButtonData.NO);
             ButtonType btnAnnuler = new ButtonType("❌ Annuler", ButtonBar.ButtonData.CANCEL_CLOSE);
@@ -563,24 +573,21 @@ public class GestionReclamationController implements Initializable {
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent()) {
                 if (result.get() == btnFiltre) {
-                    // Remplacer par la version filtrée
                     messageField.setText(resultatFiltrage.getTexteFiltre());
                     message = resultatFiltrage.getTexteFiltre();
                     statusLabel.setText("✅ Message filtré automatiquement");
                 } else if (result.get() == btnModifier) {
-                    // L'utilisateur veut modifier
                     messageField.requestFocus();
                     messageField.selectAll();
-                    return; // Arrêter l'envoi
+                    return;
                 } else {
-                    // Annuler
-                    return; // Arrêter l'envoi
+                    return;
                 }
             } else {
-                return; // Annuler si la boîte de dialogue est fermée
+                return;
             }
         }
-            // Confirmation
+
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirmation");
         confirm.setHeaderText("Envoyer la réclamation");
@@ -588,24 +595,6 @@ public class GestionReclamationController implements Initializable {
 
         if (confirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
             try {
-                // Traduction du message (optionnelle - ne bloque pas l'envoi)
-                String langueOriginale = "inconnue";
-                String messageTraduit = "";
-
-                try {
-                    langueOriginale = traductionService.detecterLangue(message);
-                    messageTraduit = traductionService.traduireVersFrancais(message);
-                    statusLabel.setText("✅ Langue détectée : " + langueOriginale);
-
-                    showAlert("Succès", "✅ Réclamation envoyée !", Alert.AlertType.INFORMATION);
-                    viderFormulaire();
-                    afficherReclamations(); // ✅ Cette ligne mettra à jour les stats
-                } catch (Exception e) {
-                    System.out.println("Traduction non disponible: " + e.getMessage());
-                    // On continue sans traduction
-                }
-
-                // Appel au service (à adapter selon votre méthode)
                 service.ajouterReclamationEtRetournerId(
                         currentUserId,
                         type,
@@ -616,8 +605,12 @@ public class GestionReclamationController implements Initializable {
                         busMatricule,
                         cantineType,
                         ecoleNom,
-                        autrePrecision
-                        // Note: Vous devrez peut-être modifier votre méthode pour accepter langueOriginale et messageTraduit
+                        autrePrecision,
+                        idChauffeur,
+                        idBus,
+                        idEcole,
+                        idMaitresse,
+                        idParent
                 );
 
                 showAlert("Succès", "✅ Réclamation envoyée avec succès !", Alert.AlertType.INFORMATION);
@@ -634,11 +627,11 @@ public class GestionReclamationController implements Initializable {
     @FXML
     private void modifierReclamation() {
         Reclamation selected = tableReclamation.getSelectionModel().getSelectedItem();
-        // ✅ Vérifier si l'utilisateur peut modifier (seulement ses propres réclamations)
         if (selected != null && selected.getUserId() != currentUserId) {
             showAlert("Accès refusé", "Vous ne pouvez modifier que vos propres réclamations", Alert.AlertType.WARNING);
             return;
         }
+
         String type = typeChoice.getValue();
         String message = messageField.getText();
 
@@ -672,7 +665,6 @@ public class GestionReclamationController implements Initializable {
                 selected.setType(type);
                 selected.setDescription(message.trim());
 
-                // Mettre à jour les champs spécifiques
                 selected.setChauffeurNom(chauffeurNomField.getText());
                 selected.setChauffeurPrenom(chauffeurPrenomField.getText());
                 selected.setBusMatricule(busMatriculeField.getText());
@@ -695,11 +687,12 @@ public class GestionReclamationController implements Initializable {
     @FXML
     private void supprimerReclamation() {
         Reclamation selected = tableReclamation.getSelectionModel().getSelectedItem();
-// ✅ Vérifier si l'utilisateur peut supprimer (seulement ses propres réclamations)
+
         if (selected != null && selected.getUserId() != currentUserId) {
             showAlert("Accès refusé", "Vous ne pouvez supprimer que vos propres réclamations", Alert.AlertType.WARNING);
             return;
         }
+
         if (selected == null) {
             showAlert("Erreur", "❌ Veuillez sélectionner une réclamation à supprimer !", Alert.AlertType.WARNING);
             return;
@@ -712,7 +705,6 @@ public class GestionReclamationController implements Initializable {
 
         if (confirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
             try {
-                // Vérifier s'il y a une réponse associée
                 Reponse reponse = reponseService.getReponseByReclamationId(selected.getId());
                 if (reponse != null) {
                     reponseService.delete(reponse.getId());
@@ -770,23 +762,37 @@ public class GestionReclamationController implements Initializable {
     }
 
     // ================= AFFICHAGE =================
-    // ================= AFFICHAGE =================
 
     private void afficherReclamations() {
         try {
-            // Récupérer la liste des réclamations
-            List<Reclamation> liste = service.selectAll();
+            CategorieUser role = AppSession.getInstance().getConnectedUserRoleEnum();
+            List<Reclamation> liste;
 
-            // Créer l'ObservableList avec le bon type
-            javafx.collections.ObservableList<Reclamation> data = FXCollections.observableArrayList(liste);
+            int roleId = 0;
+            int ecoleId = 0;
 
-            // Mettre à jour la table
-            tableReclamation.setItems(data);
+            switch (role) {
+                case PARENT:
+                    roleId = AppSession.getInstance().getParentId();
+                    break;
+                case CHAUFFEUR:
+                    roleId = AppSession.getInstance().getChauffeurId();
+                    break;
+                case MAITRESSE:
+                    roleId = AppSession.getInstance().getMaitresseId();
+                    break;
+                case RESPONSABLEECOLE:
+                    ecoleId = AppSession.getInstance().getEcoleId();
+                    break;
+                default:
+                    break;
+            }
 
-            // ✅ METTRE À JOUR LES STATISTIQUES DE LA BARRE LATÉRALE
+            liste = service.getReclamationsByRole(role, roleId, ecoleId);
+
+            tableReclamation.setItems(FXCollections.observableArrayList(liste));
             mettreAJourStatistiques(liste);
 
-            // Mettre à jour le compteur de réclamations
             if (compteurReclamations != null) {
                 int taille = liste.size();
                 if (taille == 0) {
@@ -804,17 +810,14 @@ public class GestionReclamationController implements Initializable {
         }
     }
 
-    // ✅ NOUVELLE MÉTHODE POUR METTRE À JOUR LES STATISTIQUES
     private void mettreAJourStatistiques(List<Reclamation> liste) {
         if (liste == null || liste.isEmpty()) {
-            // Si la liste est vide, mettre tous les compteurs à 0
             if (totalReclamations != null) totalReclamations.setText("0");
             if (enAttenteCount != null) enAttenteCount.setText("0");
             if (traiteesCount != null) traiteesCount.setText("0");
             return;
         }
 
-        // Compter les réclamations par statut
         int total = liste.size();
         int enAttente = 0;
         int traitees = 0;
@@ -827,24 +830,12 @@ public class GestionReclamationController implements Initializable {
             }
         }
 
-        // Mettre à jour les labels
-        if (totalReclamations != null) {
-            totalReclamations.setText(String.valueOf(total));
-        }
-
-        if (enAttenteCount != null) {
-            enAttenteCount.setText(String.valueOf(enAttente));
-        }
-
-        if (traiteesCount != null) {
-            traiteesCount.setText(String.valueOf(traitees));
-        }
-
-        System.out.println("📊 Statistiques mises à jour - Total: " + total +
-                ", En attente: " + enAttente +
-                ", Traitées: " + traitees);
+        if (totalReclamations != null) totalReclamations.setText(String.valueOf(total));
+        if (enAttenteCount != null) enAttenteCount.setText(String.valueOf(enAttente));
+        if (traiteesCount != null) traiteesCount.setText(String.valueOf(traitees));
     }
-// ================= TRADUCTION REPONSE =================
+
+    // ================= TRADUCTION =================
 
     @FXML
     private void traduireReponse() {
@@ -887,6 +878,7 @@ public class GestionReclamationController implements Initializable {
             }
         }).start();
     }
+
     @FXML
     private void traduireMessage() {
         String message = messageField.getText();
@@ -898,71 +890,61 @@ public class GestionReclamationController implements Initializable {
 
         String langueCibleNom = langueCibleChoice.getValue();
 
-        System.out.println("Langue sélectionnée: '" + langueCibleNom + "'");
         if (langueCibleNom == null || langueCibleNom.isEmpty()) {
             traductionLabel.setText("⚠️ Veuillez choisir une langue dans la liste");
             traductionLabel.setStyle("-fx-text-fill: #e67e22;");
             return;
         }
-        // ✅ Vérifier que languesMap n'est pas null
+
         if (languesMap == null) {
             traductionLabel.setText("❌ Erreur de configuration des langues");
             traductionLabel.setStyle("-fx-text-fill: #e74c3c;");
             return;
         }
+
         String langueCibleCode = languesMap.get(langueCibleNom);
-        System.out.println("Code correspondant: '" + langueCibleCode + "'");
         if (langueCibleCode == null) {
             traductionLabel.setText("❌ Langue non supportée: " + langueCibleNom);
             traductionLabel.setStyle("-fx-text-fill: #e74c3c;");
             return;
         }
+
         statusLabel.setText("⏳ Traduction en cours...");
         traductionLabel.setText("Recherche de traduction...");
-
-
-
-        // Désactiver le bouton pendant la traduction
-        // traduireButton.setDisable(true);
 
         new Thread(() -> {
             try {
                 String traduit = traductionService.traduireVersLangue(message, langueCibleCode);
 
                 javafx.application.Platform.runLater(() -> {
-                    // ✅ Gestion de tous les cas possibles
                     if (traduit == null) {
                         traductionLabel.setText("❌ Erreur de traduction");
                         traductionLabel.setStyle("-fx-text-fill: #e74c3c;");
                         statusLabel.setText("❌ Échec de la traduction");
-                    }
-                    else if (traduit.startsWith("[")) {
+                    } else if (traduit.startsWith("[")) {
                         traductionLabel.setText("⚠️ " + traduit);
                         traductionLabel.setStyle("-fx-text-fill: #e67e22;");
                         statusLabel.setText("⚠️ " + traduit);
-                    }
-                    else if (traduit.startsWith("Erreur") || traduit.contains("Erreur")) {
+                    } else if (traduit.startsWith("Erreur") || traduit.contains("Erreur")) {
                         traductionLabel.setText("❌ " + traduit);
                         traductionLabel.setStyle("-fx-text-fill: #e74c3c;");
                         statusLabel.setText("❌ " + traduit);
-                    }
-                    else {
+                    } else {
                         traductionLabel.setText("📝 " + traduit);
                         traductionLabel.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
                         statusLabel.setText("✅ Traduction effectuée");
                     }
-                    // traduireButton.setDisable(false);
                 });
             } catch (Exception e) {
                 javafx.application.Platform.runLater(() -> {
                     traductionLabel.setText("❌ Erreur: " + e.getMessage());
                     traductionLabel.setStyle("-fx-text-fill: #e74c3c;");
                     statusLabel.setText("❌ Erreur de traduction");
-                    // traduireButton.setDisable(false);
                 });
             }
         }).start();
     }
+
     // ================= RESET =================
 
     @FXML
@@ -970,7 +952,6 @@ public class GestionReclamationController implements Initializable {
         typeChoice.setValue(null);
         messageField.clear();
 
-        // Vider les nouveaux champs
         chauffeurNomField.clear();
         chauffeurPrenomField.clear();
         busMatriculeField.clear();
@@ -986,17 +967,15 @@ public class GestionReclamationController implements Initializable {
 
         cacherTousLesPanels();
     }
-// ================= CONFIGURATION DES BOUTONS SELON LE RÔLE =================
+
+    // ================= CONFIGURATION DES BOUTONS =================
 
     private void configurerBoutonsSelonRole() {
-        // Les admins ne peuvent pas créer de réclamation
         if (currentUserRole == CategorieUser.ADMIN) {
-            // Désactiver les champs de création
             typeChoice.setDisable(true);
             messageField.setDisable(true);
             if (envoyerButton != null) envoyerButton.setDisable(true);
 
-            // Désactiver les panels de détails
             panelChauffeur.setDisable(true);
             panelBus.setDisable(true);
             panelCantine.setDisable(true);
@@ -1005,7 +984,6 @@ public class GestionReclamationController implements Initializable {
             panelTrajet.setDisable(true);
         }
 
-        // Les utilisateurs normaux peuvent créer mais pas répondre
         if (currentUserRole != CategorieUser.ADMIN && currentUserRole != CategorieUser.RESPONSABLEECOLE) {
             if (traduireReponseButton != null) {
                 traduireReponseButton.setDisable(true);
@@ -1013,6 +991,60 @@ public class GestionReclamationController implements Initializable {
             reponseArea.setEditable(false);
         }
     }
+
+    // ================= REMPLIR LES CHOIX =================
+
+    private void remplirChoixChauffeur() {
+        try {
+            List<Chauffeur> chauffeurs = chauffeurService.getAll();
+            chauffeurChoice.getItems().addAll(chauffeurs);
+            chauffeurChoice.setConverter(new StringConverter<Chauffeur>() {
+                @Override
+                public String toString(Chauffeur c) {
+                    return c != null ? c.getPrenom() + " " + c.getNom() : "";
+                }
+                @Override
+                public Chauffeur fromString(String string) { return null; }
+            });
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void remplirChoixBus() {
+        try {
+            List<Bus> buses = busService.getAll();
+            busChoice.getItems().addAll(buses);
+            busChoice.setConverter(new StringConverter<Bus>() {
+                @Override
+                public String toString(Bus b) {
+                    return b != null ? b.getMatricule() : "";
+                }
+                @Override
+                public Bus fromString(String string) { return null; }
+            });
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void remplirChoixEcole() {
+        try {
+            List<Ecole> ecoles = ecoleService.getAll();
+            ecoleChoice.getItems().addAll(ecoles);
+            ecoleChoice.setConverter(new StringConverter<Ecole>() {
+                @Override
+                public String toString(Ecole e) {
+                    return e != null ? e.getNomEcole() : "";
+                }
+                @Override
+                public Ecole fromString(String string) { return null; }
+            });
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     // ================= UTILITAIRE =================
 
     private void showAlert(String title, String content, Alert.AlertType type) {

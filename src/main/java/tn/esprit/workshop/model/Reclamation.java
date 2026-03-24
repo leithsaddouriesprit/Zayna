@@ -18,6 +18,11 @@ public class Reclamation {
     private String cantineType;       // Type de problème cantine
     private String ecoleNom;          // Nom de l'école
     private String autrePrecision;    // Précision pour "Autre"
+    private int idEcole;
+    private int idChauffeur;
+    private int idBus;
+    private int idMaitresse;
+    private int idParent;
 
     public Reclamation() {}
 
@@ -77,8 +82,19 @@ public class Reclamation {
 
     public String getAutrePrecision() { return autrePrecision; }
     public void setAutrePrecision(String autrePrecision) { this.autrePrecision = autrePrecision; }
+    public int getIdEcole() { return idEcole; }
+    public void setIdEcole(int idEcole) { this.idEcole = idEcole; }
+    public int getIdChauffeur() { return idChauffeur; }
+    public void setIdChauffeur(int idChauffeur) { this.idChauffeur = idChauffeur; }
 
-    // Méthode utilitaire pour afficher un résumé lisible (sans ID)
+    public int getIdBus() { return idBus; }
+    public void setIdBus(int idBus) { this.idBus = idBus; }
+
+    public int getIdMaitresse() { return idMaitresse; }
+    public void setIdMaitresse(int idMaitresse) { this.idMaitresse = idMaitresse; }
+
+    public int getIdParent() { return idParent; }
+    public void setIdParent(int idParent) { this.idParent = idParent; }
 
     @Override
     public String toString() {

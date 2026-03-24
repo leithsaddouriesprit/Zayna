@@ -12,8 +12,9 @@ public class Reponse {
 
     public Reponse() { }
 
-    public Reponse(int reclamation_id, String message, LocalDateTime date) {
+    public Reponse(int reclamation_id,int userId, String message, LocalDateTime date) {
         this.reclamation_id = reclamation_id;
+        this.userId = userId;
         this.message = message;
         this.date = date;
     }

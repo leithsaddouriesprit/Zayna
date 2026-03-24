@@ -8,6 +8,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -81,7 +83,24 @@ public class ChauffeurService {
             ps.executeUpdate();
         }
     }
-
+    // Dans ChauffeurService.java
+    public List<Chauffeur> getAll() throws SQLException {
+        List<Chauffeur> list = new ArrayList<>();
+        String sql = "SELECT * FROM chauffeur";
+        try (Connection cnx = MyBDConnexion.getInstance().getConnection();
+             Statement st = cnx.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                Chauffeur c = new Chauffeur();
+                c.setId(rs.getInt("id"));
+                c.setNom(rs.getString("nom"));
+                c.setPrenom(rs.getString("prenom"));
+                // ... autres champs
+                list.add(c);
+            }
+        }
+        return list;
+    }
 
 }
 
