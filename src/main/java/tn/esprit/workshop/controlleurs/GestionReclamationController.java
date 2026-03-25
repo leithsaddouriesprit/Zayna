@@ -17,12 +17,12 @@ import tn.esprit.workshop.services.ReclamationService;
 import tn.esprit.workshop.services.ReponseService;
 import tn.esprit.workshop.services.TraductionService;
 import javafx.geometry.Insets;
+
+import java.sql.*;
 import java.util.Optional;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import java.net.URL;
-import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
@@ -36,6 +36,7 @@ import tn.esprit.workshop.services.leith.BusService;
 import tn.esprit.workshop.services.leith.ChauffeurService;
 import tn.esprit.workshop.services.leith.EcoleService;
 import tn.esprit.workshop.utilis.AppSession;
+import tn.esprit.workshop.utilis.MyBDConnexion;
 
 public class GestionReclamationController implements Initializable {
 
@@ -417,13 +418,49 @@ public class GestionReclamationController implements Initializable {
         typeChoice.setValue(r.getType());
         messageField.setText(r.getDescription());
 
-        chauffeurNomField.setText(r.getChauffeurNom());
-        chauffeurPrenomField.setText(r.getChauffeurPrenom());
-        busMatriculeField.setText(r.getBusMatricule());
-        cantineTypeChoice.setValue(r.getCantineType());
-        ecoleNomField.setText(r.getEcoleNom());
-        autrePrecisionField.setText(r.getAutrePrecision());
+        // ✅ Remplir les ChoiceBox avec les valeurs de la réclamation
+        if (chauffeurChoice != null && r.getIdChauffeur() > 0) {
+            try {
+                Chauffeur chauffeur = chauffeurService.getById(r.getIdChauffeur());
+                chauffeurChoice.setValue(chauffeur);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else if (chauffeurChoice != null) {
+            chauffeurChoice.setValue(null);
+        }
 
+        if (busChoice != null && r.getIdBus() > 0) {
+            try {
+                Bus bus = busService.getById(r.getIdBus());
+                busChoice.setValue(bus);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else if (busChoice != null) {
+            busChoice.setValue(null);
+        }
+
+        if (ecoleChoice != null && r.getIdEcole() > 0) {
+            try {
+                Ecole ecole = ecoleService.getById(r.getIdEcole());
+                ecoleChoice.setValue(ecole);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else if (ecoleChoice != null) {
+            ecoleChoice.setValue(null);
+        }
+
+        if (cantineTypeChoice != null) {
+            cantineTypeChoice.setValue(r.getCantineType());
+        }
+
+        if (autrePrecisionField != null) {
+            autrePrecisionField.setText(r.getAutrePrecision());
+        }
+
+        // Afficher le bon panel
         changerPanelSelonType(r.getType());
     }
 
@@ -431,21 +468,43 @@ public class GestionReclamationController implements Initializable {
 
     @FXML
     private void envoyerReclamation() {
-        if (currentUserRole == CategorieUser.ADMIN) {
-            showAlert("Accès refusé", "Les administrateurs ne peuvent pas créer de réclamations", Alert.AlertType.WARNING);
+        // ✅ Vérifier si l'utilisateur peut créer une réclamation
+        if (currentUserRole == CategorieUser.ADMIN || currentUserRole == CategorieUser.RESPONSABLEECOLE) {
+            showAlert("Accès refusé",
+                    "Les administrateurs et responsables d'école ne peuvent pas créer de réclamations.\n" +
+                            "Seuls les parents, chauffeurs et maîtresses peuvent créer des réclamations.",
+                    Alert.AlertType.WARNING);
             return;
         }
 
         String type = typeChoice.getValue();
         String message = messageField.getText();
 
+        // ========== ✅ NOUVEAU : RÉCUPÉRER L'ÉCOLE DE L'UTILISATEUR CONNECTÉ ==========
+        int idEcoleUtilisateur = 0;
+
+        if (currentUserRole == CategorieUser.PARENT) {
+            int parentId = AppSession.getInstance().getParentId();
+            idEcoleUtilisateur = getEcoleIdByParentId(parentId);
+            System.out.println("Parent - École ID: " + idEcoleUtilisateur);
+        }
+        else if (currentUserRole == CategorieUser.CHAUFFEUR) {
+            int chauffeurId = AppSession.getInstance().getChauffeurId();
+            idEcoleUtilisateur = getEcoleIdByChauffeurId(chauffeurId);
+            System.out.println("Chauffeur - École ID: " + idEcoleUtilisateur);
+        }
+        else if (currentUserRole == CategorieUser.MAITRESSE) {
+            int maitresseId = AppSession.getInstance().getMaitresseId();
+            idEcoleUtilisateur = getEcoleIdByMaitresseId(maitresseId);
+            System.out.println("Maîtresse - École ID: " + idEcoleUtilisateur);
+        }
+
         // Variables pour les IDs
         int idChauffeur = 0;
         int idBus = 0;
-        int idEcole = 0;
+        int idEcole = idEcoleUtilisateur;  // ✅ Utiliser l'école de l'utilisateur connecté
         int idMaitresse = 0;
         int idParent = 0;
-
         // Variables pour les noms (copie pour historique)
         String chauffeurNom = "";
         String chauffeurPrenom = "";
@@ -472,6 +531,9 @@ public class GestionReclamationController implements Initializable {
             Ecole selectedEcole = ecoleChoice.getValue();
             idEcole = selectedEcole.getId();
             ecoleNom = selectedEcole.getNomEcole();
+            System.out.println("École sélectionnée - ID: " + idEcole + ", Nom: " + ecoleNom); // Pour déboguer
+        } else {
+            idEcole = 0; // Si pas d'école sélectionnée, mettre 0 (NULL dans la base)
         }
 
         // Récupérer les valeurs des autres champs
@@ -627,6 +689,8 @@ public class GestionReclamationController implements Initializable {
     @FXML
     private void modifierReclamation() {
         Reclamation selected = tableReclamation.getSelectionModel().getSelectedItem();
+
+        // ✅ Vérifier si l'utilisateur peut modifier (seulement ses propres réclamations)
         if (selected != null && selected.getUserId() != currentUserId) {
             showAlert("Accès refusé", "Vous ne pouvez modifier que vos propres réclamations", Alert.AlertType.WARNING);
             return;
@@ -665,12 +729,38 @@ public class GestionReclamationController implements Initializable {
                 selected.setType(type);
                 selected.setDescription(message.trim());
 
-                selected.setChauffeurNom(chauffeurNomField.getText());
-                selected.setChauffeurPrenom(chauffeurPrenomField.getText());
-                selected.setBusMatricule(busMatriculeField.getText());
-                selected.setCantineType(cantineTypeChoice.getValue());
-                selected.setEcoleNom(ecoleNomField.getText());
-                selected.setAutrePrecision(autrePrecisionField.getText());
+                // ✅ Mettre à jour les champs spécifiques (ceux qui existent)
+                // Pour Chauffeur
+                if (type.equals("Chauffeur") && chauffeurChoice != null && chauffeurChoice.getValue() != null) {
+                    Chauffeur selectedChauffeur = chauffeurChoice.getValue();
+                    selected.setIdChauffeur(selectedChauffeur.getId());
+                    selected.setChauffeurNom(selectedChauffeur.getNom());
+                    selected.setChauffeurPrenom(selectedChauffeur.getPrenom());
+                }
+
+                // Pour Bus
+                if (type.equals("Bus") && busChoice != null && busChoice.getValue() != null) {
+                    Bus selectedBus = busChoice.getValue();
+                    selected.setIdBus(selectedBus.getBusId());
+                    selected.setBusMatricule(selectedBus.getMatricule());
+                }
+
+                // Pour École
+                if (type.equals("École") && ecoleChoice != null && ecoleChoice.getValue() != null) {
+                    Ecole selectedEcole = ecoleChoice.getValue();
+                    selected.setIdEcole(selectedEcole.getId());
+                    selected.setEcoleNom(selectedEcole.getNomEcole());
+                }
+
+                // Pour Cantine
+                if (cantineTypeChoice != null && cantineTypeChoice.getValue() != null) {
+                    selected.setCantineType(cantineTypeChoice.getValue());
+                }
+
+                // Pour Autre
+                if (autrePrecisionField != null) {
+                    selected.setAutrePrecision(autrePrecisionField.getText());
+                }
 
                 service.updateOne(selected);
 
@@ -952,18 +1042,48 @@ public class GestionReclamationController implements Initializable {
         typeChoice.setValue(null);
         messageField.clear();
 
-        chauffeurNomField.clear();
-        chauffeurPrenomField.clear();
-        busMatriculeField.clear();
-        cantineTypeChoice.setValue(null);
-        ecoleNomField.clear();
-        autrePrecisionField.clear();
+        // ✅ Vider les nouveaux champs (ceux qui existent dans votre FXML)
+        if (cantineTypeChoice != null) {
+            cantineTypeChoice.setValue(null);
+        }
 
-        reponseArea.clear();
-        statutReponseLabel.setText("En attente de réponse");
-        tableReclamation.getSelectionModel().clearSelection();
-        searchField.clear();
-        statusLabel.setText("Formulaire réinitialisé");
+        if (autrePrecisionField != null) {
+            autrePrecisionField.clear();
+        }
+
+        // ✅ Vider les ChoiceBox (les champs qui existent)
+        if (chauffeurChoice != null) {
+            chauffeurChoice.setValue(null);
+        }
+
+        if (busChoice != null) {
+            busChoice.setValue(null);
+        }
+
+        if (ecoleChoice != null) {
+            ecoleChoice.setValue(null);
+        }
+
+        // ✅ Réinitialiser les zones d'affichage
+        if (reponseArea != null) {
+            reponseArea.clear();
+        }
+
+        if (statutReponseLabel != null) {
+            statutReponseLabel.setText("En attente de réponse");
+        }
+
+        if (tableReclamation != null) {
+            tableReclamation.getSelectionModel().clearSelection();
+        }
+
+        if (searchField != null) {
+            searchField.clear();
+        }
+
+        if (statusLabel != null) {
+            statusLabel.setText("Formulaire réinitialisé");
+        }
 
         cacherTousLesPanels();
     }
@@ -1044,7 +1164,62 @@ public class GestionReclamationController implements Initializable {
             e.printStackTrace();
         }
     }
+    /**
+     * Récupère l'ID de l'école d'un parent
+     */
+    private int getEcoleIdByParentId(int parentId) {
+        try {
+            String sql = "SELECT id_ecole FROM parent WHERE id = ?";
+            Connection cnx = MyBDConnexion.getInstance().getConnection();
+            PreparedStatement ps = cnx.prepareStatement(sql);
+            ps.setInt(1, parentId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("id_ecole");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 
+    /**
+     * Récupère l'ID de l'école d'un chauffeur
+     */
+    private int getEcoleIdByChauffeurId(int chauffeurId) {
+        try {
+            String sql = "SELECT id_ecole FROM chauffeur WHERE id = ?";
+            Connection cnx = MyBDConnexion.getInstance().getConnection();
+            PreparedStatement ps = cnx.prepareStatement(sql);
+            ps.setInt(1, chauffeurId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("id_ecole");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    /**
+     * Récupère l'ID de l'école d'une maîtresse
+     */
+    private int getEcoleIdByMaitresseId(int maitresseId) {
+        try {
+            String sql = "SELECT id_ecole FROM maitresse WHERE id = ?";
+            Connection cnx = MyBDConnexion.getInstance().getConnection();
+            PreparedStatement ps = cnx.prepareStatement(sql);
+            ps.setInt(1, maitresseId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("id_ecole");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
     // ================= UTILITAIRE =================
 
     private void showAlert(String title, String content, Alert.AlertType type) {

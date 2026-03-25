@@ -100,18 +100,6 @@ public class AgentShellController {
     }
 
     @FXML
-    private void openReclamation() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/GestionReclamation.fxml"));
-            Parent root = loader.load();
-            contentArea.getChildren().clear();
-            contentArea.getChildren().add(root);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
     private void openReponses() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/GestionReponse.fxml"));

@@ -167,6 +167,13 @@ public class ReclamationService {
                                                String cantineType, String ecoleNom, String autrePrecision,
                                                int idChauffeur, int idBus, int idEcole, int idMaitresse, int idParent) throws SQLException {
 
+        // Convertir les IDs 0 en NULL pour la base de données
+        Integer idChauffeurVal = idChauffeur == 0 ? null : idChauffeur;
+        Integer idBusVal = idBus == 0 ? null : idBus;
+        Integer idEcoleVal = idEcole == 0 ? null : idEcole;
+        Integer idMaitresseVal = idMaitresse == 0 ? null : idMaitresse;
+        Integer idParentVal = idParent == 0 ? null : idParent;
+
         String sql = "INSERT INTO reclamation (user_id, type, description, statut, " +
                 "chauffeur_nom, chauffeur_prenom, bus_matricule, cantine_type, ecole_nom, autre_precision, " +
                 "id_chauffeur, id_bus, id_ecole, id_maitresse, id_parent) " +
@@ -185,11 +192,37 @@ public class ReclamationService {
             ps.setString(8, cantineType);
             ps.setString(9, ecoleNom);
             ps.setString(10, autrePrecision);
-            ps.setInt(11, idChauffeur);
-            ps.setInt(12, idBus);
-            ps.setInt(13, idEcole);
-            ps.setInt(14, idMaitresse);
-            ps.setInt(15, idParent);
+
+            // Gérer les nulls pour les clés étrangères
+            if (idChauffeurVal == null) {
+                ps.setNull(11, Types.INTEGER);
+            } else {
+                ps.setInt(11, idChauffeurVal);
+            }
+
+            if (idBusVal == null) {
+                ps.setNull(12, Types.INTEGER);
+            } else {
+                ps.setInt(12, idBusVal);
+            }
+
+            if (idEcoleVal == null) {
+                ps.setNull(13, Types.INTEGER);
+            } else {
+                ps.setInt(13, idEcoleVal);
+            }
+
+            if (idMaitresseVal == null) {
+                ps.setNull(14, Types.INTEGER);
+            } else {
+                ps.setInt(14, idMaitresseVal);
+            }
+
+            if (idParentVal == null) {
+                ps.setNull(15, Types.INTEGER);
+            } else {
+                ps.setInt(15, idParentVal);
+            }
 
             ps.executeUpdate();
 
@@ -307,5 +340,96 @@ public class ReclamationService {
             }
         }
         return list;
+    }
+
+    // Récupérer toutes les réclamations liées à une école (via chauffeur, bus, maîtresse, ou directement)
+    public List<Reclamation> getReclamationsByEcoleId(int ecoleId) throws SQLException {
+        List<Reclamation> list = new ArrayList<>();
+
+        String sql = "SELECT DISTINCT r.* FROM reclamation r " +
+                "LEFT JOIN chauffeur c ON r.id_chauffeur = c.id " +
+                "LEFT JOIN bus b ON r.id_bus = b.id " +
+                "LEFT JOIN maitresse m ON r.id_maitresse = m.id " +
+                "LEFT JOIN users u ON r.user_id = u.id " +
+                "LEFT JOIN parent p ON u.id = p.user_id " +
+                "LEFT JOIN agent_ecole ae ON u.id = ae.user_id " +
+                "WHERE r.id_ecole = ? " +                    // Réclamation directe sur l'école
+                "OR c.id_ecole = ? " +                       // Réclamation sur un chauffeur de cette école
+                "OR b.id_ecole = ? " +                       // Réclamation sur un bus de cette école
+                "OR m.id_ecole = ? " +                       // Réclamation sur une maîtresse de cette école
+                "OR (u.categorie = 'PARENT' AND p.id_ecole = ?) " +  // Réclamation d'un parent de cette école
+                "OR (u.categorie = 'RESPONSABLEECOLE' AND ae.id_ecole = ?) " + // Réclamation d'un responsable de cette école
+                "ORDER BY r.date_reclamation DESC";
+
+        try (Connection cnx = getConnection();
+             PreparedStatement ps = cnx.prepareStatement(sql)) {
+
+            // Mettre le même paramètre 6 fois
+            for (int i = 1; i <= 6; i++) {
+                ps.setInt(i, ecoleId);
+            }
+
+            System.out.println("Exécution de la requête SQL pour l'école ID: " + ecoleId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(extractReclamationFromResultSet(rs));
+                }
+            }
+            System.out.println("Réclamations trouvées: " + list.size());
+        }
+        return list;
+    }
+
+    // ==================== MÉTHODES DE RÉCUPÉRATION D'ÉCOLE ====================
+
+    /**
+     * Récupère l'ID de l'école d'un parent
+     */
+    public int getEcoleIdByParentId(int parentId) throws SQLException {
+        String sql = "SELECT id_ecole FROM parent WHERE id = ?";
+        try (Connection cnx = getConnection();
+             PreparedStatement ps = cnx.prepareStatement(sql)) {
+            ps.setInt(1, parentId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("id_ecole");
+                }
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Récupère l'ID de l'école d'un chauffeur
+     */
+    public int getEcoleIdByChauffeurId(int chauffeurId) throws SQLException {
+        String sql = "SELECT id_ecole FROM chauffeur WHERE id = ?";
+        try (Connection cnx = getConnection();
+             PreparedStatement ps = cnx.prepareStatement(sql)) {
+            ps.setInt(1, chauffeurId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("id_ecole");
+                }
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Récupère l'ID de l'école d'une maîtresse
+     */
+    public int getEcoleIdByMaitresseId(int maitresseId) throws SQLException {
+        String sql = "SELECT id_ecole FROM maitresse WHERE id = ?";
+        try (Connection cnx = getConnection();
+             PreparedStatement ps = cnx.prepareStatement(sql)) {
+            ps.setInt(1, maitresseId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("id_ecole");
+                }
+            }
+        }
+        return 0;
     }
 }

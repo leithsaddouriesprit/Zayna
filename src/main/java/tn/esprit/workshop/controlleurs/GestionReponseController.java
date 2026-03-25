@@ -663,22 +663,34 @@ public class GestionReponseController implements Initializable {
     private void afficherToutesReclamations() {
         try {
             CategorieUser currentUserRole = AppSession.getInstance().getConnectedUserRoleEnum();
+
+            System.out.println("=== DÉBOGAGE AFFICHAGE RÉCLAMATIONS ===");
+            System.out.println("Rôle: " + currentUserRole);
+
             List<Reclamation> reclamations;
 
-            // ✅ FILTRAGE SELON LE RÔLE
             if (currentUserRole == CategorieUser.RESPONSABLEECOLE) {
-                // Responsable École : ne voit que les réclamations de SON école
                 int ecoleId = AppSession.getInstance().getEcoleId();
-                reclamations = reclamationService.getByEcoleId(ecoleId);
-                statusLabel.setText("Affichage des réclamations de votre école");
+                System.out.println("ID École du responsable: " + ecoleId);
+
+                // Récupérer les réclamations avec la méthode
+                reclamations = reclamationService.getReclamationsByEcoleId(ecoleId);
+
+                System.out.println("Nombre de réclamations trouvées: " + reclamations.size());
+                for (Reclamation r : reclamations) {
+                    System.out.println("  - ID: " + r.getId() + ", Type: " + r.getType() +
+                            ", id_ecole: " + r.getIdEcole() +
+                            ", id_chauffeur: " + r.getIdChauffeur() +
+                            ", id_bus: " + r.getIdBus());
+                }
+
+                statusLabel.setText("Affichage des réclamations de votre école (" + reclamations.size() + ")");
             }
             else if (currentUserRole == CategorieUser.ADMIN) {
-                // Admin : voit toutes les réclamations
                 reclamations = reclamationService.selectAll();
                 statusLabel.setText("Affichage de toutes les réclamations");
             }
             else {
-                // Autres rôles (ne devraient pas accéder à cette interface)
                 reclamations = new ArrayList<>();
                 statusLabel.setText("Vous n'avez pas accès à cette interface");
             }
@@ -688,18 +700,11 @@ public class GestionReponseController implements Initializable {
             mettreAJourStatistiques(reclamations);
             tableReclamation.refresh();
 
-            if (!reclamations.isEmpty()) {
-                tableReclamation.getSelectionModel().selectFirst();
-            }
-
-            System.out.println("Tableau rafraîchi avec " + reclamations.size() + " réclamations");
-
         } catch (SQLException e) {
             statusLabel.setText("❌ Erreur chargement");
             e.printStackTrace();
         }
     }
-
     private boolean validerSelectionEtReponse() {
         if (reclamationSelectionnee == null) {
             showAlert("Erreur", "❌ Veuillez sélectionner une réclamation !", Alert.AlertType.WARNING);
