@@ -284,3 +284,60 @@
     -fx-padding: 14 10;
     -fx-font-size: 13px;
 }
+/* =========================================================
+   CHOICEBOX STYLES - CORRIGÉ POUR VISIBILITÉ
+   ========================================================= */
+
+/* Style pour le ChoiceBox lui-même (fond clair, texte noir) */
+.combo-box {
+    -fx-background-color: #F4F4F4 !important;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #e2e8f0;
+    -fx-text-fill: #1A1A1A !important;
+    -fx-font-size: 13px;
+    -fx-padding: 8 12;
+}
+
+/* Style pour le texte affiché dans le ChoiceBox */
+.combo-box .list-cell {
+    -fx-text-fill: #1A1A1A !important;
+    -fx-background-color: #F4F4F4 !important;
+}
+
+/* Style pour la flèche du ChoiceBox */
+.combo-box .arrow-button {
+    -fx-background-color: #F4F4F4;
+}
+
+.combo-box .arrow {
+    -fx-background-color: #1A1A1A;
+}
+
+/* Style pour la liste déroulante */
+.combo-box-popup .list-view {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #FEC111;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+/* Style pour les éléments de la liste (texte noir sur fond blanc) */
+.combo-box-popup .list-cell {
+    -fx-text-fill: #1A1A1A !important;
+    -fx-background-color: #FFFFFF !important;
+    -fx-padding: 8 12;
+}
+
+/* Style pour l'élément survolé */
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: #FEC111 !important;
+    -fx-text-fill: #1A1A1A !important;
+}
+
+/* Style pour l'élément sélectionné */
+.combo-box-popup .list-cell:selected {
+    -fx-background-color: #FEC111 !important;
+    -fx-text-fill: #1A1A1A !important;
+    -fx-font-weight: bold;
+}

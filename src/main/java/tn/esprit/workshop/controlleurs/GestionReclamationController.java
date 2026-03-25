@@ -545,7 +545,25 @@ public class GestionReclamationController implements Initializable {
             autrePrecision = autrePrecisionField.getText();
         }
 
-        // Validations
+        // Validation spécifique selon le type
+        if (type.equals("Chauffeur") && (chauffeurChoice.getValue() == null || chauffeurChoice.getValue().getId() == 0)) {
+            showAlert("Erreur", "❌ Veuillez sélectionner un chauffeur", Alert.AlertType.WARNING);
+            chauffeurChoice.requestFocus();
+            return;
+        }
+
+        if (type.equals("Bus") && (busChoice.getValue() == null || busChoice.getValue().getBusId() == 0)) {
+            showAlert("Erreur", "❌ Veuillez sélectionner un bus", Alert.AlertType.WARNING);
+            busChoice.requestFocus();
+            return;
+        }
+
+        if (type.equals("École") && (ecoleChoice.getValue() == null || ecoleChoice.getValue().getId() == 0)) {
+            showAlert("Erreur", "❌ Veuillez sélectionner une école", Alert.AlertType.WARNING);
+            ecoleChoice.requestFocus();
+            return;
+        }
+
         if (type == null || type.isEmpty()) {
             showAlert("Erreur de saisie", "❌ Veuillez sélectionner un type de réclamation !", Alert.AlertType.WARNING);
             return;
@@ -1113,15 +1131,29 @@ public class GestionReclamationController implements Initializable {
     }
 
     // ================= REMPLIR LES CHOIX =================
-
     private void remplirChoixChauffeur() {
         try {
             List<Chauffeur> chauffeurs = chauffeurService.getAll();
+            chauffeurChoice.getItems().clear();
+
+            // ✅ AJOUTER UN ÉLÉMENT PAR DÉFAUT
+            Chauffeur defaultItem = new Chauffeur();
+            defaultItem.setId(0);
+            defaultItem.setNom("Sélectionner un chauffeur");
+            defaultItem.setPrenom("");
+            chauffeurChoice.getItems().add(defaultItem);
+
             chauffeurChoice.getItems().addAll(chauffeurs);
+
+            // Sélectionner l'élément par défaut
+            chauffeurChoice.setValue(defaultItem);
+
             chauffeurChoice.setConverter(new StringConverter<Chauffeur>() {
                 @Override
                 public String toString(Chauffeur c) {
-                    return c != null ? c.getPrenom() + " " + c.getNom() : "";
+                    if (c == null) return "";
+                    if (c.getId() == 0) return "🔽 Sélectionner un chauffeur";
+                    return c.getPrenom() + " " + c.getNom();
                 }
                 @Override
                 public Chauffeur fromString(String string) { return null; }
@@ -1134,11 +1166,25 @@ public class GestionReclamationController implements Initializable {
     private void remplirChoixBus() {
         try {
             List<Bus> buses = busService.getAll();
+            busChoice.getItems().clear();
+
+            // ✅ AJOUTER UN ÉLÉMENT PAR DÉFAUT
+            Bus defaultItem = new Bus();
+            defaultItem.setBusId(0);
+            defaultItem.setMatricule("Sélectionner un bus");
+            busChoice.getItems().add(defaultItem);
+
             busChoice.getItems().addAll(buses);
+
+            // Sélectionner l'élément par défaut
+            busChoice.setValue(defaultItem);
+
             busChoice.setConverter(new StringConverter<Bus>() {
                 @Override
                 public String toString(Bus b) {
-                    return b != null ? b.getMatricule() : "";
+                    if (b == null) return "";
+                    if (b.getBusId() == 0) return "🔽 Sélectionner un bus";
+                    return b.getMatricule();
                 }
                 @Override
                 public Bus fromString(String string) { return null; }
@@ -1151,11 +1197,25 @@ public class GestionReclamationController implements Initializable {
     private void remplirChoixEcole() {
         try {
             List<Ecole> ecoles = ecoleService.getAll();
+            ecoleChoice.getItems().clear();
+
+            // ✅ AJOUTER UN ÉLÉMENT PAR DÉFAUT
+            Ecole defaultItem = new Ecole();
+            defaultItem.setId(0);
+            defaultItem.setNomEcole("Sélectionner une école");
+            ecoleChoice.getItems().add(defaultItem);
+
             ecoleChoice.getItems().addAll(ecoles);
+
+            // Sélectionner l'élément par défaut
+            ecoleChoice.setValue(defaultItem);
+
             ecoleChoice.setConverter(new StringConverter<Ecole>() {
                 @Override
                 public String toString(Ecole e) {
-                    return e != null ? e.getNomEcole() : "";
+                    if (e == null) return "";
+                    if (e.getId() == 0) return "🔽 Sélectionner une école";
+                    return e.getNomEcole();
                 }
                 @Override
                 public Ecole fromString(String string) { return null; }
