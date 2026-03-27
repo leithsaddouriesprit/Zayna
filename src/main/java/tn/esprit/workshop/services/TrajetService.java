@@ -18,8 +18,9 @@ public class TrajetService {
 
     // Ajouter un trajet
     public void insertTrajet(Trajet trajet) throws SQLException {
-        String req = "INSERT INTO trajet (ecole_id, nom_trajet, point_depart, point_arrivee, " +
-                "heure_depart, heure_arrivee, jours, prix_mensuel, description, places_disponibles) " +
+        // CORRIGÉ : noms sans underscore
+        String req = "INSERT INTO trajet (ecoleId, nomTrajet, pointDepart, pointArrivee, " +
+                "heureDepart, heureArrivee, jours, prixMensuel, description, placesDisponibles) " +
                 "VALUES (?,?,?,?,?,?,?,?,?,?)";
 
         PreparedStatement ps = connection.prepareStatement(req);
@@ -39,8 +40,9 @@ public class TrajetService {
 
     // Modifier un trajet
     public void updateTrajet(Trajet trajet) throws SQLException {
-        String req = "UPDATE trajet SET nom_trajet=?, point_depart=?, point_arrivee=?, " +
-                "heure_depart=?, heure_arrivee=?, jours=?, prix_mensuel=?, description=?, places_disponibles=? " +
+        // CORRIGÉ : noms sans underscore
+        String req = "UPDATE trajet SET nomTrajet=?, pointDepart=?, pointArrivee=?, " +
+                "heureDepart=?, heureArrivee=?, jours=?, prixMensuel=?, description=?, placesDisponibles=? " +
                 "WHERE id=?";
 
         PreparedStatement ps = connection.prepareStatement(req);
@@ -69,7 +71,8 @@ public class TrajetService {
     // Lister tous les trajets
     public List<Trajet> selectAllTrajets() throws SQLException {
         List<Trajet> trajets = new ArrayList<>();
-        String req = "SELECT * FROM trajet ORDER BY heure_depart";
+        // CORRIGÉ : noms sans underscore et ORDER BY heureDepart
+        String req = "SELECT * FROM trajet ORDER BY heureDepart";
 
         Statement st = connection.createStatement();
         ResultSet rs = st.executeQuery(req);
@@ -77,16 +80,16 @@ public class TrajetService {
         while (rs.next()) {
             Trajet t = new Trajet();
             t.setId(rs.getInt("id"));
-            t.setEcoleId(rs.getInt("ecole_id"));
-            t.setNomTrajet(rs.getString("nom_trajet"));
-            t.setPointDepart(rs.getString("point_depart"));
-            t.setPointArrivee(rs.getString("point_arrivee"));
-            t.setHeureDepart(rs.getTime("heure_depart").toLocalTime());
-            t.setHeureArrivee(rs.getTime("heure_arrivee").toLocalTime());
+            t.setEcoleId(rs.getInt("ecoleId"));              // CORRIGÉ
+            t.setNomTrajet(rs.getString("nomTrajet"));       // CORRIGÉ
+            t.setPointDepart(rs.getString("pointDepart"));   // CORRIGÉ
+            t.setPointArrivee(rs.getString("pointArrivee")); // CORRIGÉ
+            t.setHeureDepart(rs.getTime("heureDepart").toLocalTime());     // CORRIGÉ
+            t.setHeureArrivee(rs.getTime("heureArrivee").toLocalTime());   // CORRIGÉ
             t.setJours(rs.getString("jours"));
-            t.setPrixMensuel(rs.getDouble("prix_mensuel"));
+            t.setPrixMensuel(rs.getDouble("prixMensuel"));   // CORRIGÉ
             t.setDescription(rs.getString("description"));
-            t.setPlacesDisponibles(rs.getInt("places_disponibles"));
+            t.setPlacesDisponibles(rs.getInt("placesDisponibles")); // CORRIGÉ
             trajets.add(t);
         }
         return trajets;
@@ -95,7 +98,8 @@ public class TrajetService {
     // Lister les trajets d'une école spécifique
     public List<Trajet> selectTrajetsByEcole(int ecoleId) throws SQLException {
         List<Trajet> trajets = new ArrayList<>();
-        String req = "SELECT * FROM trajet WHERE ecole_id = ? ORDER BY heure_depart";
+        // CORRIGÉ : noms sans underscore
+        String req = "SELECT * FROM trajet WHERE ecoleId = ? ORDER BY heureDepart";
 
         PreparedStatement ps = connection.prepareStatement(req);
         ps.setInt(1, ecoleId);
@@ -104,16 +108,16 @@ public class TrajetService {
         while (rs.next()) {
             Trajet t = new Trajet();
             t.setId(rs.getInt("id"));
-            t.setEcoleId(rs.getInt("ecole_id"));
-            t.setNomTrajet(rs.getString("nom_trajet"));
-            t.setPointDepart(rs.getString("point_depart"));
-            t.setPointArrivee(rs.getString("point_arrivee"));
-            t.setHeureDepart(rs.getTime("heure_depart").toLocalTime());
-            t.setHeureArrivee(rs.getTime("heure_arrivee").toLocalTime());
+            t.setEcoleId(rs.getInt("ecoleId"));              // CORRIGÉ
+            t.setNomTrajet(rs.getString("nomTrajet"));       // CORRIGÉ
+            t.setPointDepart(rs.getString("pointDepart"));   // CORRIGÉ
+            t.setPointArrivee(rs.getString("pointArrivee")); // CORRIGÉ
+            t.setHeureDepart(rs.getTime("heureDepart").toLocalTime());     // CORRIGÉ
+            t.setHeureArrivee(rs.getTime("heureArrivee").toLocalTime());   // CORRIGÉ
             t.setJours(rs.getString("jours"));
-            t.setPrixMensuel(rs.getDouble("prix_mensuel"));
+            t.setPrixMensuel(rs.getDouble("prixMensuel"));   // CORRIGÉ
             t.setDescription(rs.getString("description"));
-            t.setPlacesDisponibles(rs.getInt("places_disponibles"));
+            t.setPlacesDisponibles(rs.getInt("placesDisponibles")); // CORRIGÉ
             trajets.add(t);
         }
         return trajets;
@@ -121,7 +125,8 @@ public class TrajetService {
 
     // Compter les trajets d'une école
     public int countTrajetsByEcole(int ecoleId) throws SQLException {
-        String req = "SELECT COUNT(*) FROM trajet WHERE ecole_id = ?";
+        // CORRIGÉ : ecoleId au lieu de ecole_id
+        String req = "SELECT COUNT(*) FROM trajet WHERE ecoleId = ?";
         PreparedStatement ps = connection.prepareStatement(req);
         ps.setInt(1, ecoleId);
         ResultSet rs = ps.executeQuery();

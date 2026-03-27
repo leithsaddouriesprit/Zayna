@@ -1,6 +1,5 @@
 package tn.esprit.workshop.services;
 
-import tn.esprit.workshop.model.Ecole;
 import tn.esprit.workshop.model.Programme;
 import tn.esprit.workshop.utilis.MyBDConnexion;
 
@@ -20,7 +19,8 @@ public class ProgrammeService {
 
     // Ajouter un programme
     public void insertProgramme(Programme p) throws SQLException {
-        String req = "INSERT INTO programme (ecole_id, nom_programme, description_programme, niveau, duree, prix_programme) VALUES (?,?,?,?,?,?)";
+        // Utilise les noms SANS underscore
+        String req = "INSERT INTO programme (ecoleId, nomProgramme, descriptionProgramme, niveau, duree, prixProgramme) VALUES (?,?,?,?,?,?)";
 
         PreparedStatement ps = connection.prepareStatement(req);
         ps.setInt(1, p.getEcoleId());
@@ -35,7 +35,7 @@ public class ProgrammeService {
 
     // Modifier un programme
     public void updateProgramme(Programme p) throws SQLException {
-        String req = "UPDATE programme SET ecole_id=?, nom_programme=?, description_programme=?, niveau=?, duree=?, prix_programme=? WHERE id=?";
+        String req = "UPDATE programme SET ecoleId=?, nomProgramme=?, descriptionProgramme=?, niveau=?, duree=?, prixProgramme=? WHERE id=?";
 
         PreparedStatement ps = connection.prepareStatement(req);
         ps.setInt(1, p.getEcoleId());
@@ -68,12 +68,12 @@ public class ProgrammeService {
         while (rs.next()) {
             Programme p = new Programme();
             p.setId(rs.getInt("id"));
-            p.setEcoleId(rs.getInt("ecole_id"));  // Changé ici
-            p.setNomProgramme(rs.getString("nom_programme"));
-            p.setDescriptionProgramme(rs.getString("description_programme"));
+            p.setEcoleId(rs.getInt("ecoleId"));  // Changé : ecoleId au lieu de ecole_id
+            p.setNomProgramme(rs.getString("nomProgramme"));  // Changé
+            p.setDescriptionProgramme(rs.getString("descriptionProgramme"));  // Changé
             p.setNiveau(rs.getString("niveau"));
             p.setDuree(rs.getString("duree"));
-            p.setPrixProgramme(rs.getDouble("prix_programme"));
+            p.setPrixProgramme(rs.getDouble("prixProgramme"));  // Changé
             programmes.add(p);
         }
         return programmes;

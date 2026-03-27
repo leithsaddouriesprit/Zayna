@@ -8,7 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.layout.VBox;  // IMPORTANT: pour VBox
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import tn.esprit.workshop.model.Ecole;
 import tn.esprit.workshop.model.Programme;
@@ -101,6 +101,108 @@ public class AgentController {
         loadProgrammes();
         loadTrajets();
         setupListeners();
+        setupHeureValidation(); // NOUVEAU : validation des heures
+    }
+
+    // ===== NOUVELLE MÉTHODE : VALIDATION DES HEURES EN TEMPS RÉEL =====
+    private void setupHeureValidation() {
+        // Format attendu : HH:MM (ex: 08:30, 14:45)
+        String pattern = "^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$";
+
+        // Pour le champ heure de départ
+        tfHeureDepart.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == null || newValue.isEmpty()) {
+                tfHeureDepart.setStyle("-fx-border-color: #e0e7ed; -fx-border-width: 2px;");
+                return;
+            }
+
+            // Formatage automatique : ajoute ":" après 2 chiffres
+            if (newValue.length() == 2 && !newValue.contains(":") && oldValue.length() < 2) {
+                tfHeureDepart.setText(newValue + ":");
+                tfHeureDepart.positionCaret(3);
+            }
+
+            // Validation visuelle
+            if (newValue.matches(pattern)) {
+                tfHeureDepart.setStyle("-fx-border-color: #27ae60; -fx-border-width: 2px;");
+            } else {
+                tfHeureDepart.setStyle("-fx-border-color: #e74c3c; -fx-border-width: 2px;");
+            }
+        });
+
+        // Pour le champ heure d'arrivée
+        tfHeureArrivee.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == null || newValue.isEmpty()) {
+                tfHeureArrivee.setStyle("-fx-border-color: #e0e7ed; -fx-border-width: 2px;");
+                return;
+            }
+
+            // Formatage automatique : ajoute ":" après 2 chiffres
+            if (newValue.length() == 2 && !newValue.contains(":") && oldValue.length() < 2) {
+                tfHeureArrivee.setText(newValue + ":");
+                tfHeureArrivee.positionCaret(3);
+            }
+
+            // Validation visuelle
+            if (newValue.matches(pattern)) {
+                tfHeureArrivee.setStyle("-fx-border-color: #27ae60; -fx-border-width: 2px;");
+            } else {
+                tfHeureArrivee.setStyle("-fx-border-color: #e74c3c; -fx-border-width: 2px;");
+            }
+        });
+    }
+
+    // ===== NOUVELLE MÉTHODE : VALIDATION APPROFONDIE DES HEURES =====
+    private boolean validerHeuresTrajet() {
+        String heureDepart = tfHeureDepart.getText().trim();
+        String heureArrivee = tfHeureArrivee.getText().trim();
+
+        // Vérifier le format avec une regex
+        String pattern = "^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$";
+
+        if (!heureDepart.matches(pattern)) {
+            showAlert("Erreur de format",
+                    "L'heure de départ doit être au format HH:MM (ex: 08:30, 14:45)",
+                    AlertType.WARNING);
+            tfHeureDepart.requestFocus();
+            return false;
+        }
+
+        if (!heureArrivee.matches(pattern)) {
+            showAlert("Erreur de format",
+                    "L'heure d'arrivée doit être au format HH:MM (ex: 08:30, 14:45)",
+                    AlertType.WARNING);
+            tfHeureArrivee.requestFocus();
+            return false;
+        }
+
+        // Vérifier que l'heure de départ est avant l'heure d'arrivée
+        try {
+            LocalTime depart = LocalTime.parse(heureDepart);
+            LocalTime arrivee = LocalTime.parse(heureArrivee);
+
+            if (depart.isAfter(arrivee)) {
+                showAlert("Erreur de logique",
+                        "L'heure de départ doit être avant l'heure d'arrivée",
+                        AlertType.WARNING);
+                tfHeureDepart.requestFocus();
+                return false;
+            }
+
+            if (depart.equals(arrivee)) {
+                showAlert("Erreur de logique",
+                        "L'heure de départ et d'arrivée ne peuvent pas être identiques",
+                        AlertType.WARNING);
+                tfHeureDepart.requestFocus();
+                return false;
+            }
+
+        } catch (DateTimeParseException e) {
+            showAlert("Erreur", "Format d'heure invalide", AlertType.ERROR);
+            return false;
+        }
+
+        return true;
     }
 
     // ===== CONFIGURATION TABLE ÉCOLES =====
@@ -391,7 +493,7 @@ public class AgentController {
         return true;
     }
 
-    // ===== VALIDATIONS TRAJETS =====
+    // ===== VALIDATIONS TRAJETS (MISE À JOUR) =====
     private boolean validateTrajetFields() {
         if (tfNomTrajet.getText().trim().isEmpty()) {
             showAlert("Erreur", "Le nom du trajet est obligatoire", AlertType.WARNING);
@@ -418,7 +520,9 @@ public class AgentController {
             tfHeureArrivee.requestFocus();
             return false;
         }
-        return true;
+
+        // Validation approfondie des heures
+        return validerHeuresTrajet();
     }
 
     // ===== VIDER LES CHAMPS =====
@@ -454,6 +558,11 @@ public class AgentController {
         tfPrixTrajet.clear();
         tfPlaces.setText("30");
         tfDescriptionTrajet.clear();
+
+        // Reset des styles
+        tfHeureDepart.setStyle("-fx-border-color: #e0e7ed; -fx-border-width: 2px;");
+        tfHeureArrivee.setStyle("-fx-border-color: #e0e7ed; -fx-border-width: 2px;");
+
         tableTrajets.getSelectionModel().clearSelection();
     }
 
@@ -638,7 +747,7 @@ public class AgentController {
         }
     }
 
-    // ===== CRUD TRAJETS =====
+    // ===== CRUD TRAJETS (AVEC VALIDATION DES HEURES) =====
     @FXML
     private void ajouterTrajet() {
         Ecole selectedEcole = tableEcole.getSelectionModel().getSelectedItem();

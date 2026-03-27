@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
@@ -14,11 +15,17 @@ import javafx.stage.Stage;
 import tn.esprit.workshop.model.Ecole;
 import tn.esprit.workshop.model.Programme;
 import tn.esprit.workshop.model.Trajet;
+import tn.esprit.workshop.model.JourFerieApi;
+import tn.esprit.workshop.model.Meteo;
 import tn.esprit.workshop.services.EcoleService;
 import tn.esprit.workshop.services.ProgrammeService;
 import tn.esprit.workshop.services.TrajetService;
+import tn.esprit.workshop.services.JourFerieApiService;
+import tn.esprit.workshop.services.MeteoService;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,11 +48,15 @@ public class ParentController {
 
     @FXML private Button btnInscrire;
     @FXML private Button btnVoirTrajets;
+    @FXML private Button btnCalendrier;
+    @FXML private Button btnMeteo;  // NOUVEAU
 
     // ===== SERVICES =====
     private final EcoleService ecoleService = new EcoleService();
     private final ProgrammeService programmeService = new ProgrammeService();
     private final TrajetService trajetService = new TrajetService();
+    private final JourFerieApiService jourFerieApiService = new JourFerieApiService();
+    private final MeteoService meteoService = new MeteoService();  // NOUVEAU
 
     // ===== LISTS =====
     private ObservableList<Ecole> ecoleList = FXCollections.observableArrayList();
@@ -206,7 +217,7 @@ public class ParentController {
 
         // En-tête avec icône et titre
         HBox header = new HBox(15);
-        header.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        header.setAlignment(Pos.CENTER_LEFT);
 
         Label iconLabel = new Label("📘");
         iconLabel.setStyle(
@@ -250,7 +261,7 @@ public class ParentController {
 
         // Détails (durée)
         HBox dureeBox = new HBox(10);
-        dureeBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        dureeBox.setAlignment(Pos.CENTER_LEFT);
 
         Label dureeIcon = new Label("⏱️");
         dureeIcon.setStyle("-fx-font-size: 18px;");
@@ -387,6 +398,280 @@ public class ParentController {
         } catch (SQLException e) {
             showAlert("Erreur", "Impossible de charger les trajets: " + e.getMessage(), AlertType.ERROR);
         }
+    }
+
+    // ===== VOIR LE CALENDRIER DES JOURS FÉRIÉS =====
+    @FXML
+    private void voirCalendrier() {
+        // Créer une fenêtre de chargement
+        Stage loadingStage = new Stage();
+        loadingStage.initModality(Modality.APPLICATION_MODAL);
+        loadingStage.setTitle("Chargement");
+        loadingStage.setResizable(false);
+
+        VBox loadingRoot = new VBox(20);
+        loadingRoot.setAlignment(Pos.CENTER);
+        loadingRoot.setStyle("-fx-background-color: white; -fx-padding: 30px; -fx-background-radius: 15px;");
+
+        ProgressIndicator progressIndicator = new ProgressIndicator();
+        progressIndicator.setPrefSize(60, 60);
+
+        Label loadingLabel = new Label("Récupération des jours fériés...");
+        loadingLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+        Label apiLabel = new Label("Connexion à l'API Nager.Date");
+        apiLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #7f8c8d;");
+
+        loadingRoot.getChildren().addAll(progressIndicator, loadingLabel, apiLabel);
+
+        Scene loadingScene = new Scene(loadingRoot, 320, 220);
+        loadingStage.setScene(loadingScene);
+        loadingStage.show();
+
+        // Charger les données dans un thread séparé
+        new Thread(() -> {
+            try {
+                Thread.sleep(500);
+
+                // Récupérer les données pour 2025 et 2026
+                List<JourFerieApi> joursFeries2025 = jourFerieApiService.getJoursFeries(2025);
+                List<JourFerieApi> joursFeries2026 = jourFerieApiService.getJoursFeries(2026);
+
+                javafx.application.Platform.runLater(() -> {
+                    loadingStage.close();
+                    afficherFenetreCalendrier(joursFeries2025, joursFeries2026);
+                });
+
+            } catch (Exception e) {
+                javafx.application.Platform.runLater(() -> {
+                    loadingStage.close();
+                    showAlert("Erreur", "Impossible de charger le calendrier: " + e.getMessage(), AlertType.ERROR);
+                    e.printStackTrace();
+                });
+            }
+        }).start();
+    }
+
+    // ===== AFFICHER LA FENÊTRE DU CALENDRIER =====
+    private void afficherFenetreCalendrier(List<JourFerieApi> jours2025, List<JourFerieApi> jours2026) {
+        Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setTitle("Calendrier scolaire - Jours fériés Tunisie");
+        stage.setResizable(false);
+
+        VBox root = new VBox(15);
+        root.setStyle("-fx-background-color: white; -fx-padding: 25px; -fx-background-radius: 15px;");
+        root.setPrefWidth(800);
+        root.setPrefHeight(500);
+
+        Label titleLabel = new Label("📅 Jours fériés en Tunisie");
+        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-padding: 0 0 15px 0; -fx-border-width: 0 0 2px 0; -fx-border-color: #2ecc71;");
+
+        Label sourceLabel = new Label("Source: Nager.Date API");
+        sourceLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #7f8c8d; -fx-padding: 0 0 10px 0;");
+
+        Label countLabel = new Label("2025: " + jours2025.size() + " jours • 2026: " + jours2026.size() + " jours");
+        countLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #34495e; -fx-padding: 5px 0;");
+
+        TabPane tabPane = new TabPane();
+        tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+
+        Tab tab2025 = new Tab("2025");
+        tab2025.setContent(creerTableauJoursFeries(jours2025));
+        tab2025.setClosable(false);
+
+        Tab tab2026 = new Tab("2026");
+        tab2026.setContent(creerTableauJoursFeries(jours2026));
+        tab2026.setClosable(false);
+
+        tabPane.getTabs().addAll(tab2025, tab2026);
+
+        HBox buttonBox = new HBox(15);
+        buttonBox.setAlignment(Pos.CENTER);
+
+        Button refreshButton = new Button("🔄 Rafraîchir");
+        refreshButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 25px; -fx-background-radius: 25px; -fx-cursor: hand;");
+        refreshButton.setOnAction(e -> {
+            stage.close();
+            voirCalendrier();
+        });
+
+        Button closeButton = new Button("Fermer");
+        closeButton.setStyle("-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 40px; -fx-background-radius: 25px; -fx-cursor: hand;");
+        closeButton.setOnAction(e -> stage.close());
+
+        buttonBox.getChildren().addAll(refreshButton, closeButton);
+
+        root.getChildren().addAll(titleLabel, sourceLabel, countLabel, tabPane, buttonBox);
+        VBox.setVgrow(tabPane, Priority.ALWAYS);
+
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        stage.showAndWait();
+    }
+
+    // ===== CRÉER UN TABLEAU DE JOURS FÉRIÉS =====
+    private TableView<JourFerieApi> creerTableauJoursFeries(List<JourFerieApi> joursFeries) {
+        TableView<JourFerieApi> table = new TableView<>();
+        table.setItems(FXCollections.observableArrayList(joursFeries));
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
+
+        TableColumn<JourFerieApi, String> colDate = new TableColumn<>("Date");
+        colDate.setCellValueFactory(data ->
+                new javafx.beans.property.SimpleStringProperty(
+                        LocalDate.parse(data.getValue().getDate()).format(formatter)
+                ));
+        colDate.setPrefWidth(150);
+
+        TableColumn<JourFerieApi, String> colNomAr = new TableColumn<>("Nom (arabe)");
+        colNomAr.setCellValueFactory(data ->
+                new javafx.beans.property.SimpleStringProperty(data.getValue().getLocalName()));
+        colNomAr.setPrefWidth(250);
+
+        TableColumn<JourFerieApi, String> colNomEn = new TableColumn<>("Nom (anglais)");
+        colNomEn.setCellValueFactory(data ->
+                new javafx.beans.property.SimpleStringProperty(data.getValue().getName()));
+        colNomEn.setPrefWidth(200);
+
+        TableColumn<JourFerieApi, String> colType = new TableColumn<>("Type");
+        colType.setCellValueFactory(data -> {
+            List<String> types = data.getValue().getTypes();
+            String typeStr = (types != null && !types.isEmpty()) ? types.get(0) : "Public";
+            return new javafx.beans.property.SimpleStringProperty(typeStr);
+        });
+        colType.setPrefWidth(100);
+
+        table.getColumns().addAll(colDate, colNomAr, colNomEn, colType);
+        table.setPrefHeight(300);
+        table.setStyle("-fx-font-size: 13px;");
+
+        return table;
+    }
+
+    // ===== VOIR LA MÉTÉO (NOUVEAU) =====
+    @FXML
+    private void voirMeteo() {
+        // Créer une fenêtre de chargement
+        Stage loadingStage = new Stage();
+        loadingStage.initModality(Modality.APPLICATION_MODAL);
+        loadingStage.setTitle("Chargement");
+        loadingStage.setResizable(false);
+
+        VBox loadingRoot = new VBox(20);
+        loadingRoot.setAlignment(Pos.CENTER);
+        loadingRoot.setStyle("-fx-background-color: white; -fx-padding: 30px; -fx-background-radius: 15px;");
+
+        ProgressIndicator progressIndicator = new ProgressIndicator();
+        progressIndicator.setPrefSize(60, 60);
+
+        Label loadingLabel = new Label("Récupération de la météo...");
+        loadingLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+        Label apiLabel = new Label("Connexion à l'API OpenWeatherMap");
+        apiLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #7f8c8d;");
+
+        loadingRoot.getChildren().addAll(progressIndicator, loadingLabel, apiLabel);
+
+        Scene loadingScene = new Scene(loadingRoot, 320, 220);
+        loadingStage.setScene(loadingScene);
+        loadingStage.show();
+
+        // Charger les données dans un thread séparé
+        new Thread(() -> {
+            try {
+                Thread.sleep(500);
+
+                // Déterminer la ville à interroger
+                String ville = "Tunis";
+                if (ecoleSelectionnee != null && ecoleSelectionnee.getPosition() != null && !ecoleSelectionnee.getPosition().isEmpty()) {
+                    ville = ecoleSelectionnee.getPosition();
+                }
+
+                Meteo meteo = meteoService.getMeteo(ville);
+
+                javafx.application.Platform.runLater(() -> {
+                    loadingStage.close();
+                    afficherFenetreMeteo(meteo);
+                });
+
+            } catch (Exception e) {
+                javafx.application.Platform.runLater(() -> {
+                    loadingStage.close();
+                    showAlert("Erreur", "Impossible de charger la météo: " + e.getMessage(), AlertType.ERROR);
+                    e.printStackTrace();
+                });
+            }
+        }).start();
+    }
+
+    // ===== AFFICHER LA FENÊTRE MÉTÉO =====
+    private void afficherFenetreMeteo(Meteo meteo) {
+        Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setTitle("Météo - " + meteo.getVille());
+
+        VBox root = new VBox(20);
+        root.setStyle("-fx-background-color: white; -fx-padding: 30px; -fx-background-radius: 20px;");
+        root.setAlignment(Pos.CENTER);
+        root.setPrefWidth(350);
+
+        // Emoji météo
+        Label emojiLabel = new Label(meteo.getEmoji());
+        emojiLabel.setStyle("-fx-font-size: 70px;");
+
+        // Température
+        Label tempLabel = new Label(String.format("%.1f°C", meteo.getTemperature()));
+        tempLabel.setStyle("-fx-font-size: 48px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+        // Ressenti
+        Label ressentiLabel = new Label("Ressenti: " + String.format("%.1f°C", meteo.getRessenti()));
+        ressentiLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #7f8c8d;");
+
+        // Description
+        Label descriptionLabel = new Label(meteo.getDescription());
+        descriptionLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #34495e;");
+
+        // Séparateur
+        Separator separator = new Separator();
+        separator.setStyle("-fx-background-color: #ecf0f1;");
+
+        // Détails
+        GridPane details = new GridPane();
+        details.setHgap(20);
+        details.setVgap(12);
+        details.setAlignment(Pos.CENTER);
+
+        Label humiditeIcon = new Label("💧");
+        humiditeIcon.setStyle("-fx-font-size: 18px;");
+        Label humiditeLabel = new Label("Humidité:");
+        humiditeLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #34495e;");
+        Label humiditeValue = new Label(meteo.getHumidite() + "%");
+        humiditeValue.setStyle("-fx-text-fill: #2c3e50;");
+        details.add(humiditeIcon, 0, 0);
+        details.add(humiditeLabel, 1, 0);
+        details.add(humiditeValue, 2, 0);
+
+        Label ventIcon = new Label("💨");
+        ventIcon.setStyle("-fx-font-size: 18px;");
+        Label ventLabel = new Label("Vent:");
+        ventLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #34495e;");
+        Label ventValue = new Label(String.format("%.1f km/h", meteo.getVent()));
+        ventValue.setStyle("-fx-text-fill: #2c3e50;");
+        details.add(ventIcon, 0, 1);
+        details.add(ventLabel, 1, 1);
+        details.add(ventValue, 2, 1);
+
+        // Bouton fermer
+        Button closeButton = new Button("Fermer");
+        closeButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 12px 40px; -fx-background-radius: 25px; -fx-cursor: hand;");
+        closeButton.setOnAction(e -> stage.close());
+
+        root.getChildren().addAll(emojiLabel, tempLabel, ressentiLabel, descriptionLabel, separator, details, closeButton);
+
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        stage.showAndWait();
     }
 
     // ===== INSCRIPTION =====

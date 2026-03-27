@@ -177,6 +177,42 @@
         -fx-effect: dropshadow(gaussian, rgba(243, 156, 18, 0.4), 10, 0, 0, 4);
         }
 
+        /* ===== BOUTON CALENDRIER ===== */
+        .calendrier-button {
+        -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #3498db 0%, #2980b9 100%);
+        -fx-text-fill: white;
+        -fx-font-weight: bold;
+        -fx-font-size: 14px;
+        -fx-padding: 10px 25px;
+        -fx-background-radius: 25px;
+        -fx-cursor: hand;
+        -fx-effect: dropshadow(gaussian, rgba(52, 152, 219, 0.3), 5, 0, 0, 2);
+        }
+
+        .calendrier-button:hover {
+        -fx-scale-x: 1.05;
+        -fx-scale-y: 1.05;
+        -fx-effect: dropshadow(gaussian, rgba(52, 152, 219, 0.4), 10, 0, 0, 4);
+        }
+
+        /* ===== BOUTON MÉTÉO ===== */
+        .meteo-button {
+        -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #00b4d8 0%, #0096c7 100%);
+        -fx-text-fill: white;
+        -fx-font-weight: bold;
+        -fx-font-size: 14px;
+        -fx-padding: 10px 25px;
+        -fx-background-radius: 25px;
+        -fx-cursor: hand;
+        -fx-effect: dropshadow(gaussian, rgba(0, 180, 216, 0.3), 5, 0, 0, 2);
+        }
+
+        .meteo-button:hover {
+        -fx-scale-x: 1.05;
+        -fx-scale-y: 1.05;
+        -fx-effect: dropshadow(gaussian, rgba(0, 180, 216, 0.4), 10, 0, 0, 4);
+        }
+
         /* ===== CARTES DES PROGRAMMES ===== */
         .programs-section {
         -fx-padding: 20px 0 0 0;
@@ -332,9 +368,11 @@
                         <Label fx:id="lblInfosEcole" text="-" GridPane.rowIndex="4" GridPane.columnIndex="1" wrapText="true" maxWidth="500" styleClass="detail-value"/>
                     </GridPane>
 
-                    <HBox alignment="CENTER" spacing="20" style="-fx-padding: 20px 0 0 0;">
-                        <Button fx:id="btnInscrire" text="📝 S'inscrire dans cette école" styleClass="inscription-button" onAction="#inscrireEnfant"/>
-                        <Button fx:id="btnVoirTrajets" text="🚌 Voir les trajets" styleClass="trajets-button" onAction="#voirTrajets"/>
+                    <HBox alignment="CENTER" spacing="15" style="-fx-padding: 20px 0 0 0;">
+                        <Button fx:id="btnInscrire" text="📝 S'inscrire" styleClass="inscription-button" onAction="#inscrireEnfant"/>
+                        <Button fx:id="btnVoirTrajets" text="🚌 Trajets" styleClass="trajets-button" onAction="#voirTrajets"/>
+                        <Button fx:id="btnCalendrier" text="📅 Calendrier" styleClass="calendrier-button" onAction="#voirCalendrier"/>
+                        <Button fx:id="btnMeteo" text="🌤️ Météo" styleClass="meteo-button" onAction="#voirMeteo"/>
                     </HBox>
                 </VBox>
 
@@ -343,7 +381,7 @@
                     <ImageView fitHeight="50" fitWidth="50">
                         <Image url="https://img.icons8.com/color/48/info.png"/>
                     </ImageView>
-                    <Label text="Sélectionnez une école dans la liste pour voir ses informations et programmes" textAlignment="CENTER"/>
+                    <Label text="Sélectionnez une école dans la liste pour voir ses informations, programmes et trajets" textAlignment="CENTER"/>
                 </VBox>
 
                 <!-- Section des programmes en cartes -->
