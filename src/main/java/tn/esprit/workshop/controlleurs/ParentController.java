@@ -17,14 +17,17 @@ import tn.esprit.workshop.model.Programme;
 import tn.esprit.workshop.model.Trajet;
 import tn.esprit.workshop.model.JourFerieApi;
 import tn.esprit.workshop.model.Meteo;
+import tn.esprit.workshop.model.DemandeInscription;
 import tn.esprit.workshop.services.EcoleService;
 import tn.esprit.workshop.services.ProgrammeService;
 import tn.esprit.workshop.services.TrajetService;
 import tn.esprit.workshop.services.JourFerieApiService;
 import tn.esprit.workshop.services.MeteoService;
+import tn.esprit.workshop.services.DemandeService;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -49,14 +52,15 @@ public class ParentController {
     @FXML private Button btnInscrire;
     @FXML private Button btnVoirTrajets;
     @FXML private Button btnCalendrier;
-    @FXML private Button btnMeteo;  // NOUVEAU
+    @FXML private Button btnMeteo;
 
     // ===== SERVICES =====
     private final EcoleService ecoleService = new EcoleService();
     private final ProgrammeService programmeService = new ProgrammeService();
     private final TrajetService trajetService = new TrajetService();
     private final JourFerieApiService jourFerieApiService = new JourFerieApiService();
-    private final MeteoService meteoService = new MeteoService();  // NOUVEAU
+    private final MeteoService meteoService = new MeteoService();
+    private final DemandeService demandeService = new DemandeService();
 
     // ===== LISTS =====
     private ObservableList<Ecole> ecoleList = FXCollections.observableArrayList();
@@ -184,7 +188,6 @@ public class ParentController {
                         "-fx-max-width: 280px;"
         );
 
-        // Effet hover
         card.setOnMouseEntered(e ->
                 card.setStyle(
                         "-fx-background-color: white;" +
@@ -215,7 +218,6 @@ public class ParentController {
                 )
         );
 
-        // En-tête avec icône et titre
         HBox header = new HBox(15);
         header.setAlignment(Pos.CENTER_LEFT);
 
@@ -245,7 +247,6 @@ public class ParentController {
         titleBox.getChildren().addAll(titleLabel, niveauLabel);
         header.getChildren().addAll(iconLabel, titleBox);
 
-        // Description
         Label descriptionLabel = new Label(p.getDescriptionProgramme());
         descriptionLabel.setWrapText(true);
         descriptionLabel.setStyle(
@@ -255,11 +256,9 @@ public class ParentController {
                         "-fx-font-weight: 500;"
         );
 
-        // Ligne de séparation
         Separator separator = new Separator();
         separator.setStyle("-fx-background-color: #ecf0f1; -fx-padding: 5px 0;");
 
-        // Détails (durée)
         HBox dureeBox = new HBox(10);
         dureeBox.setAlignment(Pos.CENTER_LEFT);
 
@@ -285,7 +284,6 @@ public class ParentController {
         }
 
         try {
-            // Récupérer les trajets de l'école
             List<Trajet> trajets = trajetService.selectTrajetsByEcole(ecoleSelectionnee.getId());
 
             if (trajets.isEmpty()) {
@@ -293,27 +291,22 @@ public class ParentController {
                 return;
             }
 
-            // Créer une nouvelle fenêtre (popup)
             Stage popupStage = new Stage();
             popupStage.initModality(Modality.APPLICATION_MODAL);
             popupStage.setTitle("Trajets disponibles - " + ecoleSelectionnee.getNom());
 
-            // Conteneur principal
             VBox root = new VBox(20);
             root.setStyle("-fx-background-color: white; -fx-padding: 25px; -fx-background-radius: 15px;");
             root.setPrefWidth(600);
             root.setPrefHeight(400);
 
-            // Titre
             Label titleLabel = new Label("🚌 Trajets disponibles pour " + ecoleSelectionnee.getNom());
             titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-padding: 0 0 15px 0; -fx-border-width: 0 0 2px 0; -fx-border-color: #f39c12;");
 
-            // Liste des trajets
             ListView<Trajet> trajetsList = new ListView<>();
             trajetsList.setItems(FXCollections.observableArrayList(trajets));
             trajetsList.setPrefHeight(300);
 
-            // Personnalisation de l'affichage des trajets
             trajetsList.setCellFactory(param -> new ListCell<Trajet>() {
                 @Override
                 protected void updateItem(Trajet trajet, boolean empty) {
@@ -326,11 +319,9 @@ public class ParentController {
                         VBox card = new VBox(8);
                         card.setStyle("-fx-padding: 15px; -fx-background-color: #fef5e7; -fx-background-radius: 12px; -fx-border-color: #f39c12; -fx-border-width: 1px; -fx-border-radius: 12px;");
 
-                        // Nom du trajet
                         Label nomLabel = new Label(trajet.getNomTrajet());
                         nomLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
 
-                        // Trajet (départ → arrivée)
                         HBox routeBox = new HBox(5);
                         Label routeIcon = new Label("🔄");
                         routeIcon.setStyle("-fx-font-size: 14px;");
@@ -338,7 +329,6 @@ public class ParentController {
                         routeText.setStyle("-fx-font-size: 14px; -fx-text-fill: #34495e;");
                         routeBox.getChildren().addAll(routeIcon, routeText);
 
-                        // Horaires
                         HBox timeBox = new HBox(5);
                         Label timeIcon = new Label("⏰");
                         timeIcon.setStyle("-fx-font-size: 14px;");
@@ -346,7 +336,6 @@ public class ParentController {
                         timeText.setStyle("-fx-font-size: 14px; -fx-text-fill: #34495e;");
                         timeBox.getChildren().addAll(timeIcon, timeText);
 
-                        // Jours
                         HBox joursBox = new HBox(5);
                         Label joursIcon = new Label("📅");
                         joursIcon.setStyle("-fx-font-size: 14px;");
@@ -354,7 +343,6 @@ public class ParentController {
                         joursText.setStyle("-fx-font-size: 14px; -fx-text-fill: #34495e;");
                         joursBox.getChildren().addAll(joursIcon, joursText);
 
-                        // Prix et places
                         HBox infoBox = new HBox(20);
 
                         Label prixLabel = new Label(String.format("💰 %.2f DT/mois", trajet.getPrixMensuel()));
@@ -371,7 +359,6 @@ public class ParentController {
 
                         card.getChildren().addAll(nomLabel, routeBox, timeBox, joursBox, infoBox);
 
-                        // Description si elle existe
                         if (trajet.getDescription() != null && !trajet.getDescription().isEmpty()) {
                             Label descLabel = new Label(trajet.getDescription());
                             descLabel.setWrapText(true);
@@ -384,7 +371,6 @@ public class ParentController {
                 }
             });
 
-            // Bouton fermer
             Button closeButton = new Button("Fermer");
             closeButton.setStyle("-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 30px; -fx-background-radius: 25px; -fx-cursor: hand;");
             closeButton.setOnAction(e -> popupStage.close());
@@ -403,7 +389,6 @@ public class ParentController {
     // ===== VOIR LE CALENDRIER DES JOURS FÉRIÉS =====
     @FXML
     private void voirCalendrier() {
-        // Créer une fenêtre de chargement
         Stage loadingStage = new Stage();
         loadingStage.initModality(Modality.APPLICATION_MODAL);
         loadingStage.setTitle("Chargement");
@@ -428,12 +413,10 @@ public class ParentController {
         loadingStage.setScene(loadingScene);
         loadingStage.show();
 
-        // Charger les données dans un thread séparé
         new Thread(() -> {
             try {
                 Thread.sleep(500);
 
-                // Récupérer les données pour 2025 et 2026
                 List<JourFerieApi> joursFeries2025 = jourFerieApiService.getJoursFeries(2025);
                 List<JourFerieApi> joursFeries2026 = jourFerieApiService.getJoursFeries(2026);
 
@@ -549,10 +532,9 @@ public class ParentController {
         return table;
     }
 
-    // ===== VOIR LA MÉTÉO (NOUVEAU) =====
+    // ===== VOIR LA MÉTÉO =====
     @FXML
     private void voirMeteo() {
-        // Créer une fenêtre de chargement
         Stage loadingStage = new Stage();
         loadingStage.initModality(Modality.APPLICATION_MODAL);
         loadingStage.setTitle("Chargement");
@@ -577,12 +559,10 @@ public class ParentController {
         loadingStage.setScene(loadingScene);
         loadingStage.show();
 
-        // Charger les données dans un thread séparé
         new Thread(() -> {
             try {
                 Thread.sleep(500);
 
-                // Déterminer la ville à interroger
                 String ville = "Tunis";
                 if (ecoleSelectionnee != null && ecoleSelectionnee.getPosition() != null && !ecoleSelectionnee.getPosition().isEmpty()) {
                     ville = ecoleSelectionnee.getPosition();
@@ -616,27 +596,21 @@ public class ParentController {
         root.setAlignment(Pos.CENTER);
         root.setPrefWidth(350);
 
-        // Emoji météo
         Label emojiLabel = new Label(meteo.getEmoji());
         emojiLabel.setStyle("-fx-font-size: 70px;");
 
-        // Température
         Label tempLabel = new Label(String.format("%.1f°C", meteo.getTemperature()));
         tempLabel.setStyle("-fx-font-size: 48px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
 
-        // Ressenti
         Label ressentiLabel = new Label("Ressenti: " + String.format("%.1f°C", meteo.getRessenti()));
         ressentiLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #7f8c8d;");
 
-        // Description
         Label descriptionLabel = new Label(meteo.getDescription());
         descriptionLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #34495e;");
 
-        // Séparateur
         Separator separator = new Separator();
         separator.setStyle("-fx-background-color: #ecf0f1;");
 
-        // Détails
         GridPane details = new GridPane();
         details.setHgap(20);
         details.setVgap(12);
@@ -662,7 +636,6 @@ public class ParentController {
         details.add(ventLabel, 1, 1);
         details.add(ventValue, 2, 1);
 
-        // Bouton fermer
         Button closeButton = new Button("Fermer");
         closeButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 12px 40px; -fx-background-radius: 25px; -fx-cursor: hand;");
         closeButton.setOnAction(e -> stage.close());
@@ -674,7 +647,7 @@ public class ParentController {
         stage.showAndWait();
     }
 
-    // ===== INSCRIPTION =====
+    // ===== DEMANDE D'INSCRIPTION (MODIFIÉ) =====
     @FXML
     private void inscrireEnfant() {
         if (ecoleSelectionnee == null) {
@@ -683,17 +656,31 @@ public class ParentController {
         }
 
         Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Inscription");
-        dialog.setHeaderText("Inscription à " + ecoleSelectionnee.getNom());
+        dialog.setTitle("Demande d'inscription");
+        dialog.setHeaderText("Demande d'inscription à " + ecoleSelectionnee.getNom());
 
-        ButtonType confirmerButton = new ButtonType("Confirmer l'inscription", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(confirmerButton, ButtonType.CANCEL);
+        ButtonType envoyerButton = new ButtonType("Envoyer la demande", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(envoyerButton, ButtonType.CANCEL);
 
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setPadding(new Insets(20, 150, 10, 10));
 
+        // Informations parent
+        TextField nomParent = new TextField();
+        nomParent.setPromptText("Votre nom");
+
+        TextField prenomParent = new TextField();
+        prenomParent.setPromptText("Votre prénom");
+
+        TextField emailParent = new TextField();
+        emailParent.setPromptText("Votre email");
+
+        TextField telephoneParent = new TextField();
+        telephoneParent.setPromptText("Votre téléphone");
+
+        // Informations enfant
         TextField nomEnfant = new TextField();
         nomEnfant.setPromptText("Nom de l'enfant");
 
@@ -707,7 +694,7 @@ public class ParentController {
         niveauCombo.getItems().addAll("Préscolaire", "Primaire", "Collège", "Lycée");
         niveauCombo.setPromptText("Niveau scolaire");
 
-        // Ajout d'une sélection de trajet (optionnel)
+        // Trajet
         ComboBox<Trajet> trajetCombo = new ComboBox<>();
         trajetCombo.setPromptText("Choisir un trajet (optionnel)");
 
@@ -719,15 +706,8 @@ public class ParentController {
                     @Override
                     protected void updateItem(Trajet trajet, boolean empty) {
                         super.updateItem(trajet, empty);
-                        setText(empty || trajet == null ? null : trajet.getNomTrajet() + " (" + trajet.getPointDepart() + " → " + trajet.getPointArrivee() + ")");
-                    }
-                });
-
-                trajetCombo.setButtonCell(new ListCell<Trajet>() {
-                    @Override
-                    protected void updateItem(Trajet trajet, boolean empty) {
-                        super.updateItem(trajet, empty);
-                        setText(empty || trajet == null ? null : trajet.getNomTrajet());
+                        setText(empty || trajet == null ? null :
+                                trajet.getNomTrajet() + " (" + trajet.getPointDepart() + " → " + trajet.getPointArrivee() + ")");
                     }
                 });
             } else {
@@ -738,47 +718,82 @@ public class ParentController {
             e.printStackTrace();
         }
 
-        grid.add(new Label("Nom:"), 0, 0);
-        grid.add(nomEnfant, 1, 0);
-        grid.add(new Label("Prénom:"), 0, 1);
-        grid.add(prenomEnfant, 1, 1);
-        grid.add(new Label("Date naissance:"), 0, 2);
-        grid.add(dateNaissance, 1, 2);
-        grid.add(new Label("Niveau:"), 0, 3);
-        grid.add(niveauCombo, 1, 3);
-        grid.add(new Label("Trajet:"), 0, 4);
-        grid.add(trajetCombo, 1, 4);
+        // Message d'information
+        Label infoLabel = new Label("⚠️ Votre demande sera étudiée par l'agent. Vous recevrez une confirmation par email.");
+        infoLabel.setStyle("-fx-text-fill: #e67e22; -fx-font-size: 12px;");
+        infoLabel.setWrapText(true);
+
+        // Ajout à la grille
+        grid.add(new Label("👤 Vos informations:"), 0, 0, 2, 1);
+        grid.add(new Separator(), 0, 1, 2, 1);
+
+        grid.add(new Label("Nom:"), 0, 2);
+        grid.add(nomParent, 1, 2);
+        grid.add(new Label("Prénom:"), 0, 3);
+        grid.add(prenomParent, 1, 3);
+        grid.add(new Label("Email:"), 0, 4);
+        grid.add(emailParent, 1, 4);
+        grid.add(new Label("Téléphone:"), 0, 5);
+        grid.add(telephoneParent, 1, 5);
+
+        grid.add(new Label("👶 Informations enfant:"), 0, 6, 2, 1);
+        grid.add(new Separator(), 0, 7, 2, 1);
+
+        grid.add(new Label("Nom:"), 0, 8);
+        grid.add(nomEnfant, 1, 8);
+        grid.add(new Label("Prénom:"), 0, 9);
+        grid.add(prenomEnfant, 1, 9);
+        grid.add(new Label("Date naissance:"), 0, 10);
+        grid.add(dateNaissance, 1, 10);
+        grid.add(new Label("Niveau:"), 0, 11);
+        grid.add(niveauCombo, 1, 11);
+        grid.add(new Label("Trajet:"), 0, 12);
+        grid.add(trajetCombo, 1, 12);
+
+        grid.add(infoLabel, 0, 13, 2, 1);
+        GridPane.setMargin(infoLabel, new Insets(10, 0, 0, 0));
 
         dialog.getDialogPane().setContent(grid);
 
         Optional<ButtonType> result = dialog.showAndWait();
-        if (result.isPresent() && result.get() == confirmerButton) {
-            if (nomEnfant.getText().isEmpty() || prenomEnfant.getText().isEmpty() ||
+        if (result.isPresent() && result.get() == envoyerButton) {
+
+            // Vérification des champs
+            if (nomParent.getText().isEmpty() || prenomParent.getText().isEmpty() ||
+                    emailParent.getText().isEmpty() || telephoneParent.getText().isEmpty() ||
+                    nomEnfant.getText().isEmpty() || prenomEnfant.getText().isEmpty() ||
                     dateNaissance.getValue() == null || niveauCombo.getValue() == null) {
                 showAlert("Erreur", "Veuillez remplir tous les champs obligatoires", AlertType.ERROR);
                 return;
             }
 
-            String trajetInfo = trajetCombo.getValue() != null ?
-                    trajetCombo.getValue().getNomTrajet() + " (" + trajetCombo.getValue().getPointDepart() + " → " + trajetCombo.getValue().getPointArrivee() + ")" :
-                    "Aucun trajet sélectionné";
+            try {
+                DemandeInscription demande = new DemandeInscription();
+                demande.setParentNom(nomParent.getText().trim());
+                demande.setParentPrenom(prenomParent.getText().trim());
+                demande.setParentEmail(emailParent.getText().trim());
+                demande.setParentTelephone(telephoneParent.getText().trim());
+                demande.setEnfantNom(nomEnfant.getText().trim());
+                demande.setEnfantPrenom(prenomEnfant.getText().trim());
+                demande.setEnfantDateNaissance(dateNaissance.getValue());
+                demande.setNiveauScolaire(niveauCombo.getValue());
+                demande.setEcoleId(ecoleSelectionnee.getId());
+                demande.setTrajetId(trajetCombo.getValue() != null ? trajetCombo.getValue().getId() : 0);
+                demande.setDateDemande(LocalDateTime.now());
+                demande.setStatut("EN_ATTENTE");
 
-            String message = String.format(
-                    "✅ Inscription confirmée !\n\n" +
-                            "École: %s\n" +
-                            "Enfant: %s %s\n" +
-                            "Date naissance: %s\n" +
-                            "Niveau: %s\n" +
-                            "Trajet: %s\n\n" +
-                            "Un email de confirmation a été envoyé.",
-                    ecoleSelectionnee.getNom(),
-                    prenomEnfant.getText(), nomEnfant.getText(),
-                    dateNaissance.getValue().toString(),
-                    niveauCombo.getValue(),
-                    trajetInfo
-            );
+                demandeService.ajouterDemande(demande);
 
-            showAlert("Succès", message, AlertType.INFORMATION);
+                showAlert("Demande envoyée !",
+                        "✅ Votre demande d'inscription a été envoyée avec succès !\n\n" +
+                                "L'agent va étudier votre demande et vous recevrez une confirmation par email sous 48h.\n\n" +
+                                "Merci de votre confiance.",
+                        AlertType.INFORMATION);
+
+            } catch (SQLException e) {
+                showAlert("Erreur", "Erreur lors de l'envoi de la demande: " + e.getMessage(), AlertType.ERROR);
+                e.printStackTrace();
+            }
         }
     }
 

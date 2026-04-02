@@ -149,6 +149,25 @@
         -fx-wrap-text: true;
         }
 
+        /* ===== STATISTIQUES DEMANDES ===== */
+        .stats-card {
+        -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #667eea 0%, #764ba2 100%);
+        -fx-background-radius: 15px;
+        -fx-padding: 15px;
+        -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 8, 0, 0, 3);
+        }
+
+        .stats-number {
+        -fx-font-size: 28px;
+        -fx-font-weight: bold;
+        -fx-text-fill: white;
+        }
+
+        .stats-label {
+        -fx-font-size: 12px;
+        -fx-text-fill: rgba(255, 255, 255, 0.8);
+        }
+
         /* ===== BOUTONS D'ACTION ===== */
         .boutons-container {
         -fx-spacing: 15px;
@@ -197,6 +216,22 @@
         .button-vider {
         -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #95a5a6 0%, #7f8c8d 100%);
         -fx-text-fill: white;
+        }
+
+        .button-accepter {
+        -fx-background-color: #27ae60;
+        -fx-text-fill: white;
+        -fx-background-radius: 5;
+        -fx-cursor: hand;
+        -fx-padding: 5 15;
+        }
+
+        .button-refuser {
+        -fx-background-color: #e74c3c;
+        -fx-text-fill: white;
+        -fx-background-radius: 5;
+        -fx-cursor: hand;
+        -fx-padding: 5 15;
         }
 
         /* ===== TABLEAU AMÉLIORÉ ===== */
@@ -251,23 +286,6 @@
         -fx-alignment: center;
         }
 
-        /* Bouton dans la table */
-        .table-button {
-        -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #9b59b6 0%, #8e44ad 100%);
-        -fx-text-fill: white;
-        -fx-background-radius: 15;
-        -fx-cursor: hand;
-        -fx-font-weight: bold;
-        -fx-padding: 4 12;
-        -fx-font-size: 11px;
-        }
-
-        .table-button:hover {
-        -fx-background-color: #8e44ad;
-        -fx-scale-x: 1.05;
-        -fx-scale-y: 1.05;
-        }
-
         /* ===== MESSAGE D'INFORMATION ===== */
         .info-message {
         -fx-background-color: #e8f5e9;
@@ -318,8 +336,8 @@
             </HBox>
         </HBox>
 
-        <!-- TabPane avec 3 onglets -->
-        <TabPane tabClosingPolicy="UNAVAILABLE" prefHeight="600">
+        <!-- TabPane avec 4 onglets -->
+        <TabPane tabClosingPolicy="UNAVAILABLE" prefHeight="650">
             <!-- Onglet 1: Écoles -->
             <Tab text="🏫 Écoles">
                 <VBox spacing="15" style="-fx-padding: 15;">
@@ -465,7 +483,7 @@
                 </VBox>
             </Tab>
 
-            <!-- Onglet 3: Trajets (NOUVEAU) -->
+            <!-- Onglet 3: Trajets -->
             <Tab text="🚌 Trajets">
                 <VBox spacing="15" style="-fx-padding: 15;">
                     <!-- Message si aucune école sélectionnée -->
@@ -528,6 +546,55 @@
                             <TableColumn fx:id="colTrajetPlaces" text="Places" prefWidth="60"/>
                         </columns>
                     </TableView>
+                </VBox>
+            </Tab>
+
+            <!-- Onglet 4: Demandes d'inscription (NOUVEAU) -->
+            <Tab text="📋 Demandes">
+                <VBox spacing="15" style="-fx-padding: 15;">
+
+                    <!-- Statistiques des demandes -->
+                    <HBox spacing="20" alignment="CENTER">
+                        <VBox spacing="5" alignment="CENTER" styleClass="stats-card">
+                            <Label fx:id="lblDemandesEnAttente" text="0" styleClass="stats-number"/>
+                            <Label text="En attente" styleClass="stats-label"/>
+                        </VBox>
+                        <VBox spacing="5" alignment="CENTER" styleClass="stats-card">
+                            <Label fx:id="lblDemandesAcceptees" text="0" styleClass="stats-number"/>
+                            <Label text="Acceptées" styleClass="stats-label"/>
+                        </VBox>
+                        <VBox spacing="5" alignment="CENTER" styleClass="stats-card">
+                            <Label fx:id="lblDemandesRefusees" text="0" styleClass="stats-number"/>
+                            <Label text="Refusées" styleClass="stats-label"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Tableau des demandes -->
+                    <Label text="📋 Demandes d'inscription en attente" styleClass="table-title"/>
+                    <TableView fx:id="tableDemandes" prefHeight="350" styleClass="custom-table">
+                        <columns>
+                            <TableColumn fx:id="colDemandeParent" text="Parent" prefWidth="150"/>
+                            <TableColumn fx:id="colDemandeEnfant" text="Enfant" prefWidth="120"/>
+                            <TableColumn fx:id="colDemandeNiveau" text="Niveau" prefWidth="100"/>
+                            <TableColumn fx:id="colDemandeDate" text="Date demande" prefWidth="150"/>
+                            <TableColumn fx:id="colDemandeAction" text="Action" prefWidth="120"/>
+                        </columns>
+                    </TableView>
+
+                    <!-- Zone commentaire -->
+                    <HBox spacing="10" alignment="CENTER">
+                        <TextField fx:id="tfCommentaire" promptText="Commentaire (optionnel)" HBox.hgrow="ALWAYS" styleClass="custom-field"/>
+                        <Button text="✅ Accepter" styleClass="button-accepter" onAction="#accepterDemande"/>
+                        <Button text="❌ Refuser" styleClass="button-refuser" onAction="#refuserDemande"/>
+                    </HBox>
+
+                    <!-- Message d'information -->
+                    <HBox styleClass="info-message" spacing="10" alignment="CENTER">
+                        <ImageView fitHeight="20" fitWidth="20">
+                            <Image url="https://img.icons8.com/color/48/info.png"/>
+                        </ImageView>
+                        <Label text="Sélectionnez une demande et cliquez sur Accepter ou Refuser"/>
+                    </HBox>
                 </VBox>
             </Tab>
         </TabPane>

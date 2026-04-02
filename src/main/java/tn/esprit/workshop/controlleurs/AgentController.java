@@ -13,13 +13,18 @@ import javafx.stage.Stage;
 import tn.esprit.workshop.model.Ecole;
 import tn.esprit.workshop.model.Programme;
 import tn.esprit.workshop.model.Trajet;
+import tn.esprit.workshop.model.DemandeInscription;
 import tn.esprit.workshop.services.EcoleService;
 import tn.esprit.workshop.services.ProgrammeService;
 import tn.esprit.workshop.services.TrajetService;
+import tn.esprit.workshop.services.DemandeService;
+import tn.esprit.workshop.services.EnfantService;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
@@ -82,47 +87,166 @@ public class AgentController {
     @FXML private TextField tfPlaces;
     @FXML private TextArea tfDescriptionTrajet;
 
+    // ===== COMPOSANTS POUR DEMANDES D'INSCRIPTION =====
+    @FXML private TableView<DemandeInscription> tableDemandes;
+    @FXML private TableColumn<DemandeInscription, String> colDemandeParent;
+    @FXML private TableColumn<DemandeInscription, String> colDemandeEnfant;
+    @FXML private TableColumn<DemandeInscription, String> colDemandeNiveau;
+    @FXML private TableColumn<DemandeInscription, String> colDemandeDate;
+    @FXML private TableColumn<DemandeInscription, Void> colDemandeAction;
+
+    @FXML private Label lblDemandesEnAttente;
+    @FXML private Label lblDemandesAcceptees;
+    @FXML private Label lblDemandesRefusees;
+    @FXML private TextField tfCommentaire;
+
+    // ===== VARIABLES =====
+    private Ecole ecoleSelectionnee = null;
+
     // ===== SERVICES =====
     private final EcoleService ecoleService = new EcoleService();
     private final ProgrammeService programmeService = new ProgrammeService();
     private final TrajetService trajetService = new TrajetService();
+    private final DemandeService demandeService = new DemandeService();
+    private final EnfantService enfantService = new EnfantService();
 
     // ===== LISTS =====
     private ObservableList<Ecole> ecoleList = FXCollections.observableArrayList();
     private ObservableList<Programme> programmeList = FXCollections.observableArrayList();
     private ObservableList<Trajet> trajetList = FXCollections.observableArrayList();
+    private ObservableList<DemandeInscription> demandeList = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
         setupEcoleTable();
         setupProgrammeTable();
         setupTrajetTable();
+        setupDemandeTable();
         loadEcoles();
         loadProgrammes();
         loadTrajets();
         setupListeners();
-        setupHeureValidation(); // NOUVEAU : validation des heures
+        setupHeureValidation();
     }
 
-    // ===== NOUVELLE MÉTHODE : VALIDATION DES HEURES EN TEMPS RÉEL =====
+    // ===== CONFIGURATION TABLE DEMANDES =====
+    private void setupDemandeTable() {
+        colDemandeParent.setCellValueFactory(data ->
+                new javafx.beans.property.SimpleStringProperty(data.getValue().getParentNomComplet()));
+        colDemandeEnfant.setCellValueFactory(data ->
+                new javafx.beans.property.SimpleStringProperty(data.getValue().getEnfantNomComplet()));
+        colDemandeNiveau.setCellValueFactory(data ->
+                new javafx.beans.property.SimpleStringProperty(data.getValue().getNiveauScolaire()));
+        colDemandeDate.setCellValueFactory(data ->
+                new javafx.beans.property.SimpleStringProperty(
+                        data.getValue().getDateDemande().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))));
+    }
+
+    // ===== CHARGEMENT DES DEMANDES PAR ÉCOLE =====
+    private void loadDemandesByEcole(int ecoleId) {
+        try {
+            List<DemandeInscription> demandes = demandeService.selectDemandesByEcole(ecoleId);
+            demandeList.setAll(demandes);
+            tableDemandes.setItems(demandeList);
+            chargerStatistiquesDemandesByEcole(ecoleId);
+        } catch (SQLException e) {
+            showAlert("Erreur", "Impossible de charger les demandes: " + e.getMessage(), AlertType.ERROR);
+        }
+    }
+
+    private void chargerStatistiquesDemandesByEcole(int ecoleId) {
+        try {
+            int enAttente = demandeService.selectDemandesByEcole(ecoleId).size();
+            int acceptees = demandeService.selectDemandesByEcoleAndStatut(ecoleId, "ACCEPTEE").size();
+            int refusees = demandeService.selectDemandesByEcoleAndStatut(ecoleId, "REFUSEE").size();
+
+            lblDemandesEnAttente.setText(String.valueOf(enAttente));
+            lblDemandesAcceptees.setText(String.valueOf(acceptees));
+            lblDemandesRefusees.setText(String.valueOf(refusees));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // ===== MÉTHODES FXML POUR LES BOUTONS =====
+    @FXML
+    private void accepterDemande() {
+        DemandeInscription selected = tableDemandes.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            accepterDemande(selected);
+        } else {
+            showAlert("Information", "Veuillez sélectionner une demande", AlertType.WARNING);
+        }
+    }
+
+    @FXML
+    private void refuserDemande() {
+        DemandeInscription selected = tableDemandes.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            refuserDemande(selected);
+        } else {
+            showAlert("Information", "Veuillez sélectionner une demande", AlertType.WARNING);
+        }
+    }
+
+    // ===== MÉTHODES INTERNES AVEC PARAMÈTRE =====
+    private void accepterDemande(DemandeInscription demande) {
+        Alert confirm = new Alert(AlertType.CONFIRMATION);
+        confirm.setTitle("Accepter la demande");
+        confirm.setHeaderText("Accepter l'inscription de " + demande.getEnfantNomComplet());
+        confirm.setContentText("Voulez-vous accepter cette demande d'inscription ?");
+
+        Optional<ButtonType> result = confirm.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            try {
+                String commentaire = tfCommentaire.getText().trim();
+                demandeService.accepterDemande(demande.getId(), commentaire, enfantService);
+                if (ecoleSelectionnee != null) {
+                    loadDemandesByEcole(ecoleSelectionnee.getId());
+                }
+                tfCommentaire.clear();
+                showAlert("Succès", "Demande acceptée ! L'enfant a été ajouté dans la base.", AlertType.INFORMATION);
+            } catch (SQLException e) {
+                showAlert("Erreur", e.getMessage(), AlertType.ERROR);
+            }
+        }
+    }
+
+    private void refuserDemande(DemandeInscription demande) {
+        Alert confirm = new Alert(AlertType.CONFIRMATION);
+        confirm.setTitle("Refuser la demande");
+        confirm.setHeaderText("Refuser l'inscription de " + demande.getEnfantNomComplet());
+        confirm.setContentText("Voulez-vous refuser cette demande d'inscription ?");
+
+        Optional<ButtonType> result = confirm.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            try {
+                String commentaire = tfCommentaire.getText().trim();
+                demandeService.refuserDemande(demande.getId(), commentaire);
+                if (ecoleSelectionnee != null) {
+                    loadDemandesByEcole(ecoleSelectionnee.getId());
+                }
+                tfCommentaire.clear();
+                showAlert("Succès", "Demande refusée.", AlertType.INFORMATION);
+            } catch (SQLException e) {
+                showAlert("Erreur", e.getMessage(), AlertType.ERROR);
+            }
+        }
+    }
+
+    // ===== VALIDATION DES HEURES =====
     private void setupHeureValidation() {
-        // Format attendu : HH:MM (ex: 08:30, 14:45)
         String pattern = "^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$";
 
-        // Pour le champ heure de départ
         tfHeureDepart.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null || newValue.isEmpty()) {
                 tfHeureDepart.setStyle("-fx-border-color: #e0e7ed; -fx-border-width: 2px;");
                 return;
             }
-
-            // Formatage automatique : ajoute ":" après 2 chiffres
             if (newValue.length() == 2 && !newValue.contains(":") && oldValue.length() < 2) {
                 tfHeureDepart.setText(newValue + ":");
                 tfHeureDepart.positionCaret(3);
             }
-
-            // Validation visuelle
             if (newValue.matches(pattern)) {
                 tfHeureDepart.setStyle("-fx-border-color: #27ae60; -fx-border-width: 2px;");
             } else {
@@ -130,20 +254,15 @@ public class AgentController {
             }
         });
 
-        // Pour le champ heure d'arrivée
         tfHeureArrivee.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null || newValue.isEmpty()) {
                 tfHeureArrivee.setStyle("-fx-border-color: #e0e7ed; -fx-border-width: 2px;");
                 return;
             }
-
-            // Formatage automatique : ajoute ":" après 2 chiffres
             if (newValue.length() == 2 && !newValue.contains(":") && oldValue.length() < 2) {
                 tfHeureArrivee.setText(newValue + ":");
                 tfHeureArrivee.positionCaret(3);
             }
-
-            // Validation visuelle
             if (newValue.matches(pattern)) {
                 tfHeureArrivee.setStyle("-fx-border-color: #27ae60; -fx-border-width: 2px;");
             } else {
@@ -152,56 +271,39 @@ public class AgentController {
         });
     }
 
-    // ===== NOUVELLE MÉTHODE : VALIDATION APPROFONDIE DES HEURES =====
     private boolean validerHeuresTrajet() {
         String heureDepart = tfHeureDepart.getText().trim();
         String heureArrivee = tfHeureArrivee.getText().trim();
-
-        // Vérifier le format avec une regex
         String pattern = "^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$";
 
         if (!heureDepart.matches(pattern)) {
-            showAlert("Erreur de format",
-                    "L'heure de départ doit être au format HH:MM (ex: 08:30, 14:45)",
-                    AlertType.WARNING);
+            showAlert("Erreur de format", "L'heure de départ doit être au format HH:MM", AlertType.WARNING);
             tfHeureDepart.requestFocus();
             return false;
         }
-
         if (!heureArrivee.matches(pattern)) {
-            showAlert("Erreur de format",
-                    "L'heure d'arrivée doit être au format HH:MM (ex: 08:30, 14:45)",
-                    AlertType.WARNING);
+            showAlert("Erreur de format", "L'heure d'arrivée doit être au format HH:MM", AlertType.WARNING);
             tfHeureArrivee.requestFocus();
             return false;
         }
 
-        // Vérifier que l'heure de départ est avant l'heure d'arrivée
         try {
             LocalTime depart = LocalTime.parse(heureDepart);
             LocalTime arrivee = LocalTime.parse(heureArrivee);
-
             if (depart.isAfter(arrivee)) {
-                showAlert("Erreur de logique",
-                        "L'heure de départ doit être avant l'heure d'arrivée",
-                        AlertType.WARNING);
+                showAlert("Erreur de logique", "L'heure de départ doit être avant l'heure d'arrivée", AlertType.WARNING);
                 tfHeureDepart.requestFocus();
                 return false;
             }
-
             if (depart.equals(arrivee)) {
-                showAlert("Erreur de logique",
-                        "L'heure de départ et d'arrivée ne peuvent pas être identiques",
-                        AlertType.WARNING);
+                showAlert("Erreur de logique", "Les heures ne peuvent pas être identiques", AlertType.WARNING);
                 tfHeureDepart.requestFocus();
                 return false;
             }
-
         } catch (DateTimeParseException e) {
             showAlert("Erreur", "Format d'heure invalide", AlertType.ERROR);
             return false;
         }
-
         return true;
     }
 
@@ -213,7 +315,6 @@ public class AgentController {
         colDescription.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getDescription()));
         colInformations.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getInformations()));
 
-        // Formatage du prix
         colPrix.setCellFactory(tc -> new TableCell<Ecole, Double>() {
             @Override
             protected void updateItem(Double price, boolean empty) {
@@ -222,7 +323,6 @@ public class AgentController {
             }
         });
 
-        // Bouton d'action "Programmes"
         colAction.setCellFactory(param -> new TableCell<Ecole, Void>() {
             private final Button btn = new Button("📋 Programmes");
             {
@@ -239,7 +339,6 @@ public class AgentController {
             }
         });
 
-        // Sélection dans la table
         tableEcole.getSelectionModel().selectedItemProperty().addListener((obs, old, ecole) -> {
             if (ecole != null) {
                 tfNom.setText(ecole.getNom());
@@ -247,8 +346,7 @@ public class AgentController {
                 tfPrix.setText(String.valueOf(ecole.getPrixMensuel()));
                 tfDescription.setText(ecole.getDescription());
                 tfInfos.setText(ecole.getInformations());
-
-                // Activer les onglets programmes et trajets
+                ecoleSelectionnee = ecole;
                 activerOngletsPourEcole(ecole);
             }
         });
@@ -263,7 +361,6 @@ public class AgentController {
         colProgPrix.setCellValueFactory(data -> new javafx.beans.property.SimpleObjectProperty<>(data.getValue().getPrixProgramme()));
         colProgDescription.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getDescriptionProgramme()));
 
-        // Formatage du prix
         colProgPrix.setCellFactory(tc -> new TableCell<Programme, Double>() {
             @Override
             protected void updateItem(Double price, boolean empty) {
@@ -272,7 +369,6 @@ public class AgentController {
             }
         });
 
-        // Sélection dans la table
         tableProgramme.getSelectionModel().selectedItemProperty().addListener((obs, old, prog) -> {
             if (prog != null) {
                 cbEcole.getSelectionModel().select(getEcoleById(prog.getEcoleId()));
@@ -296,7 +392,6 @@ public class AgentController {
         colTrajetPrix.setCellValueFactory(data -> new javafx.beans.property.SimpleObjectProperty<>(data.getValue().getPrixMensuel()));
         colTrajetPlaces.setCellValueFactory(data -> new javafx.beans.property.SimpleObjectProperty<>(data.getValue().getPlacesDisponibles()));
 
-        // Formatage du prix
         colTrajetPrix.setCellFactory(tc -> new TableCell<Trajet, Double>() {
             @Override
             protected void updateItem(Double price, boolean empty) {
@@ -305,7 +400,6 @@ public class AgentController {
             }
         });
 
-        // Sélection dans la table
         tableTrajets.getSelectionModel().selectedItemProperty().addListener((obs, old, trajet) -> {
             if (trajet != null) {
                 tfNomTrajet.setText(trajet.getNomTrajet());
@@ -364,7 +458,6 @@ public class AgentController {
             trajetListLabel.setManaged(hasTrajets);
             tableTrajets.setVisible(hasTrajets);
             tableTrajets.setManaged(hasTrajets);
-
         } catch (SQLException e) {
             showAlert("Erreur", "Impossible de charger les trajets: " + e.getMessage(), AlertType.ERROR);
         }
@@ -372,7 +465,6 @@ public class AgentController {
 
     // ===== CONFIGURATION DES LISTENERS =====
     private void setupListeners() {
-        // Affichage du ComboBox
         cbEcole.setCellFactory(param -> new ListCell<Ecole>() {
             @Override
             protected void updateItem(Ecole ecole, boolean empty) {
@@ -380,7 +472,6 @@ public class AgentController {
                 setText(empty || ecole == null ? null : ecole.getNom());
             }
         });
-
         cbEcole.setButtonCell(new ListCell<Ecole>() {
             @Override
             protected void updateItem(Ecole ecole, boolean empty) {
@@ -392,7 +483,7 @@ public class AgentController {
 
     // ===== ACTIVER LES ONGLETS POUR UNE ÉCOLE =====
     private void activerOngletsPourEcole(Ecole ecole) {
-        // Activer l'onglet programmes
+        // Programmes
         if (programmeMessageContainer != null && programmeFormContainer != null) {
             programmeMessageContainer.setVisible(false);
             programmeMessageContainer.setManaged(false);
@@ -400,7 +491,6 @@ public class AgentController {
             programmeFormContainer.setManaged(true);
         }
 
-        // Charger les programmes de cette école
         ObservableList<Programme> programmesEcole = FXCollections.observableArrayList();
         for (Programme p : programmeList) {
             if (p.getEcoleId() == ecole.getId()) {
@@ -417,16 +507,17 @@ public class AgentController {
             tableProgramme.setItems(programmesEcole);
         }
 
-        // Activer l'onglet trajets
+        // Trajets
         if (trajetMessageContainer != null && trajetFormContainer != null) {
             trajetMessageContainer.setVisible(false);
             trajetMessageContainer.setManaged(false);
             trajetFormContainer.setVisible(true);
             trajetFormContainer.setManaged(true);
         }
-
-        // Charger les trajets de cette école
         loadTrajetsByEcole(ecole.getId());
+
+        // Demandes - CHARGER UNIQUEMENT LES DEMANDES DE CETTE ÉCOLE
+        loadDemandesByEcole(ecole.getId());
     }
 
     // ===== UTILITAIRES =====
@@ -444,22 +535,19 @@ public class AgentController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/Programme.fxml"));
             Parent root = loader.load();
-
             ProgrammeController programmeController = loader.getController();
             programmeController.setEcoleSelectionnee(ecole);
-
             Stage stage = (Stage) tableEcole.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("Gestion des Programmes - " + ecole.getNom());
             stage.show();
-
         } catch (IOException e) {
             showAlert("Erreur", "Impossible d'ouvrir la gestion des programmes: " + e.getMessage(), AlertType.ERROR);
             e.printStackTrace();
         }
     }
 
-    // ===== VALIDATIONS ÉCOLES =====
+    // ===== VALIDATIONS =====
     private boolean validateEcoleFields() {
         if (tfNom.getText().trim().isEmpty()) {
             showAlert("Erreur", "Le nom de l'école est obligatoire", AlertType.WARNING);
@@ -474,7 +562,6 @@ public class AgentController {
         return true;
     }
 
-    // ===== VALIDATIONS PROGRAMMES =====
     private boolean validateProgrammeFields() {
         if (cbEcole.getValue() == null) {
             showAlert("Erreur", "Veuillez sélectionner une école", AlertType.WARNING);
@@ -493,7 +580,6 @@ public class AgentController {
         return true;
     }
 
-    // ===== VALIDATIONS TRAJETS (MISE À JOUR) =====
     private boolean validateTrajetFields() {
         if (tfNomTrajet.getText().trim().isEmpty()) {
             showAlert("Erreur", "Le nom du trajet est obligatoire", AlertType.WARNING);
@@ -520,8 +606,6 @@ public class AgentController {
             tfHeureArrivee.requestFocus();
             return false;
         }
-
-        // Validation approfondie des heures
         return validerHeuresTrajet();
     }
 
@@ -558,19 +642,21 @@ public class AgentController {
         tfPrixTrajet.clear();
         tfPlaces.setText("30");
         tfDescriptionTrajet.clear();
-
-        // Reset des styles
         tfHeureDepart.setStyle("-fx-border-color: #e0e7ed; -fx-border-width: 2px;");
         tfHeureArrivee.setStyle("-fx-border-color: #e0e7ed; -fx-border-width: 2px;");
-
         tableTrajets.getSelectionModel().clearSelection();
+    }
+
+    @FXML
+    private void clearDemandeFields() {
+        tfCommentaire.clear();
+        tableDemandes.getSelectionModel().clearSelection();
     }
 
     // ===== CRUD ÉCOLES =====
     @FXML
     private void ajouterEcole() {
         if (!validateEcoleFields()) return;
-
         try {
             Ecole e = new Ecole();
             e.setNom(tfNom.getText().trim());
@@ -578,7 +664,6 @@ public class AgentController {
             e.setPrixMensuel(Double.parseDouble(tfPrix.getText().trim()));
             e.setDescription(tfDescription.getText().trim());
             e.setInformations(tfInfos.getText().trim());
-
             ecoleService.insertEcole(e);
             loadEcoles();
             clearEcoleFields();
@@ -597,13 +682,10 @@ public class AgentController {
             showAlert("Info", "Sélectionnez une école à modifier", AlertType.WARNING);
             return;
         }
-
         if (!validateEcoleFields()) return;
-
         Alert confirm = new Alert(AlertType.CONFIRMATION);
         confirm.setContentText("Modifier cette école ?");
         Optional<ButtonType> result = confirm.showAndWait();
-
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
                 selected.setNom(tfNom.getText().trim());
@@ -611,7 +693,6 @@ public class AgentController {
                 selected.setPrixMensuel(Double.parseDouble(tfPrix.getText().trim()));
                 selected.setDescription(tfDescription.getText().trim());
                 selected.setInformations(tfInfos.getText().trim());
-
                 ecoleService.updateEcole(selected);
                 loadEcoles();
                 clearEcoleFields();
@@ -629,11 +710,9 @@ public class AgentController {
             showAlert("Info", "Sélectionnez une école à supprimer", AlertType.WARNING);
             return;
         }
-
         Alert confirm = new Alert(AlertType.CONFIRMATION);
         confirm.setContentText("Supprimer l'école \"" + selected.getNom() + "\" ?");
         Optional<ButtonType> result = confirm.showAndWait();
-
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
                 ecoleService.deleteEcole(selected.getId());
@@ -650,7 +729,6 @@ public class AgentController {
     @FXML
     private void ajouterProgramme() {
         if (!validateProgrammeFields()) return;
-
         try {
             Programme p = new Programme();
             p.setEcoleId(cbEcole.getValue().getId());
@@ -659,17 +737,11 @@ public class AgentController {
             p.setDuree(tfDuree.getText().trim());
             p.setPrixProgramme(Double.parseDouble(tfPrixProgramme.getText().trim()));
             p.setDescriptionProgramme(tfDescriptionProgramme.getText().trim());
-
             programmeService.insertProgramme(p);
             loadProgrammes();
             clearProgrammeFields();
-
-            // Recharger les programmes de l'école sélectionnée
             Ecole selectedEcole = tableEcole.getSelectionModel().getSelectedItem();
-            if (selectedEcole != null) {
-                activerOngletsPourEcole(selectedEcole);
-            }
-
+            if (selectedEcole != null) activerOngletsPourEcole(selectedEcole);
             showAlert("Succès", "Programme ajouté!", AlertType.INFORMATION);
         } catch (SQLException e) {
             showAlert("Erreur", "Erreur SQL: " + e.getMessage(), AlertType.ERROR);
@@ -685,13 +757,10 @@ public class AgentController {
             showAlert("Info", "Sélectionnez un programme à modifier", AlertType.WARNING);
             return;
         }
-
         if (!validateProgrammeFields()) return;
-
         Alert confirm = new Alert(AlertType.CONFIRMATION);
         confirm.setContentText("Modifier ce programme ?");
         Optional<ButtonType> result = confirm.showAndWait();
-
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
                 selected.setEcoleId(cbEcole.getValue().getId());
@@ -700,16 +769,11 @@ public class AgentController {
                 selected.setDuree(tfDuree.getText().trim());
                 selected.setPrixProgramme(Double.parseDouble(tfPrixProgramme.getText().trim()));
                 selected.setDescriptionProgramme(tfDescriptionProgramme.getText().trim());
-
                 programmeService.updateProgramme(selected);
                 loadProgrammes();
                 clearProgrammeFields();
-
                 Ecole selectedEcole = tableEcole.getSelectionModel().getSelectedItem();
-                if (selectedEcole != null) {
-                    activerOngletsPourEcole(selectedEcole);
-                }
-
+                if (selectedEcole != null) activerOngletsPourEcole(selectedEcole);
                 showAlert("Succès", "Programme modifié!", AlertType.INFORMATION);
             } catch (SQLException e) {
                 showAlert("Erreur", e.getMessage(), AlertType.ERROR);
@@ -724,22 +788,16 @@ public class AgentController {
             showAlert("Info", "Sélectionnez un programme à supprimer", AlertType.WARNING);
             return;
         }
-
         Alert confirm = new Alert(AlertType.CONFIRMATION);
         confirm.setContentText("Supprimer ce programme ?");
         Optional<ButtonType> result = confirm.showAndWait();
-
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
                 programmeService.deleteProgramme(selected);
                 loadProgrammes();
                 clearProgrammeFields();
-
                 Ecole selectedEcole = tableEcole.getSelectionModel().getSelectedItem();
-                if (selectedEcole != null) {
-                    activerOngletsPourEcole(selectedEcole);
-                }
-
+                if (selectedEcole != null) activerOngletsPourEcole(selectedEcole);
                 showAlert("Succès", "Programme supprimé!", AlertType.INFORMATION);
             } catch (SQLException e) {
                 showAlert("Erreur", e.getMessage(), AlertType.ERROR);
@@ -747,7 +805,7 @@ public class AgentController {
         }
     }
 
-    // ===== CRUD TRAJETS (AVEC VALIDATION DES HEURES) =====
+    // ===== CRUD TRAJETS =====
     @FXML
     private void ajouterTrajet() {
         Ecole selectedEcole = tableEcole.getSelectionModel().getSelectedItem();
@@ -755,9 +813,7 @@ public class AgentController {
             showAlert("Erreur", "Veuillez sélectionner une école d'abord", AlertType.WARNING);
             return;
         }
-
         if (!validateTrajetFields()) return;
-
         try {
             Trajet t = new Trajet();
             t.setEcoleId(selectedEcole.getId());
@@ -770,7 +826,6 @@ public class AgentController {
             t.setPrixMensuel(Double.parseDouble(tfPrixTrajet.getText().trim()));
             t.setPlacesDisponibles(Integer.parseInt(tfPlaces.getText().trim()));
             t.setDescription(tfDescriptionTrajet.getText().trim());
-
             trajetService.insertTrajet(t);
             loadTrajets();
             clearTrajetFields();
@@ -792,13 +847,10 @@ public class AgentController {
             showAlert("Info", "Sélectionnez un trajet à modifier", AlertType.WARNING);
             return;
         }
-
         if (!validateTrajetFields()) return;
-
         Alert confirm = new Alert(AlertType.CONFIRMATION);
         confirm.setContentText("Modifier ce trajet ?");
         Optional<ButtonType> result = confirm.showAndWait();
-
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
                 selected.setNomTrajet(tfNomTrajet.getText().trim());
@@ -810,16 +862,11 @@ public class AgentController {
                 selected.setPrixMensuel(Double.parseDouble(tfPrixTrajet.getText().trim()));
                 selected.setPlacesDisponibles(Integer.parseInt(tfPlaces.getText().trim()));
                 selected.setDescription(tfDescriptionTrajet.getText().trim());
-
                 trajetService.updateTrajet(selected);
                 loadTrajets();
                 clearTrajetFields();
-
                 Ecole selectedEcole = tableEcole.getSelectionModel().getSelectedItem();
-                if (selectedEcole != null) {
-                    loadTrajetsByEcole(selectedEcole.getId());
-                }
-
+                if (selectedEcole != null) loadTrajetsByEcole(selectedEcole.getId());
                 showAlert("Succès", "Trajet modifié!", AlertType.INFORMATION);
             } catch (SQLException e) {
                 showAlert("Erreur", e.getMessage(), AlertType.ERROR);
@@ -836,22 +883,16 @@ public class AgentController {
             showAlert("Info", "Sélectionnez un trajet à supprimer", AlertType.WARNING);
             return;
         }
-
         Alert confirm = new Alert(AlertType.CONFIRMATION);
         confirm.setContentText("Supprimer ce trajet ?");
         Optional<ButtonType> result = confirm.showAndWait();
-
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
                 trajetService.deleteTrajet(selected.getId());
                 loadTrajets();
                 clearTrajetFields();
-
                 Ecole selectedEcole = tableEcole.getSelectionModel().getSelectedItem();
-                if (selectedEcole != null) {
-                    loadTrajetsByEcole(selectedEcole.getId());
-                }
-
+                if (selectedEcole != null) loadTrajetsByEcole(selectedEcole.getId());
                 showAlert("Succès", "Trajet supprimé!", AlertType.INFORMATION);
             } catch (SQLException e) {
                 showAlert("Erreur", e.getMessage(), AlertType.ERROR);
