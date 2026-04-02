@@ -1,4 +1,4 @@
-package tn.esprit.workshop.model;
+package tn.esprit.workshop.model.amal;
 
 public class Programme {
 
@@ -22,7 +22,6 @@ public class Programme {
         this.prixProgramme = prixProgramme;
     }
 
-    // GETTERS
     public int getId() { return id; }
     public int getEcoleId() { return ecoleId; }
     public String getNomProgramme() { return nomProgramme; }
@@ -31,7 +30,6 @@ public class Programme {
     public String getDuree() { return duree; }
     public double getPrixProgramme() { return prixProgramme; }
 
-    // SETTERS
     public void setId(int id) { this.id = id; }
     public void setEcoleId(int ecoleId) { this.ecoleId = ecoleId; }
     public void setNomProgramme(String nomProgramme) { this.nomProgramme = nomProgramme; }

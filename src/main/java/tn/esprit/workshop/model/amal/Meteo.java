@@ -1,4 +1,4 @@
-package tn.esprit.workshop.model;
+package tn.esprit.workshop.model.amal;
 
 public class Meteo {
     private String ville;
@@ -11,7 +11,6 @@ public class Meteo {
 
     public Meteo() {}
 
-    // Getters et Setters
     public String getVille() { return ville; }
     public void setVille(String ville) { this.ville = ville; }
 
@@ -33,8 +32,8 @@ public class Meteo {
     public double getVent() { return vent; }
     public void setVent(double vent) { this.vent = vent; }
 
-    // Obtenir l'icône en fonction de la description
     public String getEmoji() {
+        if (description == null) return "🌡️";
         if (description.contains("pluie")) return "🌧️";
         if (description.contains("nuage")) return "☁️";
         if (description.contains("soleil") || description.contains("clair")) return "☀️";

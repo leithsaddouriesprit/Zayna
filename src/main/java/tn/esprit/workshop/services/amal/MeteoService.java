@@ -1,11 +1,10 @@
-package tn.esprit.workshop.services;
+package tn.esprit.workshop.services.amal;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import tn.esprit.workshop.model.Meteo;
+import tn.esprit.workshop.model.amal.Meteo;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -28,19 +27,9 @@ public class MeteoService {
         this.gson = new Gson();
     }
 
-    /**
-     * Récupère la météo pour une ville donnée
-     * @param ville Nom de la ville (ex: "Tunis", "La marsa")
-     * @return Objet Meteo avec les informations
-     */
     public Meteo getMeteo(String ville) throws IOException, InterruptedException {
-        // 🔧 CORRECTION : Encoder la ville pour gérer les espaces
-        String villeEncoded = URLEncoder.encode(ville, StandardCharsets.UTF_8.toString());
-
-        // Construire l'URL avec la ville encodée
+        String villeEncoded = URLEncoder.encode(ville, StandardCharsets.UTF_8);
         String url = BASE_URL + "?q=" + villeEncoded + "&units=metric&lang=fr&appid=" + API_KEY;
-
-        System.out.println("📡 Appel API météo: " + url);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
@@ -50,13 +39,10 @@ public class MeteoService {
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-        System.out.println("Réponse reçue - Code: " + response.statusCode());
-
         if (response.statusCode() == 200) {
             return parseReponse(response.body(), ville);
-        } else {
-            throw new IOException("Erreur API météo: " + response.statusCode() + " - " + response.body());
         }
+        throw new IOException("Erreur API météo: " + response.statusCode() + " - " + response.body());
     }
 
     private Meteo parseReponse(String json, String ville) {
@@ -75,18 +61,6 @@ public class MeteoService {
         meteo.setHumidite(main.get("humidity").getAsInt());
         meteo.setVent(wind.get("speed").getAsDouble());
 
-        System.out.println("✅ Météo récupérée: " + meteo.getTemperature() + "°C - " + meteo.getDescription());
-
         return meteo;
-    }
-
-    public boolean testerConnexion() {
-        try {
-            getMeteo("Tunis");
-            return true;
-        } catch (Exception e) {
-            System.err.println("❌ API météo inaccessible: " + e.getMessage());
-            return false;
-        }
     }
 }

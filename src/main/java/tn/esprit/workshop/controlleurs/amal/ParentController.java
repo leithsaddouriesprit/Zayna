@@ -1,4 +1,4 @@
-package tn.esprit.workshop.controlleurs;
+package tn.esprit.workshop.controlleurs.amal;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -8,22 +8,17 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import tn.esprit.workshop.model.Ecole;
-import tn.esprit.workshop.model.Programme;
-import tn.esprit.workshop.model.Trajet;
-import tn.esprit.workshop.model.JourFerieApi;
-import tn.esprit.workshop.model.Meteo;
-import tn.esprit.workshop.model.DemandeInscription;
-import tn.esprit.workshop.services.EcoleService;
-import tn.esprit.workshop.services.ProgrammeService;
-import tn.esprit.workshop.services.TrajetService;
-import tn.esprit.workshop.services.JourFerieApiService;
-import tn.esprit.workshop.services.MeteoService;
-import tn.esprit.workshop.services.DemandeService;
+import tn.esprit.workshop.model.amal.DemandeInscription;
+import tn.esprit.workshop.model.amal.JourFerieApi;
+import tn.esprit.workshop.model.amal.Meteo;
+import tn.esprit.workshop.model.amal.Programme;
+import tn.esprit.workshop.services.amal.DemandeService;
+import tn.esprit.workshop.services.amal.JourFerieApiService;
+import tn.esprit.workshop.services.amal.MeteoService;
+import tn.esprit.workshop.services.amal.ProgrammeService;
 
 import java.sql.SQLException;
 import java.time.LocalDate;

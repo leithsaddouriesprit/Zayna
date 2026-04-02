@@ -1,4 +1,4 @@
-package tn.esprit.workshop.model;
+package tn.esprit.workshop.model.amal;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,14 +16,12 @@ public class DemandeInscription {
     private int ecoleId;
     private int trajetId;
     private LocalDateTime dateDemande;
-    private String statut; // EN_ATTENTE, ACCEPTEE, REFUSEE
+    private String statut;
     private String commentaireAgent;
     private LocalDateTime dateTraitement;
 
-    // Constructeurs
     public DemandeInscription() {}
 
-    // Getters et Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -68,12 +66,4 @@ public class DemandeInscription {
 
     public LocalDateTime getDateTraitement() { return dateTraitement; }
     public void setDateTraitement(LocalDateTime dateTraitement) { this.dateTraitement = dateTraitement; }
-
-    public String getParentNomComplet() {
-        return parentPrenom + " " + parentNom;
-    }
-
-    public String getEnfantNomComplet() {
-        return enfantPrenom + " " + enfantNom;
-    }
 }

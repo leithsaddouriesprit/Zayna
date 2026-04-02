@@ -6,7 +6,7 @@
 <?import javafx.scene.image.Image?>
 
 <VBox xmlns="http://javafx.com/javafx/20" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="tn.esprit.workshop.controlleurs.ProgrammeController"
+      fx:controller="tn.esprit.workshop.controlleurs.amal.ProgrammeController"
       spacing="20" alignment="TOP_CENTER"
       style="
           -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #667eea 0%, #764ba2 50%, #6b8cff 100%);
@@ -73,36 +73,6 @@
         .close-button:pressed {
         -fx-scale-x: 0.95;
         -fx-scale-y: 0.95;
-        }
-
-        /* ===== SÉLECTION ÉCOLE ===== */
-        .ecole-container {
-        -fx-padding: 5px 0 10px 0;
-        }
-
-        .custom-combo {
-        -fx-background-color: white;
-        -fx-border-color: #e2e8f0;
-        -fx-border-width: 2px;
-        -fx-border-radius: 15px;
-        -fx-background-radius: 15px;
-        -fx-padding: 8px 15px;
-        -fx-font-size: 14px;
-        -fx-min-width: 320px;
-        -fx-max-width: 320px;
-        -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 5, 0, 0, 2);
-        }
-
-        .custom-combo:hover {
-        -fx-border-color: #667eea;
-        -fx-effect: dropshadow(gaussian, rgba(102, 126, 234, 0.3), 15, 0, 0, 5);
-        -fx-scale-x: 1.02;
-        -fx-scale-y: 1.02;
-        }
-
-        .custom-combo:focused {
-        -fx-border-color: #764ba2;
-        -fx-effect: dropshadow(gaussian, rgba(118, 75, 162, 0.4), 20, 0, 0, 5);
         }
 
         /* ===== CHAMPS DE FORMULAIRE ===== */
@@ -305,27 +275,6 @@
         -fx-font-size: 13px;
         }
 
-        /* ===== COMPATIBILITÉ COMBOBOX ===== */
-        .combo-box .list-cell {
-        -fx-padding: 5px 10px;
-        }
-
-        .combo-box-popup .list-view {
-        -fx-background-color: white;
-        -fx-border-color: #e2e8f0;
-        -fx-border-radius: 10px;
-        -fx-background-radius: 10px;
-        -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0, 0, 3);
-        }
-
-        .combo-box-popup .list-cell:hover {
-        -fx-background-color: #e6fffa;
-        }
-
-        .combo-box-popup .list-cell:filled:selected {
-        -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #667eea 0%, #764ba2 100%);
-        -fx-text-fill: white;
-        }
     </style>
 
     <!-- Conteneur principal -->
@@ -350,14 +299,6 @@
             </Button>
         </HBox>
 
-        <!-- Choix de l'école -->
-        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="ecole-container">
-            <ImageView fitHeight="24" fitWidth="24">
-                <Image url="https://img.icons8.com/color/48/school-building.png"/>
-            </ImageView>
-            <ComboBox fx:id="cbEcole" promptText="Sélectionnez une école" prefWidth="300" styleClass="custom-combo"/>
-        </HBox>
-
         <!-- Grille des champs -->
         <GridPane hgap="20" vgap="12" alignment="CENTER" styleClass="form-grid">
             <!-- Nom -->
@@ -377,19 +318,11 @@
             </HBox>
 
             <!-- Durée -->
-            <HBox spacing="10" GridPane.rowIndex="1" GridPane.columnIndex="0" alignment="CENTER_LEFT" styleClass="field-container">
+            <HBox spacing="10" GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.columnSpan="2" alignment="CENTER_LEFT" styleClass="field-container">
                 <ImageView fitHeight="20" fitWidth="20">
                     <Image url="https://img.icons8.com/color/48/clock.png"/>
                 </ImageView>
                 <TextField fx:id="tfDuree" promptText="Durée (en mois)" styleClass="custom-field"/>
-            </HBox>
-
-            <!-- Prix -->
-            <HBox spacing="10" GridPane.rowIndex="1" GridPane.columnIndex="1" alignment="CENTER_LEFT" styleClass="field-container">
-                <ImageView fitHeight="20" fitWidth="20">
-                    <Image url="https://img.icons8.com/color/48/price-tag.png"/>
-                </ImageView>
-                <TextField fx:id="tfPrix" promptText="Prix (DT)" styleClass="custom-field"/>
             </HBox>
 
             <!-- Description -->
@@ -440,28 +373,19 @@
         <!-- TableView -->
         <TableView fx:id="tableProgramme" prefHeight="280" styleClass="custom-table">
             <columns>
-                <TableColumn fx:id="colEcole" text="École" prefWidth="150"/>
-                <TableColumn fx:id="colNom" text="Nom du Programme" prefWidth="180"/>
-                <TableColumn fx:id="colNiveau" text="Niveau" prefWidth="110"/>
-                <TableColumn fx:id="colDuree" text="Durée" prefWidth="110"/>
-                <TableColumn fx:id="colPrix" text="Prix (DT)" prefWidth="110"/>
+                <TableColumn fx:id="colNom" text="Nom du Programme" prefWidth="220"/>
+                <TableColumn fx:id="colNiveau" text="Niveau" prefWidth="120"/>
+                <TableColumn fx:id="colDuree" text="Durée" prefWidth="120"/>
             </columns>
         </TableView>
 
         <!-- Pied de page avec statistiques -->
-        <HBox styleClass="footer" alignment="CENTER_RIGHT" spacing="20">
+        <HBox styleClass="footer" alignment="CENTER" spacing="20">
             <HBox spacing="8" alignment="CENTER">
                 <ImageView fitHeight="16" fitWidth="16">
                     <Image url="https://img.icons8.com/color/48/statistics.png"/>
                 </ImageView>
                 <Label fx:id="lblTotalProgrammes" text="Total programmes: 0" styleClass="stat-text"/>
-            </HBox>
-
-            <HBox spacing="8" alignment="CENTER">
-                <ImageView fitHeight="16" fitWidth="16">
-                    <Image url="https://img.icons8.com/color/48/money-bag.png"/>
-                </ImageView>
-                <Label fx:id="lblPrixMoyen" text="Prix moyen: 0 DT" styleClass="stat-text"/>
             </HBox>
         </HBox>
     </VBox>

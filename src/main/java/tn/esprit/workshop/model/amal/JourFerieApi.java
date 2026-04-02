@@ -1,6 +1,5 @@
-package tn.esprit.workshop.model;
+package tn.esprit.workshop.model.amal;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public class JourFerieApi {
@@ -15,11 +14,9 @@ public class JourFerieApi {
     private Integer launchYear;
     private List<String> types;
 
-    // Constructeur par défaut
     public JourFerieApi() {
     }
 
-    // Getters et Setters
     public String getDate() {
         return date;
     }
@@ -90,22 +87,5 @@ public class JourFerieApi {
 
     public void setTypes(List<String> types) {
         this.types = types;
-    }
-
-    // Méthodes utilitaires
-    public LocalDate getDateAsLocalDate() {
-        return LocalDate.parse(this.date);
-    }
-
-    @Override
-    public String toString() {
-        return "JourFerieApi{" +
-                "date='" + date + '\'' +
-                ", localName='" + localName + '\'' +
-                ", name='" + name + '\'' +
-                ", countryCode='" + countryCode + '\'' +
-                ", fixed=" + fixed +
-                ", global=" + global +
-                '}';
     }
 }
