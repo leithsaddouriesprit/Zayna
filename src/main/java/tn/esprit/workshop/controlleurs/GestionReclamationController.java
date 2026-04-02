@@ -70,7 +70,8 @@ public class GestionReclamationController implements Initializable {
     private Label traiteesCount;
     @FXML
     private Label detailUserTypeLabel;
-
+    @FXML
+    private ChoiceBox<String> prioriteChoice;
     // Nouveaux champs FXML
     @FXML
     private ChoiceBox<Chauffeur> chauffeurChoice;
@@ -125,6 +126,9 @@ public class GestionReclamationController implements Initializable {
     @FXML
     private TableColumn<Reclamation, Timestamp> colDate;
     @FXML
+    private TableColumn<Reclamation, String> colPriorite;
+
+    @FXML
     private Button traduireReponseButton;
     @FXML
     private Button envoyerButton;
@@ -154,7 +158,8 @@ public class GestionReclamationController implements Initializable {
         // Initialiser les choix pour la cantine
         cantineTypeChoice.getItems().addAll("Qualité des repas", "Quantité insuffisante",
                 "Hygiène", "Service", "Autre");
-
+        prioriteChoice.getItems().addAll("Basse", "Moyenne", "Haute", "Urgente");
+        prioriteChoice.setValue("Moyenne"); // Valeur par défaut
         // Cacher tous les panels au départ
         cacherTousLesPanels();
 
@@ -285,7 +290,34 @@ public class GestionReclamationController implements Initializable {
     private void configurerColonnes() {
         colType.setCellValueFactory(new PropertyValueFactory<>("type"));
         colDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
-
+        colPriorite.setCellValueFactory(new PropertyValueFactory<>("priorite"));
+        colPriorite.setCellFactory(column -> new TableCell<Reclamation, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item);
+                    // Couleurs selon la priorité
+                    switch (item) {
+                        case "Basse":
+                            setStyle("-fx-text-fill: #22c55e; -fx-font-weight: bold;");
+                            break;
+                        case "Moyenne":
+                            setStyle("-fx-text-fill: #f59e0b; -fx-font-weight: bold;");
+                            break;
+                        case "Haute":
+                            setStyle("-fx-text-fill: #f97316; -fx-font-weight: bold;");
+                            break;
+                        case "Urgente":
+                            setStyle("-fx-text-fill: #ef4444; -fx-font-weight: bold; -fx-font-size: 13px;");
+                            break;
+                    }
+                }
+            }
+        });
         colDetails.setCellValueFactory(cellData -> {
             Reclamation r = cellData.getValue();
             String details = "";
@@ -458,7 +490,9 @@ public class GestionReclamationController implements Initializable {
     private void remplirFormulaireAvecReclamation(Reclamation r) {
         typeChoice.setValue(r.getType());
         messageField.setText(r.getDescription());
-
+        if (prioriteChoice != null && r.getPriorite() != null) {
+            prioriteChoice.setValue(r.getPriorite());
+        }
         // ✅ Remplir les ChoiceBox avec les valeurs de la réclamation
         if (chauffeurChoice != null && r.getIdChauffeur() > 0) {
             try {
@@ -516,6 +550,10 @@ public class GestionReclamationController implements Initializable {
                             "Seuls les parents, chauffeurs et maîtresses peuvent créer des réclamations.",
                     Alert.AlertType.WARNING);
             return;
+        }
+        String priorite = prioriteChoice.getValue();
+        if (priorite == null) {
+            priorite = "Moyenne"; // Valeur par défaut
         }
 
         String type = typeChoice.getValue();
@@ -716,6 +754,7 @@ public class GestionReclamationController implements Initializable {
                         type,
                         message.trim(),
                         "EN_ATTENTE",
+                        priorite,
                         chauffeurNom,
                         chauffeurPrenom,
                         busMatricule,
@@ -782,7 +821,7 @@ public class GestionReclamationController implements Initializable {
             try {
                 selected.setType(type);
                 selected.setDescription(message.trim());
-
+                selected.setPriorite(prioriteChoice.getValue());
                 // ✅ Mettre à jour les champs spécifiques (ceux qui existent)
                 // Pour Chauffeur
                 if (type.equals("Chauffeur") && chauffeurChoice != null && chauffeurChoice.getValue() != null) {

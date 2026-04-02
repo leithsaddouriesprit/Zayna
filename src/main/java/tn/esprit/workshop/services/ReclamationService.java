@@ -17,9 +17,9 @@ public class ReclamationService {
 
     // CREATE
     public void insertOne(Reclamation r) throws SQLException {
-        String sql = "INSERT INTO reclamation (user_id, type, description, statut, " +
+        String sql = "INSERT INTO reclamation (user_id, type, description, statut, priorite " +
                 "chauffeur_nom, chauffeur_prenom, bus_matricule, cantine_type, ecole_nom, autre_precision) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
         try (Connection cnx = getConnection();
              PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setInt(1, r.getUserId());
@@ -32,6 +32,7 @@ public class ReclamationService {
             ps.setString(8, r.getCantineType());
             ps.setString(9, r.getEcoleNom());
             ps.setString(10, r.getAutrePrecision());
+
             ps.executeUpdate();
         }
     }
@@ -83,7 +84,7 @@ public class ReclamationService {
 
     // UPDATE
     public void updateOne(Reclamation r) throws SQLException {
-        String sql = "UPDATE reclamation SET type = ?, description = ?, statut = ?, " +
+        String sql = "UPDATE reclamation SET type = ?, description = ?, statut = ?, priorite = ?," +
                 "chauffeur_nom = ?, chauffeur_prenom = ?, bus_matricule = ?, " +
                 "cantine_type = ?, ecole_nom = ?, autre_precision = ? WHERE id = ?";
         try (Connection cnx = getConnection();
@@ -91,13 +92,14 @@ public class ReclamationService {
             ps.setString(1, r.getType());
             ps.setString(2, r.getDescription());
             ps.setString(3, r.getStatut());
-            ps.setString(4, r.getChauffeurNom());
-            ps.setString(5, r.getChauffeurPrenom());
-            ps.setString(6, r.getBusMatricule());
-            ps.setString(7, r.getCantineType());
-            ps.setString(8, r.getEcoleNom());
-            ps.setString(9, r.getAutrePrecision());
-            ps.setInt(10, r.getId());
+            ps.setString(4, r.getPriorite());
+            ps.setString(5, r.getChauffeurNom());
+            ps.setString(6, r.getChauffeurPrenom());
+            ps.setString(7, r.getBusMatricule());
+            ps.setString(8, r.getCantineType());
+            ps.setString(9, r.getEcoleNom());
+            ps.setString(10, r.getAutrePrecision());
+            ps.setInt(11, r.getId());
 
             int rowsAffected = ps.executeUpdate();
             System.out.println("Lignes mises à jour: " + rowsAffected);
@@ -153,16 +155,16 @@ public class ReclamationService {
     }
 
     // Version avec 10 paramètres (pour les appels existants)
-    public int ajouterReclamationEtRetournerId(int userId, String type, String description, String statut,
+    public int ajouterReclamationEtRetournerId(int userId, String type, String description, String statut,String priorite,
                                                String chauffeurNom, String chauffeurPrenom, String busMatricule,
                                                String cantineType, String ecoleNom, String autrePrecision) throws SQLException {
-        return ajouterReclamationEtRetournerId(userId, type, description, statut,
+        return ajouterReclamationEtRetournerId(userId, type, description, statut, priorite,
                 chauffeurNom, chauffeurPrenom, busMatricule, cantineType, ecoleNom, autrePrecision,
                 0, 0, 0, 0, 0);
     }
 
     // Version avec 15 paramètres (complète)
-    public int ajouterReclamationEtRetournerId(int userId, String type, String description, String statut,
+    public int ajouterReclamationEtRetournerId(int userId, String type, String description, String statut, String priorite,
                                                String chauffeurNom, String chauffeurPrenom, String busMatricule,
                                                String cantineType, String ecoleNom, String autrePrecision,
                                                int idChauffeur, int idBus, int idEcole, int idMaitresse, int idParent) throws SQLException {
@@ -174,10 +176,10 @@ public class ReclamationService {
         Integer idMaitresseVal = idMaitresse == 0 ? null : idMaitresse;
         Integer idParentVal = idParent == 0 ? null : idParent;
 
-        String sql = "INSERT INTO reclamation (user_id, type, description, statut, " +
+        String sql = "INSERT INTO reclamation (user_id, type, description, statut, priorite," +
                 "chauffeur_nom, chauffeur_prenom, bus_matricule, cantine_type, ecole_nom, autre_precision, " +
                 "id_chauffeur, id_bus, id_ecole, id_maitresse, id_parent) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
 
         try (Connection cnx = getConnection();
              PreparedStatement ps = cnx.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -186,42 +188,43 @@ public class ReclamationService {
             ps.setString(2, type);
             ps.setString(3, description);
             ps.setString(4, statut);
-            ps.setString(5, chauffeurNom);
-            ps.setString(6, chauffeurPrenom);
-            ps.setString(7, busMatricule);
-            ps.setString(8, cantineType);
-            ps.setString(9, ecoleNom);
-            ps.setString(10, autrePrecision);
+            ps.setString(5, priorite);
+            ps.setString(6, chauffeurNom);
+            ps.setString(7, chauffeurPrenom);
+            ps.setString(8, busMatricule);
+            ps.setString(9, cantineType);
+            ps.setString(10, ecoleNom);
+            ps.setString(11, autrePrecision);
 
             // Gérer les nulls pour les clés étrangères
             if (idChauffeurVal == null) {
-                ps.setNull(11, Types.INTEGER);
+                ps.setNull(12, Types.INTEGER);
             } else {
-                ps.setInt(11, idChauffeurVal);
+                ps.setInt(12, idChauffeurVal);
             }
 
             if (idBusVal == null) {
-                ps.setNull(12, Types.INTEGER);
+                ps.setNull(13, Types.INTEGER);
             } else {
-                ps.setInt(12, idBusVal);
+                ps.setInt(13, idBusVal);
             }
 
             if (idEcoleVal == null) {
-                ps.setNull(13, Types.INTEGER);
+                ps.setNull(14, Types.INTEGER);
             } else {
-                ps.setInt(13, idEcoleVal);
+                ps.setInt(14, idEcoleVal);
             }
 
             if (idMaitresseVal == null) {
-                ps.setNull(14, Types.INTEGER);
+                ps.setNull(15, Types.INTEGER);
             } else {
-                ps.setInt(14, idMaitresseVal);
+                ps.setInt(15, idMaitresseVal);
             }
 
             if (idParentVal == null) {
-                ps.setNull(15, Types.INTEGER);
+                ps.setNull(16, Types.INTEGER);
             } else {
-                ps.setInt(15, idParentVal);
+                ps.setInt(16, idParentVal);
             }
 
             ps.executeUpdate();
@@ -244,6 +247,7 @@ public class ReclamationService {
         r.setDescription(rs.getString("description"));
         r.setDateReclamation(rs.getTimestamp("date_reclamation"));
         r.setStatut(rs.getString("statut"));
+        r.setPriorite(rs.getString("priorite"));
 
         // Champs texte
         r.setChauffeurNom(rs.getString("chauffeur_nom"));

@@ -87,15 +87,21 @@
                             <ColumnConstraints hgrow="ALWAYS"/>
                         </columnConstraints>
 
+                        <!-- Type - ligne 0 -->
                         <Label text="Type" styleClass="section-title" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
                         <ChoiceBox fx:id="typeChoice" prefWidth="280" styleClass="combo-box" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
+                        <!-- Message - ligne 1 -->
                         <Label text="Message" styleClass="section-title" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
                         <TextArea fx:id="messageField" prefRowCount="4" wrapText="true" promptText="Décrivez votre réclamation..." styleClass="text-area" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-                        <!-- Détails dynamiques -->
-                        <Label text="Détails" styleClass="section-title" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                        <StackPane GridPane.rowIndex="2" GridPane.columnIndex="1" prefHeight="200" styleClass="surface-panel-soft" style="-fx-padding: 12;">
+                        <!-- Priorité - ligne 2 -->
+                        <Label text="Priorité" styleClass="section-title" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                        <ChoiceBox fx:id="prioriteChoice" prefWidth="200" styleClass="combo-box" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                        <!-- Détails - ligne 3 -->
+                        <Label text="Détails" styleClass="section-title" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                        <StackPane GridPane.rowIndex="3" GridPane.columnIndex="1" prefHeight="200" styleClass="surface-panel-soft" style="-fx-padding: 12;">
 
                             <!-- Panel Chauffeur -->
                             <VBox fx:id="panelChauffeur" spacing="10" managed="false" visible="false">
@@ -133,9 +139,9 @@
                             </VBox>
                         </StackPane>
 
-                        <!-- Traduction -->
-                        <Label text="Traduction" styleClass="section-title" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                        <VBox GridPane.rowIndex="3" GridPane.columnIndex="1" spacing="8">
+                        <!-- Traduction - ligne 4 -->
+                        <Label text="Traduction" styleClass="section-title" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                        <VBox GridPane.rowIndex="4" GridPane.columnIndex="1" spacing="8">
                             <HBox spacing="12" alignment="CENTER_LEFT">
                                 <ChoiceBox fx:id="langueCibleChoice" prefWidth="160" styleClass="combo-box"/>
                                 <Label text="Langue cible" style="-fx-text-fill: #FEC111; -fx-font-size: 11px; -fx-font-weight: bold;"/>
@@ -180,9 +186,10 @@
                                styleClass="reclamation-table">
                         <columns>
                             <TableColumn fx:id="colType" text="Type" prefWidth="100"/>
-                            <TableColumn fx:id="colDescription" text="Message" prefWidth="350"/>
-                            <TableColumn fx:id="colDetails" text="Détails" prefWidth="180"/>
-                            <TableColumn fx:id="colDate" text="Date" prefWidth="150"/>
+                            <TableColumn fx:id="colPriorite" text="Priorité" prefWidth="80"/>
+                            <TableColumn fx:id="colDescription" text="Message" prefWidth="280"/>
+                            <TableColumn fx:id="colDetails" text="Détails" prefWidth="150"/>
+                            <TableColumn fx:id="colDate" text="Date" prefWidth="140"/>
                             <TableColumn fx:id="colStatut" text="Statut" prefWidth="100"/>
                         </columns>
                         <columnResizePolicy>
