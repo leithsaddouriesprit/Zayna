@@ -800,16 +800,19 @@ public class UserValidation {
             }
         }
 
-        // Validation du nom de l'école (obligatoire ; l'école est créée à l'inscription)
         if (isNew && (responsable.getEcole() == null || responsable.getEcole().trim().isEmpty())) {
-            errors.add("Le nom de l'école est obligatoire");
-        } else if (responsable.getEcole() != null && !responsable.getEcole().trim().isEmpty()) {
+            errors.add("Le nom de votre établissement est obligatoire");
+        }
+        if (isNew && (responsable.getAdresseEcole() == null || responsable.getAdresseEcole().trim().isEmpty())) {
+            errors.add("L'adresse de l'établissement est obligatoire");
+        }
+        if (responsable.getEcole() != null && !responsable.getEcole().trim().isEmpty()) {
             String ecole = responsable.getEcole().trim();
             if (ecole.length() < 2) {
                 errors.add("Le nom de l'école doit contenir au moins 2 caractères");
             }
-            if (ecole.length() > 200) {
-                errors.add("Le nom de l'école ne doit pas dépasser 200 caractères");
+            if (ecole.length() > 150) {
+                errors.add("Le nom de l'école ne doit pas dépasser 150 caractères");
             }
         }
 

@@ -5,9 +5,9 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.stage.Stage;
 import tn.esprit.workshop.model.amal.Programme;
 import tn.esprit.workshop.services.amal.ProgrammeService;
+import tn.esprit.workshop.utilis.AppSession;
 
 import java.sql.SQLException;
 import java.util.Optional;
@@ -25,15 +25,20 @@ public class ProgrammeController {
     @FXML private TableColumn<Programme, String> colDuree;
 
     @FXML private Label lblTotalProgrammes;
+    @FXML private Label lblEcoleConnectee;
 
     private final ProgrammeService programmeService = new ProgrammeService();
+    private int ecoleId;
 
     private ObservableList<Programme> programmeList = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
+        Integer sessionEcoleId = AppSession.getInstance().getEcoleId();
+        ecoleId = sessionEcoleId != null ? sessionEcoleId : 0;
         setupTableColumns();
         setupTableSelectionListener();
+        updateConnectedSchoolLabel();
         loadTable();
         setupNumericValidation();
     }
@@ -57,7 +62,13 @@ public class ProgrammeController {
 
     private void loadTable() {
         try {
-            programmeList.setAll(programmeService.selectAllProgrammes());
+            if (ecoleId <= 0) {
+                programmeList.clear();
+                tableProgramme.setItems(programmeList);
+                updateStatistics();
+                return;
+            }
+            programmeList.setAll(programmeService.selectProgrammesByEcoleId(ecoleId));
             tableProgramme.setItems(programmeList);
             updateStatistics();
         } catch (SQLException e) {
@@ -67,6 +78,30 @@ public class ProgrammeController {
 
     private void updateStatistics() {
         lblTotalProgrammes.setText("Total programmes: " + programmeList.size());
+    }
+
+    private void updateConnectedSchoolLabel() {
+        if (lblEcoleConnectee == null) return;
+        if (ecoleId <= 0) {
+            lblEcoleConnectee.setText("Aucune école associée à cette session. Connectez-vous avec un compte agent.");
+            lblEcoleConnectee.setVisible(true);
+            lblEcoleConnectee.setManaged(true);
+            return;
+        }
+        try {
+            String nomEcole = programmeService.getEcoleNameById(ecoleId);
+            if (nomEcole != null && !nomEcole.isBlank()) {
+                lblEcoleConnectee.setText("Établissement : " + nomEcole);
+            } else {
+                lblEcoleConnectee.setText("Établissement chargé.");
+            }
+            lblEcoleConnectee.setVisible(true);
+            lblEcoleConnectee.setManaged(true);
+        } catch (SQLException e) {
+            lblEcoleConnectee.setText("Impossible de charger le nom de l'établissement.");
+            lblEcoleConnectee.setVisible(true);
+            lblEcoleConnectee.setManaged(true);
+        }
     }
 
     private void setupNumericValidation() {
@@ -122,6 +157,7 @@ public class ProgrammeController {
             p.setNiveau(tfNiveau.getText().trim());
             p.setDuree(tfDuree.getText().trim());
             p.setDescriptionProgramme(tfDescription.getText().trim());
+            p.setEcoleId(ecoleId);
 
             programmeService.insertProgramme(p);
             loadTable();
@@ -130,7 +166,6 @@ public class ProgrammeController {
 
         } catch (SQLException e) {
             showAlert("Erreur", "Erreur lors de l'ajout : " + e.getMessage(), AlertType.ERROR);
-            e.printStackTrace();
         }
     }
 
@@ -192,12 +227,6 @@ public class ProgrammeController {
                 showAlert("Erreur", "Erreur lors de la suppression : " + e.getMessage(), AlertType.ERROR);
             }
         }
-    }
-
-    @FXML
-    private void fermerFenetre() {
-        Stage stage = (Stage) tableProgramme.getScene().getWindow();
-        stage.close();
     }
 
     private void showAlert(String title, String message, AlertType type) {

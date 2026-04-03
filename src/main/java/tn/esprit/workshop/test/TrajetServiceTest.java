@@ -40,7 +40,7 @@ public class TrajetServiceTest {
             t.setIdBus(lastBus.getBusId()); // 🔴 clé étrangère valide
             t.setIdEcole(1);
             t.setHeureDepart(LocalTime.of(7, 30));
-            t.setActif(true);
+            t.setPrix(120.0);
             t.setStatut("PLANIFIE");
 
             trajetService.insertOne(t);

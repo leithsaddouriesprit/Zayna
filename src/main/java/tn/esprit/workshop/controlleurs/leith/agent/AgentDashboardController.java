@@ -1,9 +1,12 @@
 package tn.esprit.workshop.controlleurs.leith.agent;
 
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import tn.esprit.workshop.controlleurs.leith.SceneNavigator;
+import tn.esprit.workshop.model.leith.Trajet;
 import tn.esprit.workshop.services.leith.ArretService;
 import tn.esprit.workshop.services.leith.BusService;
 import tn.esprit.workshop.services.leith.CandidatureEnfantService;
@@ -48,76 +51,103 @@ public class AgentDashboardController {
             return;
         }
 
+        lblEcole.setText("Chargement…");
+        setStatsToZero();
+        lblAlertes.setText("Chargement…");
+        lblResume.setText("");
+
+        Task<DashboardSnapshot> task = new Task<>() {
+            @Override
+            protected DashboardSnapshot call() {
+                return buildSnapshot(idEcole);
+            }
+        };
+        task.setOnSucceeded(e -> applySnapshot(task.getValue()));
+        task.setOnFailed(e -> Platform.runLater(() -> {
+            lblEcole.setText("Erreur de chargement");
+            lblAlertes.setText("Impossible de charger les indicateurs.");
+            lblResume.setText("");
+            setStatsToZero();
+        }));
+        Thread th = new Thread(task, "agent-dashboard-load");
+        th.setDaemon(true);
+        th.start();
+    }
+
+    private record DashboardSnapshot(
+            String ecoleLabel,
+            String nbChauffeur,
+            String nbEnfant,
+            String nbBus,
+            String nbTrajets,
+            String nbEnfantsTransportes,
+            String nbMaitresses,
+            String alertes,
+            String resume
+    ) {}
+
+    private DashboardSnapshot buildSnapshot(int idEcole) {
+        String ecoleLabel = "Établissement";
         try {
             EcoleService ecoleService = new EcoleService();
             var ecole = ecoleService.getById(idEcole);
-            lblEcole.setText(ecole != null && ecole.getNomEcole() != null ? ecole.getNomEcole() : "École id=" + idEcole);
-        } catch (SQLException e) {
-            lblEcole.setText("École id=" + idEcole);
+            if (ecole != null && ecole.getNomEcole() != null && !ecole.getNomEcole().isBlank()) {
+                ecoleLabel = ecole.getNomEcole();
+            }
+        } catch (SQLException ignored) {
+            // garder libellé par défaut
         }
 
-        loadStats(idEcole);
-        loadAlertes(idEcole);
-        loadResume(idEcole);
-    }
-
-    private void setStatsToZero() {
-        if (lblCandidaturesChauffeur != null) lblCandidaturesChauffeur.setText("0");
-        if (lblCandidaturesEnfant != null) lblCandidaturesEnfant.setText("0");
-        if (lblBus != null) lblBus.setText("0");
-        if (lblTrajets != null) lblTrajets.setText("0");
-        if (lblEnfantsTransportes != null) lblEnfantsTransportes.setText("0");
-        if (lblMaitressesEcole != null) lblMaitressesEcole.setText("0");
-    }
-
-    private void loadStats(int idEcole) {
+        String nbCh = "0", nbE = "0", nbB = "0", nbT = "0", nbEnf = "0", nbM = "0";
         try {
             CandidatureService candidatureService = new CandidatureService();
-            int nbChauffeur = candidatureService.findAllEnVoyeeByEcoleId(idEcole).size();
-            lblCandidaturesChauffeur.setText(String.valueOf(nbChauffeur));
-        } catch (SQLException e) {
-            lblCandidaturesChauffeur.setText("0");
-        }
+            nbCh = String.valueOf(candidatureService.findAllEnVoyeeByEcoleId(idEcole).size());
+        } catch (SQLException ignored) {}
         try {
             CandidatureEnfantService ceService = new CandidatureEnfantService();
-            int nbEnfant = ceService.findEnVoyeeByEcoleId(idEcole).size();
-            lblCandidaturesEnfant.setText(String.valueOf(nbEnfant));
-        } catch (SQLException e) {
-            lblCandidaturesEnfant.setText("0");
-        }
+            nbE = String.valueOf(ceService.findEnVoyeeByEcoleId(idEcole).size());
+        } catch (SQLException ignored) {}
         try {
             BusService busService = new BusService();
-            int nbBus = busService.selectByEcoleId(idEcole).size();
-            lblBus.setText(String.valueOf(nbBus));
-        } catch (SQLException e) {
-            lblBus.setText("0");
-        }
+            nbB = String.valueOf(busService.selectByEcoleId(idEcole).size());
+        } catch (SQLException ignored) {}
         try {
             TrajetService trajetService = new TrajetService();
-            int nbTrajets = trajetService.selectByEcoleId(idEcole).size();
-            lblTrajets.setText(String.valueOf(nbTrajets));
-        } catch (SQLException e) {
-            lblTrajets.setText("0");
-        }
+            nbT = String.valueOf(trajetService.selectByEcoleId(idEcole).size());
+        } catch (SQLException ignored) {}
         try {
             EnfantService enfantService = new EnfantService();
-            int nbEnfants = enfantService.countActifsByEcoleId(idEcole);
-            lblEnfantsTransportes.setText(String.valueOf(nbEnfants));
-        } catch (SQLException e) {
-            lblEnfantsTransportes.setText("0");
-        }
+            nbEnf = String.valueOf(enfantService.countActifsByEcoleId(idEcole));
+        } catch (SQLException ignored) {}
         try {
             MaitresseMetierService maitresseMetierService = new MaitresseMetierService();
-            int nbMaitresses = maitresseMetierService.listByEcole(idEcole, "").size();
-            if (lblMaitressesEcole != null) {
-                lblMaitressesEcole.setText(String.valueOf(nbMaitresses));
-            }
-        } catch (SQLException e) {
-            if (lblMaitressesEcole != null) lblMaitressesEcole.setText("0");
-        }
+            nbM = String.valueOf(maitresseMetierService.listByEcole(idEcole, "").size());
+        } catch (SQLException ignored) {}
+
+        String alertes = computeAlertesText(idEcole);
+        String resume = computeResumeText(idEcole);
+
+        return new DashboardSnapshot(ecoleLabel, nbCh, nbE, nbB, nbT, nbEnf, nbM, alertes, resume);
     }
 
-    private void loadAlertes(int idEcole) {
+    private void applySnapshot(DashboardSnapshot d) {
+        if (d == null) {
+            return;
+        }
+        lblEcole.setText(d.ecoleLabel());
+        lblCandidaturesChauffeur.setText(d.nbChauffeur());
+        lblCandidaturesEnfant.setText(d.nbEnfant());
+        lblBus.setText(d.nbBus());
+        lblTrajets.setText(d.nbTrajets());
+        lblEnfantsTransportes.setText(d.nbEnfantsTransportes());
+        if (lblMaitressesEcole != null) {
+            lblMaitressesEcole.setText(d.nbMaitresses());
+        }
+        lblAlertes.setText(d.alertes());
+        lblResume.setText(d.resume());
+    }
+
+    private String computeAlertesText(int idEcole) {
         List<String> lines = new ArrayList<>();
         try {
             CandidatureService cs = new CandidatureService();
@@ -137,7 +167,7 @@ public class AgentDashboardController {
         } catch (SQLException ignored) {}
         try {
             TrajetService ts = new TrajetService();
-            List<tn.esprit.workshop.model.leith.Trajet> trajets = ts.selectByEcoleId(idEcole);
+            List<Trajet> trajets = ts.selectByEcoleId(idEcole);
             ArretService arretService = new ArretService();
             int sansArrets = 0;
             for (var t : trajets) {
@@ -148,13 +178,12 @@ public class AgentDashboardController {
             if (sansBus > 0) lines.add("• " + sansBus + " trajet(s) sans bus.");
         } catch (SQLException ignored) {}
         if (lines.isEmpty()) {
-            lblAlertes.setText("Aucun point d'attention pour le moment.");
-        } else {
-            lblAlertes.setText(String.join(" ", lines));
+            return "Aucun point d'attention pour le moment.";
         }
+        return String.join(" ", lines);
     }
 
-    private void loadResume(int idEcole) {
+    private String computeResumeText(int idEcole) {
         List<String> parts = new ArrayList<>();
         try {
             CandidatureService cs = new CandidatureService();
@@ -185,7 +214,16 @@ public class AgentDashboardController {
         } catch (SQLException e) {
             parts.add("0 bus affecté(s)");
         }
-        lblResume.setText(String.join(" • ", parts));
+        return String.join(" • ", parts);
+    }
+
+    private void setStatsToZero() {
+        if (lblCandidaturesChauffeur != null) lblCandidaturesChauffeur.setText("0");
+        if (lblCandidaturesEnfant != null) lblCandidaturesEnfant.setText("0");
+        if (lblBus != null) lblBus.setText("0");
+        if (lblTrajets != null) lblTrajets.setText("0");
+        if (lblEnfantsTransportes != null) lblEnfantsTransportes.setText("0");
+        if (lblMaitressesEcole != null) lblMaitressesEcole.setText("0");
     }
 
     @FXML void openCandidaturesChauffeur() { SceneNavigator.openAgentCandidaturesChauffeur(); }

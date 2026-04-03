@@ -96,7 +96,7 @@ public class TrackingContextService {
     }
 
     private Integer getTrajetIdForBus(Connection conn, int busId) throws SQLException {
-        String sql = "SELECT id FROM trajet WHERE id_bus = ? AND actif = 1 LIMIT 1";
+        String sql = "SELECT id FROM trajet WHERE id_bus = ? LIMIT 1";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, busId);
             ResultSet rs = ps.executeQuery();

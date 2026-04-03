@@ -1,5 +1,7 @@
 package tn.esprit.workshop.controlleurs.leith.parent;
 
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import tn.esprit.workshop.controlleurs.leith.SceneNavigator;
@@ -27,24 +29,52 @@ public class ParentDashboardController {
 
     @FXML
     public void initialize() {
-        initDashboard();
-    }
-
-    private void initDashboard() {
-        // Welcome message
         String name = AppSession.getInstance().getConnectedUserName();
         String firstName = (name != null && !name.isBlank()) ? name.trim().split("\\s+")[0] : "Parent";
-        String welcome = buildWelcomeMessage(firstName);
         if (lblWelcome != null) {
-            lblWelcome.setText(welcome);
+            lblWelcome.setText(buildWelcomeMessage(firstName));
+        }
+        if (lblWeatherStatus != null) {
+            lblWeatherStatus.setText("Chargement de la météo…");
+        }
+        if (lblWeatherTemp != null) {
+            lblWeatherTemp.setText("");
+        }
+        if (lblTip != null) {
+            lblTip.setText(buildDailyTip(null));
         }
 
-        // Weather widget (safe fallback)
-        String city = resolveConnectedParentCity();
-        System.out.println("[ParentDashboard] Ville résolue pour la météo: " + city);
-        WeatherInfo info = (city != null && !city.isBlank())
-                ? weatherService.fetchForCity(city)
-                : weatherService.fetchForDefaultCity();
+        Task<WeatherInfo> task = new Task<>() {
+            @Override
+            protected WeatherInfo call() {
+                String city = resolveConnectedParentCity();
+                if (city != null && !city.isBlank()) {
+                    return weatherService.fetchForCity(city);
+                }
+                return weatherService.fetchForDefaultCity();
+            }
+        };
+        task.setOnSucceeded(e -> applyWeatherOnFx(task.getValue()));
+        task.setOnFailed(e -> Platform.runLater(() -> {
+            if (lblWeatherStatus != null) {
+                lblWeatherStatus.setText("Météo indisponible pour le moment");
+            }
+            if (lblWeatherTemp != null) {
+                lblWeatherTemp.setText("");
+            }
+            if (lblWeatherIcon != null) {
+                lblWeatherIcon.setText("☁");
+            }
+            if (lblTip != null) {
+                lblTip.setText(buildDailyTip(null));
+            }
+        }));
+        Thread t = new Thread(task, "parent-dashboard-weather");
+        t.setDaemon(true);
+        t.start();
+    }
+
+    private void applyWeatherOnFx(WeatherInfo info) {
         if (info != null && info.isAvailable() && lblWeatherTemp != null && lblWeatherStatus != null) {
             double t = info.getTemperatureCelsius() != null ? info.getTemperatureCelsius() : Double.NaN;
             String tempText = Double.isNaN(t)
@@ -64,8 +94,6 @@ public class ParentDashboardController {
                 lblWeatherIcon.setText("☁");
             }
         }
-
-        // Daily tip
         if (lblTip != null) {
             lblTip.setText(buildDailyTip(info));
         }
@@ -88,16 +116,16 @@ public class ParentDashboardController {
         if (info != null && info.isAvailable() && info.getCondition() != null) {
             String c = info.getCondition().toLowerCase(Locale.ROOT);
             if (c.contains("rain")) {
-                return "Prévoir un imperméable ou un parapluie pour votre enfant aujourd’hui.";
+                return "Prévoir un imperméable ou un parapluie pour votre enfant aujourd'hui.";
             }
             if (c.contains("snow")) {
-                return "Habillez bien votre enfant, les températures sont fraîches aujourd’hui.";
+                return "Habillez bien votre enfant, les températures sont fraîches aujourd'hui.";
             }
             if (c.contains("clear")) {
-                return "Une belle journée en perspective, n’oubliez pas une bouteille d’eau dans le sac.";
+                return "Une belle journée en perspective, n'oubliez pas une bouteille d'eau dans le sac.";
             }
             if (c.contains("cloud")) {
-                return "Un ciel couvert aujourd’hui, prévoyez une petite veste pour votre enfant.";
+                return "Un ciel couvert aujourd'hui, prévoyez une petite veste pour votre enfant.";
             }
         }
         int day = java.time.LocalDate.now().getDayOfYear();
@@ -105,9 +133,9 @@ public class ParentDashboardController {
             case 0:
                 return "Préparez le sac de votre enfant la veille pour un matin plus serein.";
             case 1:
-                return "Gardez votre téléphone joignable pendant l’horaire du transport.";
+                return "Gardez votre téléphone joignable pendant l'horaire du transport.";
             default:
-                return "Vérifiez l’horaire et le point de prise en charge avant de quitter la maison.";
+                return "Vérifiez l'horaire et le point de prise en charge avant de quitter la maison.";
         }
     }
 
@@ -132,7 +160,6 @@ public class ParentDashboardController {
     private String resolveConnectedParentCity() {
         int parentId = AppSession.getInstance().getParentId();
         if (parentId <= 0) {
-            System.out.println("[ParentDashboard] Aucun parentId en session, fallback sur DEFAULT_CITY.");
             return null;
         }
         String sql = "SELECT u.adresse FROM parent p JOIN users u ON p.user_id = u.id WHERE p.id = ?";
@@ -142,16 +169,11 @@ public class ParentDashboardController {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     String adresse = rs.getString("adresse");
-                    System.out.println("[ParentDashboard] Adresse parent brute: " + adresse);
-                    String city = extractCityFromAddress(adresse);
-                    System.out.println("[ParentDashboard] Ville extraite: " + city);
-                    return city;
+                    return extractCityFromAddress(adresse);
                 }
             }
-        } catch (SQLException e) {
-            System.out.println("[ParentDashboard] Erreur SQL lors de la résolution de la ville: " + e.getMessage());
-        } catch (Exception e) {
-            System.out.println("[ParentDashboard] Erreur inattendue lors de la résolution de la ville: " + e.getMessage());
+        } catch (SQLException ignored) {
+            // fallback météo par défaut
         }
         return null;
     }
@@ -160,16 +182,13 @@ public class ParentDashboardController {
         if (adresse == null) return null;
         String trimmed = adresse.trim();
         if (trimmed.isEmpty()) return null;
-        // Si adresse simple type \"tunis\" on la retourne directement
         if (!trimmed.contains(",") && !trimmed.contains(";")) {
             return trimmed;
         }
-        // Sinon on prend la première partie avant virgule/point-virgule
         String firstPart = trimmed.split("[,;]")[0].trim();
         return firstPart.isEmpty() ? trimmed : firstPart;
     }
 
-    // Navigation methods still available elsewhere (sidebar / shell)
     @FXML
     void openMesEnfants() {
         SceneNavigator.openParentMesEnfants();

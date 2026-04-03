@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
@@ -74,7 +73,7 @@ public class ParentShellController {
 
     @FXML
     void openDemandeTransport() {
-        loadContent("/leith/parent/ParentDemandeTransport.fxml");
+        loadContent("/amal/ParentInterface.fxml");
     }
 
     @FXML

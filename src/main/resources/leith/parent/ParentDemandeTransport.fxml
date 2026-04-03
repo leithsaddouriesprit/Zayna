@@ -10,13 +10,20 @@
     <stylesheets><URL value="@../design/global.css"/></stylesheets>
     <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
 
-    <Label text="Demande de transport scolaire" styleClass="admin-page-title"/>
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Button text="Retour" onAction="#retourChoixEcole" styleClass="btn-secondary"/>
+        <Label text="Demande de transport scolaire" styleClass="admin-page-title"/>
+    </HBox>
     <Label text="Renseignez les informations de l'enfant pour envoyer une candidature." styleClass="admin-page-subtitle" style="-fx-text-fill: #f1c40f;"/>
 
     <VBox spacing="12" styleClass="admin-section-panel parent-section-panel" VBox.vgrow="ALWAYS">
         <HBox spacing="8" alignment="CENTER_LEFT">
             <Label text="École:" styleClass="field-label"/>
             <ComboBox fx:id="comboEcole" prefWidth="320" promptText="Choisir une école"/>
+        </HBox>
+        <HBox spacing="8" alignment="CENTER_LEFT">
+            <Label text="Trajet:" styleClass="field-label"/>
+            <ComboBox fx:id="comboTrajet" prefWidth="380" promptText="Choisir un trajet de cet établissement"/>
         </HBox>
 
         <Label text="Enfant" styleClass="admin-stat-card-title"/>

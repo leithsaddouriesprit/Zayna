@@ -45,12 +45,38 @@ public class MeteoService {
         throw new IOException("Erreur API météo: " + response.statusCode() + " - " + response.body());
     }
 
-    private Meteo parseReponse(String json, String ville) {
+    /**
+     * Météo à partir des coordonnées GPS (école en base). Le libellé de ville reprend le nom renvoyé par l'API.
+     */
+    public Meteo getMeteoByCoordinates(double latitude, double longitude) throws IOException, InterruptedException {
+        String url = BASE_URL + "?lat=" + latitude + "&lon=" + longitude + "&units=metric&lang=fr&appid=" + API_KEY;
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .timeout(Duration.ofSeconds(10))
+                .GET()
+                .build();
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() == 200) {
+            return parseReponse(response.body(), null);
+        }
+        throw new IOException("Erreur API météo: " + response.statusCode() + " - " + response.body());
+    }
+
+    private Meteo parseReponse(String json, String villeFallback) {
         JsonObject root = gson.fromJson(json, JsonObject.class);
 
         JsonObject main = root.getAsJsonObject("main");
         JsonObject weather = root.getAsJsonArray("weather").get(0).getAsJsonObject();
-        JsonObject wind = root.getAsJsonObject("wind");
+        JsonObject wind = root.has("wind") && root.get("wind").isJsonObject()
+                ? root.getAsJsonObject("wind") : null;
+
+        String ville = villeFallback;
+        if (root.has("name") && !root.get("name").isJsonNull()) {
+            ville = root.get("name").getAsString();
+        }
+        if (ville == null || ville.isBlank()) {
+            ville = "Localisation";
+        }
 
         Meteo meteo = new Meteo();
         meteo.setVille(ville);
@@ -59,7 +85,11 @@ public class MeteoService {
         meteo.setDescription(weather.get("description").getAsString());
         meteo.setIcone(weather.get("icon").getAsString());
         meteo.setHumidite(main.get("humidity").getAsInt());
-        meteo.setVent(wind.get("speed").getAsDouble());
+        double vent = 0;
+        if (wind != null && wind.has("speed") && !wind.get("speed").isJsonNull()) {
+            vent = wind.get("speed").getAsDouble();
+        }
+        meteo.setVent(vent);
 
         return meteo;
     }

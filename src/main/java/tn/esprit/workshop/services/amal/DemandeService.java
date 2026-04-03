@@ -1,6 +1,7 @@
 package tn.esprit.workshop.services.amal;
 
 import tn.esprit.workshop.model.amal.DemandeInscription;
+import tn.esprit.workshop.utilis.MyBDConnexion;
 
 import java.sql.*;
 
@@ -8,7 +9,7 @@ public class DemandeService {
 
     private final Connection connection;
 
-    public DemandeService() {
+    public DemandeService() throws SQLException {
         connection = MyBDConnexion.getInstance().getConnection();
     }
 

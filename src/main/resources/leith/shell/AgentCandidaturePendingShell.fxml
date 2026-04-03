@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+             fx:controller="tn.esprit.workshop.controlleurs.leith.shell.AgentCandidaturePendingShellController"
+             styleClass="root app-shell" prefHeight="600" prefWidth="900">
+    <stylesheets>
+        <URL value="@../design/global.css"/>
+    </stylesheets>
+
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="12" minHeight="80.0" prefHeight="80.0" maxHeight="80.0" styleClass="shell-topbar admin-shell-topbar">
+            <Region HBox.hgrow="ALWAYS"/>
+            <ImageView fitHeight="22.0" fitWidth="22.0" preserveRatio="true" styleClass="top-session-icon">
+                <image>
+                    <Image url="@/leith/design/top.png"/>
+                </image>
+            </ImageView>
+            <Label fx:id="lblAccountInfo" text="Compte connecté : -- (Agent École)" styleClass="shell-account"/>
+            <Button fx:id="btnLogout" text="Se déconnecter" onAction="#logout" styleClass="shell-btn-logout"/>
+        </HBox>
+    </top>
+
+    <left>
+        <VBox spacing="8" styleClass="shell-sidebar sidebar admin-shell-sidebar">
+            <VBox styleClass="admin-brand-box">
+                <ImageView fitHeight="40.0" fitWidth="78.0" preserveRatio="true" styleClass="admin-brand-logo">
+                    <image>
+                        <Image url="@/leith/design/logo.png"/>
+                    </image>
+                </ImageView>
+                <Label text="Agent Console" styleClass="admin-brand-title"/>
+                <Label text="Candidature responsable d’école" styleClass="admin-brand-subtitle"/>
+            </VBox>
+
+            <Label text="Actions disponibles avant validation par l’administration." wrapText="true" styleClass="admin-page-subtitle"/>
+
+            <Button fx:id="btnModifier" text="Modifier la candidature" onAction="#onModifier" maxWidth="Infinity" styleClass="btn-primary"/>
+
+            <Button fx:id="btnSupprimer" text="Supprimer la candidature" onAction="#onSupprimer" maxWidth="Infinity" styleClass="btn-soft"/>
+
+            <Region VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </left>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="content-area" BorderPane.alignment="CENTER">
+            <BorderPane.margin>
+                <Insets left="14.0"/>
+            </BorderPane.margin>
+            <VBox spacing="16" styleClass="admin-main-panel">
+                <padding>
+                    <Insets top="20" right="24" bottom="24" left="20"/>
+                </padding>
+                <Label fx:id="lblStatut" text="Statut —" styleClass="admin-page-title"/>
+                <Label text="Détails de votre demande" styleClass="admin-page-subtitle"/>
+                <TextArea fx:id="txtDetails" editable="false" wrapText="true" prefRowCount="14" focusTraversable="false"
+                          styleClass="text-area form-dark"/>
+                <Label fx:id="lblMessage" styleClass="text-muted" wrapText="true"/>
+                <Label text="L’accès complet à la console agent (bus, trajets, chauffeurs, etc.) sera disponible une fois votre candidature approuvée par un administrateur. En cas de refus, vous pouvez corriger les informations et les renvoyer."
+                       wrapText="true" styleClass="admin-page-subtitle"/>
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>

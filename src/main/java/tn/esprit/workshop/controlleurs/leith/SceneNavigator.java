@@ -133,6 +133,28 @@ public class SceneNavigator {
         }
     }
 
+    /**
+     * Shell plein écran : candidature responsable d’école non approuvée ({@code EN_ATTENTE} / {@code REFUSEE}).
+     * Pas d’accès au shell agent métier complet.
+     * {@link AppSession} doit déjà contenir au minimum {@code connectedUserId}.
+     */
+    public static void openAgentCandidaturePendingWindow() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    SceneNavigator.class.getResource("/leith/shell/AgentCandidaturePendingShell.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            javafx.scene.Scene scene = new javafx.scene.Scene(root, 900, 600);
+            applyAppCss(scene, root);
+            stage.setTitle("Zayna – Candidature responsable d’école");
+            stage.setScene(scene);
+            stage.setMaximized(true);
+            stage.show();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error opening AgentCandidaturePending", e);
+        }
+    }
+
     /** Opens the Admin role in a single maximized window (shell with sidebar). Pending user set by ConnecterController. */
     public static void openAdminShell() {
         try {
@@ -140,6 +162,7 @@ public class SceneNavigator {
             Parent root = loader.load();
             Stage stage = new Stage();
             javafx.scene.Scene scene = new javafx.scene.Scene(root, 900, 600);
+            applyAppCss(scene, root);
             stage.setTitle("Zayna – Administration");
             stage.setScene(scene);
             stage.setMaximized(true);
@@ -553,6 +576,27 @@ public class SceneNavigator {
 
     public static void openParentDemandeTransport() {
         if (parentShell != null) {
+            parentShell.loadContent("/amal/ParentInterface.fxml");
+            return;
+        }
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    SceneNavigator.class.getResource("/amal/ParentInterface.fxml")
+            );
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            javafx.scene.Scene scene = new javafx.scene.Scene(root, 1000, 700);
+            applyAppCss(scene, root);
+            stage.setTitle("Zayna – Demande transport");
+            stage.setScene(scene);
+            stage.show();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error opening ParentDemandeTransport", e);
+        }
+    }
+
+    public static void openParentCandidatureTransport() {
+        if (parentShell != null) {
             parentShell.loadContent("/leith/parent/ParentDemandeTransport.fxml");
             return;
         }
@@ -564,11 +608,11 @@ public class SceneNavigator {
             Stage stage = new Stage();
             javafx.scene.Scene scene = new javafx.scene.Scene(root, 480, 380);
             applyAppCss(scene, root);
-            stage.setTitle("Zayna – Demande transport enfant");
+            stage.setTitle("Zayna – Candidature transport enfant");
             stage.setScene(scene);
             stage.show();
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error opening ParentDemandeTransport", e);
+            LOGGER.log(Level.SEVERE, "Error opening ParentCandidatureTransport", e);
         }
     }
 
@@ -590,6 +634,44 @@ public class SceneNavigator {
             stage.show();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error opening ParentSuiviCandidaturesEnfant", e);
+        }
+    }
+
+    public static void openParentTrajetsView() {
+        if (parentShell != null) {
+            parentShell.loadContent("/amal/ParentTrajets.fxml");
+            return;
+        }
+        try {
+            FXMLLoader loader = new FXMLLoader(SceneNavigator.class.getResource("/amal/ParentTrajets.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            javafx.scene.Scene scene = new javafx.scene.Scene(root, 900, 600);
+            applyAppCss(scene, root);
+            stage.setTitle("Zayna – Trajets");
+            stage.setScene(scene);
+            stage.show();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error opening ParentTrajets", e);
+        }
+    }
+
+    public static void openParentInterface() {
+        if (parentShell != null) {
+            parentShell.loadContent("/amal/ParentInterface.fxml");
+            return;
+        }
+        try {
+            FXMLLoader loader = new FXMLLoader(SceneNavigator.class.getResource("/amal/ParentInterface.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            javafx.scene.Scene scene = new javafx.scene.Scene(root, 1000, 700);
+            applyAppCss(scene, root);
+            stage.setTitle("Zayna – Parent Interface");
+            stage.setScene(scene);
+            stage.show();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error opening ParentInterface", e);
         }
     }
 

@@ -19,6 +19,9 @@ import tn.esprit.workshop.controlleurs.leith.SceneNavigator;
 import tn.esprit.workshop.controlleurs.Talel.AdminController;
 import tn.esprit.workshop.utilis.MyBDConnexion;
 import tn.esprit.workshop.services.leith.MaitresseMetierService;
+import tn.esprit.workshop.model.leith.CandidatureAgent;
+import tn.esprit.workshop.model.leith.CandidatureAgentStatut;
+import tn.esprit.workshop.services.leith.CandidatureAgentService;
 
 import java.io.IOException;
 import java.net.URL;
@@ -344,12 +347,55 @@ public class ConnecterController implements Initializable {
 
             // ---------- Flux ResponsableEcole -> Agent (Leith) ----------
             if (role == CategorieUser.RESPONSABLEECOLE) {
-                // Résolution : SELECT id, id_ecole FROM agent_ecole WHERE user_id = ?
+                CandidatureAgentService candidatureAgentService = new CandidatureAgentService();
+                CandidatureAgent candidatureAgent = null;
+                try {
+                    candidatureAgent = candidatureAgentService.findByUserId(user.getId());
+                } catch (SQLException e) {
+                    if (!CandidatureAgentService.isMissingTable(e)) {
+                        afficherErreur("Impossible de vérifier l'état de votre candidature. Réessayez plus tard.");
+                        return;
+                    }
+                    candidatureAgent = null;
+                }
                 int[] agentEcole = resolveAgentEcoleFromUser(user);
+
                 if (agentEcole == null) {
-                    afficherErreur("Aucun profil agent associé à ce compte. Veuillez contacter l'administrateur.");
+                    if (candidatureAgent == null) {
+                        afficherErreur("Aucune candidature trouvée pour ce compte. Veuillez vous inscrire ou contacter l'administrateur.");
+                        return;
+                    }
+                    if (candidatureAgent.getStatut() == CandidatureAgentStatut.APPROUVEE) {
+                        afficherErreur("Votre candidature est approuvée mais le profil agent n'est pas encore actif. Contactez l'administrateur.");
+                        return;
+                    }
+                    AppSession.getInstance().setConnectedUserId(user.getId());
+                    AppSession.getInstance().setAgentId(null);
+                    AppSession.getInstance().setEcoleId(null);
+                    setConnectedUserDisplay(user, "Agent École");
+                    AppSession.getInstance().setConnectedUserRoleEnum(user.getCategories());
+                    Stage stagePending = (Stage) loginButton.getScene().getWindow();
+                    if (stagePending != null) {
+                        stagePending.close();
+                    }
+                    SceneNavigator.openAgentCandidaturePendingWindow();
                     return;
                 }
+
+                if (candidatureAgent != null && candidatureAgent.getStatut() != CandidatureAgentStatut.APPROUVEE) {
+                    AppSession.getInstance().setConnectedUserId(user.getId());
+                    AppSession.getInstance().setAgentId(null);
+                    AppSession.getInstance().setEcoleId(null);
+                    setConnectedUserDisplay(user, "Agent École");
+                    AppSession.getInstance().setConnectedUserRoleEnum(user.getCategories());
+                    Stage stagePending = (Stage) loginButton.getScene().getWindow();
+                    if (stagePending != null) {
+                        stagePending.close();
+                    }
+                    SceneNavigator.openAgentCandidaturePendingWindow();
+                    return;
+                }
+
                 AppSession.getInstance().setConnectedUserId(user.getId());
                 AppSession.getInstance().setAgentId(agentEcole[0]);
                 AppSession.getInstance().setEcoleId(agentEcole[1]);

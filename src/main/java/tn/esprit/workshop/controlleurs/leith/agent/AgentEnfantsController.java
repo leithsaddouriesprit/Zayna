@@ -151,9 +151,6 @@ public class AgentEnfantsController implements Initializable {
         List<TrajetChoice> trajetChoices = new ArrayList<>();
         try {
             for (Trajet t : trajetService.selectByEcoleId(ecoleId)) {
-                if (!t.isActif()) {
-                    continue;
-                }
                 String lab = t.getNom() != null ? t.getNom() : ("Trajet #" + t.getTrajetId());
                 trajetChoices.add(new TrajetChoice(t.getTrajetId(), lab, t.getIdBus()));
             }

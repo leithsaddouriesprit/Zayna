@@ -1,0 +1,70 @@
+.amal-page .label {
+    -fx-text-fill: #ffffff;
+}
+
+.amal-program-card,
+.amal-trajet-card {
+    -fx-min-width: 230;
+    -fx-max-width: 320;
+}
+
+/* ——— Modales Parent : calendrier jours fériés ——— */
+.amal-modal-shell {
+    -fx-spacing: 16;
+}
+
+.amal-modal-calendar .amal-modal-table-wrap {
+    -fx-min-height: 200;
+}
+
+.table-view.amal-holiday-table {
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.table-view.amal-holiday-table .table-cell {
+    -fx-padding: 10 12 10 12;
+    -fx-wrap-text: true;
+}
+
+.amal-modal-year-bar {
+    -fx-spacing: 12;
+    -fx-alignment: center-left;
+    -fx-padding: 14 16;
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-background-radius: 14;
+    -fx-border-color: rgba(255, 255, 255, 0.10);
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+}
+
+/* ——— Modale Parent : météo ——— */
+.amal-modal-meteo .surface-panel-soft {
+    -fx-background-radius: 16;
+}
+
+.amal-meteo-hero {
+    -fx-spacing: 24;
+    -fx-alignment: center-left;
+    -fx-padding: 8 4 4 4;
+}
+
+.amal-meteo-icon {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.45), 12, 0.2, 0, 2);
+}
+
+.amal-meteo-details-grid {
+    -fx-padding: 4 0 0 0;
+}
+
+.amal-meteo-stat-label {
+    -fx-text-fill: rgba(255, 255, 255, 0.55);
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+}
+
+.amal-meteo-stat-value {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+}

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.workshop.controlleurs.amal.ParentTrajetsController"
+      styleClass="content-area admin-main-panel parent-page amal-page" spacing="12">
+    <stylesheets>
+        <URL value="@../leith/design/global.css"/>
+        <URL value="@amal-integration.css"/>
+    </stylesheets>
+    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Button text="Retour" onAction="#backToParentInterface" styleClass="btn-secondary"/>
+        <Label fx:id="lblTitle" text="Trajets" styleClass="admin-page-title"/>
+    </HBox>
+
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+        <VBox fx:id="trajetsContainer" spacing="10">
+            <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+        </VBox>
+    </ScrollPane>
+</VBox>

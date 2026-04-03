@@ -70,6 +70,7 @@
                     </VBox>
                 </content>
             </TitledPane>
+            <ToggleButton text="Programmes" onAction="#openProgrammes" maxWidth="Infinity" styleClass="admin-nav-item" toggleGroup="$navGroup"/>
 
             <TitledPane text="▸ Candidatures enfant" expanded="false" styleClass="sidebar-group admin-nav-group">
                 <content>

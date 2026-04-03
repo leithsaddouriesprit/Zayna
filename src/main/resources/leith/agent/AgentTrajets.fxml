@@ -27,7 +27,7 @@
             <TableColumn fx:id="colNom" text="Nom" prefWidth="150"/>
             <TableColumn fx:id="colIdBus" text="Id Bus" prefWidth="60"/>
             <TableColumn fx:id="colHeure" text="Heure départ" prefWidth="100"/>
-            <TableColumn fx:id="colActif" text="Actif" prefWidth="60"/>
+            <TableColumn fx:id="colPrix" text="Prix" prefWidth="80"/>
             <TableColumn fx:id="colStatut" text="Statut" prefWidth="80"/>
         </columns>
     </TableView>

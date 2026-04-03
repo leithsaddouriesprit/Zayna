@@ -1,16 +1,22 @@
 package tn.esprit.workshop.model.leith;
 
+/**
+ * Miroir JDBC de {@code candidature_agent} (zayna.sql) : {@code ecole}, {@code adresse}, etc.
+ */
 public class CandidatureAgent {
 
     private int id;
     private int userId;
     private String nom;
     private String prenom;
-    private int idEcole;
+    private String ecole;
+    private String adresse;
     private double latitude;
     private double longitude;
     private CandidatureAgentStatut statut;
-    private String nomEcole;
+    /** Affichage formaté (liste admin). */
+    private String createdAt;
+    private String updatedAt;
 
     public int getId() {
         return id;
@@ -44,12 +50,20 @@ public class CandidatureAgent {
         this.prenom = prenom;
     }
 
-    public int getIdEcole() {
-        return idEcole;
+    public String getEcole() {
+        return ecole;
     }
 
-    public void setIdEcole(int idEcole) {
-        this.idEcole = idEcole;
+    public void setEcole(String ecole) {
+        this.ecole = ecole;
+    }
+
+    public String getAdresse() {
+        return adresse;
+    }
+
+    public void setAdresse(String adresse) {
+        this.adresse = adresse;
     }
 
     public double getLatitude() {
@@ -76,11 +90,19 @@ public class CandidatureAgent {
         this.statut = statut;
     }
 
-    public String getNomEcole() {
-        return nomEcole;
+    public String getCreatedAt() {
+        return createdAt;
     }
 
-    public void setNomEcole(String nomEcole) {
-        this.nomEcole = nomEcole;
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

@@ -24,6 +24,9 @@ public final class AppSession {
     private Integer connectedUserId;
     /** maitresse.id pour l’espace maîtresse. */
     private Integer maitresseId;
+    /** Ecole sélectionnée dans le flux Parent (pour navigation interne). */
+    private Integer selectedEcoleId;
+    private String selectedEcoleName;
 
     // ✅ NOUVEAU : stocker le rôle en enum pour la logique métier
     private CategorieUser connectedUserRoleEnum;
@@ -119,5 +122,21 @@ public final class AppSession {
 
     public void setMaitresseId(Integer maitresseId) {
         this.maitresseId = maitresseId;
+    }
+
+    public Integer getSelectedEcoleId() {
+        return selectedEcoleId;
+    }
+
+    public void setSelectedEcoleId(Integer selectedEcoleId) {
+        this.selectedEcoleId = selectedEcoleId;
+    }
+
+    public String getSelectedEcoleName() {
+        return selectedEcoleName != null ? selectedEcoleName : "";
+    }
+
+    public void setSelectedEcoleName(String selectedEcoleName) {
+        this.selectedEcoleName = selectedEcoleName;
     }
 }

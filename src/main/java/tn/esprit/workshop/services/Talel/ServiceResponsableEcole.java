@@ -59,7 +59,16 @@ public class ServiceResponsableEcole {
                 throw new Exception("L'email est obligatoire");
             }
             if (responsable.getEcole() == null || responsable.getEcole().trim().isEmpty()) {
-                throw new Exception("Le nom de l'école est obligatoire");
+                throw new Exception("Le nom de votre établissement est obligatoire");
+            }
+            if (responsable.getEcole().trim().length() > 150) {
+                throw new Exception("Le nom de l'établissement ne doit pas dépasser 150 caractères");
+            }
+            if (responsable.getAdresseEcole() == null || responsable.getAdresseEcole().trim().isEmpty()) {
+                throw new Exception("L'adresse de l'établissement est obligatoire");
+            }
+            if (responsable.getAdresseEcole().trim().length() > 255) {
+                throw new Exception("L'adresse ne doit pas dépasser 255 caractères");
             }
             if (responsable.getLatitude() == null) {
                 throw new Exception("La latitude est obligatoire");

@@ -5,6 +5,9 @@ import java.util.Objects;
 public class Ecole {
     private int id;
     private String nomEcole;
+    private String adresse;
+    private Double latitude;
+    private Double longitude;
 
 public Ecole() {}
     public Ecole(int id, String nomEcole) {
@@ -26,6 +29,30 @@ public Ecole() {}
 
     public void setNomEcole(String nomEcole) {
         this.nomEcole = nomEcole;
+    }
+
+    public String getAdresse() {
+        return adresse;
+    }
+
+    public void setAdresse(String adresse) {
+        this.adresse = adresse;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 
     @Override

@@ -55,6 +55,14 @@
                 </content>
             </TitledPane>
 
+            <TitledPane text="▾ Candidatures école" expanded="true" styleClass="sidebar-group admin-nav-group">
+                <content>
+                    <VBox spacing="6" styleClass="sidebar-group-content">
+                        <ToggleButton text="Responsables d’école (à traiter)" onAction="#openCandidaturesAgentEcole" maxWidth="Infinity" styleClass="admin-nav-item admin-nav-subitem" toggleGroup="$navGroup"/>
+                    </VBox>
+                </content>
+            </TitledPane>
+
             <TitledPane text="▾ Transport" expanded="true" styleClass="sidebar-group admin-nav-group">
                 <content>
                     <VBox spacing="6" styleClass="sidebar-group-content">

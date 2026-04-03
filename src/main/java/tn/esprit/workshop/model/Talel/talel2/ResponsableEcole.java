@@ -3,8 +3,10 @@ package tn.esprit.workshop.model.Talel.talel2;
 public class ResponsableEcole extends User {
     private String prenom; // Prénom (agent_ecole) ; users.nom = nom de famille uniquement
     private String titre;
-    private String ecole; // Nom de l'école (créée à l'inscription)
-    private String adresseEcole; // Adresse de l'école
+    /** Nom de l’établissement → colonne {@code candidature_agent.ecole}. */
+    private String ecole;
+    /** Adresse de l’établissement → colonne {@code candidature_agent.adresse}. */
+    private String adresseEcole;
     private Double latitude; // Latitude école
     private Double longitude; // Longitude école
     private String telephone;

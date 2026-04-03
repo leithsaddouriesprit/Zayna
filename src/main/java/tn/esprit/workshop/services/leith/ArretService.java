@@ -112,7 +112,7 @@ public class ArretService implements CRUD<Arret> {
             t.setIdBus(rs.getInt("id_bus"));
             t.setIdEcole(rs.getInt("id_ecole"));
             t.setHeureDepart(rs.getTime("heure_depart").toLocalTime());
-            t.setActif(rs.getBoolean("actif"));
+            t.setPrix(rs.getDouble("prix"));
             t.setStatut(rs.getString("statut"));
             return t;
         }

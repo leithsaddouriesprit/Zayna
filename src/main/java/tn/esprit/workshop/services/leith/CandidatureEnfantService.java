@@ -20,8 +20,11 @@ public class CandidatureEnfantService {
         return MyBDConnexion.getInstance().getConnection();
     }
 
-    public void insert(int parentId, int idEcole, String nomEnfant, String prenomEnfant, int age, double latitude, double longitude) throws SQLException {
-        String sql = "INSERT INTO candidature_enfant (parent_id, id_ecole, nom_enfant, prenom_enfant, age, latitude, longitude, statut, date_demande) VALUES (?, ?, ?, ?, ?, ?, ?, 'ENVOYEE', CURRENT_TIMESTAMP)";
+    public void insert(int parentId, int idEcole, String nomEnfant, String prenomEnfant, int age,
+                       double latitude, double longitude, int trajetId) throws SQLException {
+        String sql = "INSERT INTO candidature_enfant (parent_id, id_ecole, nom_enfant, prenom_enfant, age, latitude, "
+                + "longitude, statut, trajet_id, date_demande) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, 'ENVOYEE', ?, CURRENT_TIMESTAMP)";
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, parentId);
             ps.setInt(2, idEcole);
@@ -30,6 +33,7 @@ public class CandidatureEnfantService {
             ps.setInt(5, age);
             ps.setDouble(6, latitude);
             ps.setDouble(7, longitude);
+            ps.setInt(8, trajetId);
             ps.executeUpdate();
         }
     }

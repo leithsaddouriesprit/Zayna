@@ -9,19 +9,19 @@ public class Trajet {
     private int idBus;
     private int idEcole;
     private LocalTime heureDepart;
-    private boolean actif;
+    private double prix;
     private String statut; // PLANIFIE, EN_COURS, TERMINE
 
     public Trajet() {}
 
     public Trajet(int trajetId, String nom, int idBus, int idEcole,
-                  LocalTime heureDepart, boolean actif, String statut) {
+                  LocalTime heureDepart, double prix, String statut) {
         this.trajetId = trajetId;
         this.nom = nom;
         this.idBus = idBus;
         this.idEcole = idEcole;
         this.heureDepart = heureDepart;
-        this.actif = actif;
+        this.prix = prix;
         this.statut = statut;
     }
 
@@ -65,12 +65,12 @@ public class Trajet {
         this.heureDepart = heureDepart;
     }
 
-    public boolean isActif() {
-        return actif;
+    public double getPrix() {
+        return prix;
     }
 
-    public void setActif(boolean actif) {
-        this.actif = actif;
+    public void setPrix(double prix) {
+        this.prix = prix;
     }
 
     public String getStatut() {
@@ -89,7 +89,7 @@ public class Trajet {
                 ", idBus=" + idBus +
                 ", idEcole=" + idEcole +
                 ", heureDepart=" + heureDepart +
-                ", actif=" + actif +
+                ", prix=" + prix +
                 ", statut='" + statut + '\'' +
                 '}';
     }

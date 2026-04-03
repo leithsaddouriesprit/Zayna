@@ -48,8 +48,6 @@ public class ControleurResponsableEcole {
     public void initialize() {
         serviceResponsable = new ServiceResponsableEcole();
         System.out.println("=== ControleurResponsableEcole initialisé ===");
-
-        // S'assurer que le label message est bien configuré
         lblMessage.setVisible(false);
         lblMessage.setManaged(true);
     }
@@ -59,7 +57,6 @@ public class ControleurResponsableEcole {
         try {
             System.out.println("=== ControleurResponsableEcole.ajouterResponsable ===");
 
-            // Récupération des données
             String nom = nomField != null ? nomField.getText().trim() : "";
             String prenom = prenomField != null ? prenomField.getText().trim() : "";
             String email = txtEmail.getText().trim().toLowerCase();
@@ -71,7 +68,6 @@ public class ControleurResponsableEcole {
             String telephone = txtTelephone.getText().trim();
             String adresse = txtAdresse.getText().trim();
 
-            // Validation des champs obligatoires
             if (nom.isEmpty()) {
                 afficherMessage("❌ Le nom est obligatoire", "error");
                 if (nomField != null) nomField.requestFocus();
@@ -93,8 +89,23 @@ public class ControleurResponsableEcole {
                 return;
             }
             if (nomEcole.isEmpty()) {
-                afficherMessage("❌ Le nom de l'école est obligatoire", "error");
+                afficherMessage("❌ Indiquez le nom de votre établissement (candidature).", "error");
                 if (txtNomEcole != null) txtNomEcole.requestFocus();
+                return;
+            }
+            if (nomEcole.length() > 150) {
+                afficherMessage("❌ Le nom de l'établissement ne doit pas dépasser 150 caractères.", "error");
+                if (txtNomEcole != null) txtNomEcole.requestFocus();
+                return;
+            }
+            if (adresseEcole.isEmpty()) {
+                afficherMessage("❌ L'adresse de l'établissement est obligatoire (candidature).", "error");
+                if (txtAdresseEcole != null) txtAdresseEcole.requestFocus();
+                return;
+            }
+            if (adresseEcole.length() > 255) {
+                afficherMessage("❌ L'adresse ne doit pas dépasser 255 caractères.", "error");
+                if (txtAdresseEcole != null) txtAdresseEcole.requestFocus();
                 return;
             }
             if (latText.isEmpty()) {
@@ -108,7 +119,6 @@ public class ControleurResponsableEcole {
                 return;
             }
 
-            // Validation latitude / longitude (numériques et plages)
             double lat;
             double lng;
             try {
@@ -136,21 +146,18 @@ public class ControleurResponsableEcole {
                 return;
             }
 
-            // Validation email
             if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
                 afficherMessage("❌ Format d'email invalide (ex: nom@domaine.com)", "error");
                 txtEmail.requestFocus();
                 return;
             }
 
-            // Validation téléphone (optionnel mais doit être valide si présent)
             if (!telephone.isEmpty() && !telephone.matches("\\d{8}")) {
                 afficherMessage("❌ Le téléphone doit contenir 8 chiffres", "error");
                 txtTelephone.requestFocus();
                 return;
             }
 
-            // Validation mot de passe
             if (passwordClair.length() < 6) {
                 afficherMessage("❌ Le mot de passe doit contenir au moins 6 caractères", "error");
                 txtMotDePasse.requestFocus();
@@ -162,24 +169,21 @@ public class ControleurResponsableEcole {
                 return;
             }
 
-            // Création de l'objet ResponsableEcole (users + ecole + agent_ecole)
             ResponsableEcole responsable = new ResponsableEcole();
             responsable.setNom(nom);
             responsable.setPrenom(prenom);
             responsable.setEmail(email);
             responsable.setEcole(nomEcole);
-            responsable.setAdresseEcole(adresseEcole.isEmpty() ? null : adresseEcole);
+            responsable.setAdresseEcole(adresseEcole);
             responsable.setLatitude(lat);
             responsable.setLongitude(lng);
             responsable.setTelephone(telephone.isEmpty() ? null : telephone);
             responsable.setAdresse(adresse.isEmpty() ? null : adresse);
 
             System.out.println("Appel du service avec email: " + email);
-
-            // Appel au service avec le mot de passe en clair
             serviceResponsable.ajouterResponsable(responsable, passwordClair);
 
-            afficherMessage("✅ Responsable d'école ajouté avec succès !", "success");
+            afficherMessage("✅ Candidature envoyée — en attente de validation. Vous n’avez pas encore accès au tableau de bord agent.", "success");
             viderFormulaire();
 
         } catch (Exception e) {
@@ -207,16 +211,10 @@ public class ControleurResponsableEcole {
         txtAdresse.clear();
     }
 
-    /**
-     * Affiche un message dans le label lblMessage
-     * @param message Le texte à afficher
-     * @param type Le type de message (success, error, warning, info)
-     */
     private void afficherMessage(String message, String type) {
         lblMessage.setText(message);
         lblMessage.setVisible(true);
 
-        // Appliquer le style en fonction du type
         switch(type) {
             case "success":
                 lblMessage.setStyle("-fx-background-color: #d4edda; -fx-text-fill: #155724; -fx-border-color: #c3e6cb;");
@@ -233,7 +231,6 @@ public class ControleurResponsableEcole {
                 break;
         }
 
-        // Créer un thread pour cacher le message après 5 secondes
         new Thread(() -> {
             try {
                 Thread.sleep(5000);
@@ -251,42 +248,28 @@ public class ControleurResponsableEcole {
 
     @FXML
     private void handleLogoutButton() {
-        System.out.println("=== Déconnexion ===");
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Déconnexion");
+        alert.setHeaderText("Voulez-vous vraiment vous déconnecter ?");
+        alert.setContentText("Vous devrez vous reconnecter pour accéder à nouveau à l'application.");
 
-        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmation.setTitle("Déconnexion");
-        confirmation.setHeaderText("Confirmation de déconnexion");
-        confirmation.setContentText("Êtes-vous sûr de vouloir vous déconnecter ?");
-
-        Optional<ButtonType> result = confirmation.showAndWait();
+        Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/Talel/ConnecterUser.fxml"));
+                javafx.stage.Stage currentStage = (javafx.stage.Stage) logoutButton.getScene().getWindow();
+                currentStage.close();
+
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/Talel/Connecter.fxml"));
                 Parent root = loader.load();
-
-                Scene currentScene = logoutButton.getScene();
-                Stage stage = (Stage) currentScene.getWindow();
-
-                stage.setScene(new Scene(root));
-                stage.setTitle("Connexion - Système de Gestion");
-                stage.centerOnScreen();
-
-                System.out.println("✅ Déconnexion réussie");
+                Stage loginStage = new Stage();
+                Scene scene = new Scene(root);
+                loginStage.setScene(scene);
+                loginStage.setTitle("Connexion - Zayna");
+                loginStage.show();
             } catch (Exception e) {
-                System.err.println("❌ Erreur lors de la déconnexion:");
                 e.printStackTrace();
-                showAlert(Alert.AlertType.ERROR, "Erreur",
-                        "Erreur lors de la déconnexion",
-                        "Impossible de retourner à la page de connexion: " + e.getMessage());
+                afficherMessage("❌ Erreur lors de la déconnexion", "error");
             }
         }
-    }
-
-    private void showAlert(Alert.AlertType type, String title, String header, String content) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(header);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 }

@@ -35,7 +35,7 @@ public class ContextBuilderService {
         // anomalies as array
         java.util.List<String> anomalies = new java.util.ArrayList<>();
 
-        Integer trajetActifId = null;
+        Integer trajetId = null;
 
         Double busLat = null, busLng = null, speedKmh = null;
         LocalDateTime posTs = null;
@@ -70,24 +70,25 @@ public class ContextBuilderService {
             }
             root.put("bus", bus);
 
-            // 2) TRAJET ACTIF
+            // 2) TRAJET
             if (busId != null) {
                 try (PreparedStatement ps = conn.prepareStatement(
-                        "SELECT id, nom, id_bus, id_ecole, heure_depart, actif, statut " +
-                                "FROM trajet WHERE id_bus=? AND actif=1 LIMIT 1"
+                        "SELECT id, nom, id_bus, id_ecole, heure_depart, prix, statut " +
+                                "FROM trajet WHERE id_bus=? LIMIT 1"
                 )) {
                     ps.setInt(1, busId);
                     try (ResultSet rs = ps.executeQuery()) {
                         if (rs.next()) {
-                            trajetActifId = rs.getInt("id");
-                            trajet.put("id", trajetActifId);
+                            trajetId = rs.getInt("id");
+                            trajet.put("id", trajetId);
                             trajet.put("nom", rs.getString("nom"));
                             trajet.put("statut", rs.getString("statut"));
                             trajet.put("heure_depart", rs.getString("heure_depart"));
+                            trajet.put("prix", rs.getBigDecimal("prix"));
                         } else {
                             trajet.put("id", null);
-                            trajet.put("error", "aucun_trajet_actif");
-                            anomalies.add("aucun_trajet_actif");
+                            trajet.put("error", "aucun_trajet");
+                            anomalies.add("aucun_trajet");
                         }
                     }
                 } catch (SQLException e) {
@@ -138,12 +139,12 @@ public class ContextBuilderService {
             root.put("position", position);
 
             // 4) NEXT STOP
-            if (trajetActifId != null) {
+            if (trajetId != null) {
                 try (PreparedStatement ps = conn.prepareStatement(
                         "SELECT nom, latitude, longitude, ordre_arret, heure_prevue " +
                                 "FROM arret WHERE id_trajet=? ORDER BY ordre_arret ASC"
                 )) {
-                    ps.setInt(1, trajetActifId);
+                    ps.setInt(1, trajetId);
                     try (ResultSet rs = ps.executeQuery()) {
                         if (rs.next()) {
                             nextStop.put("nom", rs.getString("nom"));
@@ -202,8 +203,8 @@ public class ContextBuilderService {
 
                             boolean affecteAuTrajet =
                                     enfantTrajetId != null &&
-                                            trajetActifId != null &&
-                                            enfantTrajetId.equals(trajetActifId);
+                                            trajetId != null &&
+                                            enfantTrajetId.equals(trajetId);
 
                             boolean estMonte = onBoard != null && onBoard == 1;
 
