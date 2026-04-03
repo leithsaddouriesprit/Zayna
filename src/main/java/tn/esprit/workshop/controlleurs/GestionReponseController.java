@@ -36,11 +36,14 @@ public class GestionReponseController implements Initializable {
     @FXML private TableColumn<Reclamation, String> colDetails;
     @FXML private TableColumn<Reclamation, String> colStatut;
     @FXML private TableColumn<Reclamation, Timestamp> colDate;
+    @FXML private TableColumn<Reclamation, String> colPrioriteReclamation;
+    @FXML private ProgressBar progressBar;
+    @FXML private Label lblPourcentage;
+    @FXML private Label lblStatut;
     @FXML private Label detailInfosLabel;
     @FXML private Label totalReclamations;
     @FXML private Label enAttenteCount;
     @FXML private Label traiteesCount;
-
 
     // Détails de la réclamation (sans ID affiché)
     @FXML private Label detailTypeLabel;
@@ -63,13 +66,13 @@ public class GestionReponseController implements Initializable {
     @FXML private ChoiceBox<String> langueCibleChoice;
     @FXML private Label traductionMessageLabel;
     @FXML private Button traduireMessageButton;
-    @FXML private TableColumn<Reclamation, String> colAuteur;  // ✅ NOUVEAU
-
+    @FXML private TableColumn<Reclamation, String> colAuteur;
     // Map pour stocker les codes ISO des langues
     private Map<String, String> languesMap;
     private final ReclamationService reclamationService = new ReclamationService();
     private final ReponseService reponseService = new ReponseService();
     private final ServiceAdmin serviceAdmin = new ServiceAdmin();
+
 
     private Reclamation reclamationSelectionnee;
     private Reponse reponseExistante;
@@ -126,6 +129,7 @@ public class GestionReponseController implements Initializable {
             return new javafx.beans.property.SimpleStringProperty("Utilisateur #" + r.getUserId());
         });
 
+
         colType.setCellValueFactory(new PropertyValueFactory<>("type"));
         colDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
         // ✅ NOUVELLE COLONNE DÉTAILS
@@ -158,7 +162,33 @@ public class GestionReponseController implements Initializable {
                     details = "-";
                     break;
             }
-
+            colPrioriteReclamation.setCellValueFactory(new PropertyValueFactory<>("priorite"));
+            colPrioriteReclamation.setCellFactory(column -> new TableCell<Reclamation, String>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                        setStyle("");
+                    } else {
+                        setText(item);
+                        switch (item) {
+                            case "Basse":
+                                setStyle("-fx-text-fill: #22c55e; -fx-font-weight: bold;");
+                                break;
+                            case "Moyenne":
+                                setStyle("-fx-text-fill: #f59e0b; -fx-font-weight: bold;");
+                                break;
+                            case "Haute":
+                                setStyle("-fx-text-fill: #f97316; -fx-font-weight: bold;");
+                                break;
+                            case "Urgente":
+                                setStyle("-fx-text-fill: #ef4444; -fx-font-weight: bold;");
+                                break;
+                        }
+                    }
+                }
+            });
             return new javafx.beans.property.SimpleStringProperty(details);
         });
 
@@ -180,44 +210,70 @@ public class GestionReponseController implements Initializable {
             }
         });
     }
+
     // ================= STATISTIQUES =================
 
-    private void mettreAJourStatistiques(List<Reclamation> liste) {
-        if (liste == null || liste.isEmpty()) {
-            if (totalReclamations != null) totalReclamations.setText("0");
-            if (enAttenteCount != null) enAttenteCount.setText("0");
-            if (traiteesCount != null) traiteesCount.setText("0");
-            return;
-        }
-
-        int total = liste.size();
-        int enAttente = 0;
-        int traitees = 0;
-
-        for (Reclamation r : liste) {
-            if ("EN_ATTENTE".equals(r.getStatut())) {
-                enAttente++;
-            } else if ("TRAITEE".equals(r.getStatut())) {
-                traitees++;
+        private void mettreAJourStatistiques(List<Reclamation> liste) {
+            if (liste == null || liste.isEmpty()) {
+                if (totalReclamations != null) totalReclamations.setText("0");
+                if (enAttenteCount != null) enAttenteCount.setText("0");
+                if (traiteesCount != null) traiteesCount.setText("0");
+                if (progressBar != null) {
+                    progressBar.setProgress(0);
+                    lblPourcentage.setText("0%");
+                    lblStatut.setText("0 traitée(s) sur 0");
+                    progressBar.setStyle("-fx-accent: #ef4444; -fx-background-color: #2A2A2A; -fx-background-radius: 10;");
+                }
+                return;
             }
-        }
 
-        if (totalReclamations != null) {
-            totalReclamations.setText(String.valueOf(total));
-        }
+            int total = liste.size();
+            int enAttente = 0;
+            int traitees = 0;
 
-        if (enAttenteCount != null) {
-            enAttenteCount.setText(String.valueOf(enAttente));
-        }
+            for (Reclamation r : liste) {
+                if ("EN_ATTENTE".equals(r.getStatut())) {
+                    enAttente++;
+                } else if ("TRAITEE".equals(r.getStatut())) {
+                    traitees++;
+                }
+            }
 
-        if (traiteesCount != null) {
-            traiteesCount.setText(String.valueOf(traitees));
-        }
+            if (totalReclamations != null) totalReclamations.setText(String.valueOf(total));
+            if (enAttenteCount != null) enAttenteCount.setText(String.valueOf(enAttente));
+            if (traiteesCount != null) traiteesCount.setText(String.valueOf(traitees));
 
-        System.out.println("📊 Stats - Total: " + total +
-                ", En attente: " + enAttente +
-                ", Traitées: " + traitees);
-    }
+            // ✅ BARRE DE PROGRESSION AVEC COULEURS DYNAMIQUES
+            if (progressBar != null) {
+                double progression = (double) traitees / total;
+                int pourcentage = (int)(progression * 100);
+
+                progressBar.setProgress(progression);
+                lblPourcentage.setText(pourcentage + "%");
+                lblStatut.setText(traitees + " traitée(s) sur " + total);
+
+                // 🎨 Changement de couleur selon le pourcentage
+                String couleur;
+                if (pourcentage < 30) {
+                    couleur = "#ef4444";  // Rouge
+                } else if (pourcentage < 70) {
+                    couleur = "#f59e0b";  // Orange
+                } else {
+                    couleur = "#22c55e";  // Vert
+                }
+
+                progressBar.setStyle(String.format(
+                        "-fx-accent: %s; -fx-background-color: #2A2A2A; -fx-background-radius: 10;",
+                        couleur
+                ));
+
+                System.out.println("📊 Progression: " + progression + " (" + pourcentage + "%) - Couleur: " + couleur);
+            }
+
+            System.out.println("📊 Statistiques mises à jour - Total: " + total +
+                    ", En attente: " + enAttente +
+                    ", Traitées: " + traitees);
+        }
     @FXML
     private void traduireMessage() {
         if (reclamationSelectionnee == null) {
@@ -449,9 +505,7 @@ public class GestionReponseController implements Initializable {
         }
 
         if (!validerSelectionEtReponse()) return;
-
         String reponseTexte = reponseField.getText().trim();
-
         try {
             // ✅ Récupérer l'ID de l'utilisateur connecté
             int userId = AppSession.getInstance().getConnectedUserId();

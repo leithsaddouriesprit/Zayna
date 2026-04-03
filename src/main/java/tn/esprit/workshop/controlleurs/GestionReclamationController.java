@@ -83,6 +83,9 @@ public class GestionReclamationController implements Initializable {
     private VBox panelChauffeur;
     @FXML
     private VBox panelBus;
+    @FXML private ProgressBar progressBar;
+    @FXML private Label lblPourcentage;
+    @FXML private Label lblStatut;
     @FXML
     private VBox panelCantine;
     @FXML
@@ -994,29 +997,67 @@ public class GestionReclamationController implements Initializable {
     }
 
     private void mettreAJourStatistiques(List<Reclamation> liste) {
-        if (liste == null || liste.isEmpty()) {
-            if (totalReclamations != null) totalReclamations.setText("0");
-            if (enAttenteCount != null) enAttenteCount.setText("0");
-            if (traiteesCount != null) traiteesCount.setText("0");
-            return;
-        }
-
-        int total = liste.size();
-        int enAttente = 0;
-        int traitees = 0;
-
-        for (Reclamation r : liste) {
-            if ("EN_ATTENTE".equals(r.getStatut())) {
-                enAttente++;
-            } else if ("TRAITEE".equals(r.getStatut())) {
-                traitees++;
+            if (liste == null || liste.isEmpty()) {
+                if (totalReclamations != null) totalReclamations.setText("0");
+                if (enAttenteCount != null) enAttenteCount.setText("0");
+                if (traiteesCount != null) traiteesCount.setText("0");
+                if (progressBar != null) {
+                    progressBar.setProgress(0);
+                    lblPourcentage.setText("0%");
+                    lblStatut.setText("0 traitée(s) sur 0");
+                    progressBar.setStyle("-fx-accent: #ef4444; -fx-background-color: #2A2A2A; -fx-background-radius: 10;");
+                }
+                return;
             }
+
+            int total = liste.size();
+            int enAttente = 0;
+            int traitees = 0;
+
+            for (Reclamation r : liste) {
+                if ("EN_ATTENTE".equals(r.getStatut())) {
+                    enAttente++;
+                } else if ("TRAITEE".equals(r.getStatut())) {
+                    traitees++;
+                }
+            }
+
+            if (totalReclamations != null) totalReclamations.setText(String.valueOf(total));
+            if (enAttenteCount != null) enAttenteCount.setText(String.valueOf(enAttente));
+            if (traiteesCount != null) traiteesCount.setText(String.valueOf(traitees));
+
+            // ✅ BARRE DE PROGRESSION AVEC COULEURS DYNAMIQUES
+            if (progressBar != null) {
+                double progression = (double) traitees / total;
+                int pourcentage = (int)(progression * 100);
+
+                progressBar.setProgress(progression);
+                lblPourcentage.setText(pourcentage + "%");
+                lblStatut.setText(traitees + " traitée(s) sur " + total);
+
+                // 🎨 Changement de couleur selon le pourcentage
+                String couleur;
+                if (pourcentage < 30) {
+                    couleur = "#ef4444";  // Rouge
+                } else if (pourcentage < 70) {
+                    couleur = "#f59e0b";  // Orange
+                } else {
+                    couleur = "#22c55e";  // Vert
+                }
+
+                progressBar.setStyle(String.format(
+                        "-fx-accent: %s; -fx-background-color: #2A2A2A; -fx-background-radius: 10;",
+                        couleur
+                ));
+
+                System.out.println("📊 Progression: " + progression + " (" + pourcentage + "%) - Couleur: " + couleur);
+            }
+
+            System.out.println("📊 Statistiques mises à jour - Total: " + total +
+                    ", En attente: " + enAttente +
+                    ", Traitées: " + traitees);
         }
 
-        if (totalReclamations != null) totalReclamations.setText(String.valueOf(total));
-        if (enAttenteCount != null) enAttenteCount.setText(String.valueOf(enAttente));
-        if (traiteesCount != null) traiteesCount.setText(String.valueOf(traitees));
-    }
 
     // ================= TRADUCTION =================
 

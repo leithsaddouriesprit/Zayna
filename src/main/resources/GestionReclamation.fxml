@@ -70,8 +70,30 @@
                     </VBox>
                 </HBox>
 
+                <!-- ========== BARRE DE PROGRESSION ========== -->
+                <VBox spacing="12"
+                      styleClass="surface-panel-soft"
+                      style="-fx-padding: 15; -fx-background-radius: 15;"
+                      minHeight="80">  <!-- ← FORCE UNE HAUTEUR MINIMALE -->
+
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <Label text="📊 Progression du traitement" styleClass="title-md" style="-fx-text-fill: #FEC111;"/>
+                        <Label fx:id="lblPourcentage" text="0%" style="-fx-text-fill: #FEC111; -fx-font-weight: bold; -fx-font-size: 18px;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="lblStatut" text="0 traitée(s) sur 0" styleClass="text-muted" style="-fx-font-size: 12px;"/>
+                    </HBox>
+
+                    <!-- BARRE AVEC HAUTEUR SUFFISANTE -->
+                    <ProgressBar fx:id="progressBar"
+                                 maxWidth="Infinity"
+                                 prefHeight="20"
+                                 minHeight="20"
+                                 style="-fx-accent: #FEC111; -fx-background-color: #2A2A2A; -fx-background-radius: 10;"/>
+                </VBox>
+
                 <!-- ========== FORMULAIRE DE RÉCLAMATION ========== -->
                 <VBox spacing="18" styleClass="surface-panel" style="-fx-padding: 25; -fx-background-radius: 20;">
+                    <Separator style="-fx-opacity: 0.2;"/>
 
                     <HBox alignment="CENTER_LEFT" spacing="12">
                         <StackPane>

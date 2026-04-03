@@ -6,6 +6,7 @@
 <?import javafx.scene.shape.*?>
 <?import java.net.URL?>
 
+<?import java.lang.String?>
 <AnchorPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="tn.esprit.workshop.controlleurs.GestionReponseController"
@@ -73,7 +74,26 @@
                         <Label fx:id="traiteesCount" text="0" styleClass="stat-card-value" style="-fx-text-fill: #FEC111;"/>
                     </VBox>
                 </HBox>
+                <!-- ========== BARRE DE PROGRESSION ========== -->
+                <VBox spacing="12"
+                      styleClass="surface-panel-soft"
+                      style="-fx-padding: 15; -fx-background-radius: 15;"
+                      minHeight="80">  <!-- ← FORCE UNE HAUTEUR MINIMALE -->
 
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <Label text="📊 Progression du traitement" styleClass="title-md" style="-fx-text-fill: #FEC111;"/>
+                        <Label fx:id="lblPourcentage" text="0%" style="-fx-text-fill: #FEC111; -fx-font-weight: bold; -fx-font-size: 18px;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="lblStatut" text="0 traitée(s) sur 0" styleClass="text-muted" style="-fx-font-size: 12px;"/>
+                    </HBox>
+
+                    <!-- BARRE AVEC HAUTEUR SUFFISANTE -->
+                    <ProgressBar fx:id="progressBar"
+                                 maxWidth="Infinity"
+                                 prefHeight="20"
+                                 minHeight="20"
+                                 style="-fx-accent: #FEC111; -fx-background-color: #2A2A2A; -fx-background-radius: 10;"/>
+                </VBox>
                 <!-- ========== SPLITPANE ========== -->
                 <SplitPane dividerPositions="0.55" VBox.vgrow="ALWAYS"
                            style="-fx-background-color: transparent;">
@@ -99,6 +119,7 @@
                                     <TableColumn fx:id="colType" text="Type" prefWidth="80"/>
                                     <TableColumn fx:id="colDescription" text="Message" prefWidth="200"/>
                                     <TableColumn fx:id="colDetails" text="Détails" prefWidth="120"/>
+                                    <TableColumn fx:id="colPrioriteReclamation" text="Priorité" prefWidth="90"/>
                                     <TableColumn fx:id="colStatut" text="Statut" prefWidth="80"/>
                                     <TableColumn fx:id="colDate" text="Date" prefWidth="120"/>
                                 </columns>

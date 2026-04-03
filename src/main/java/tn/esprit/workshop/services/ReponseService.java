@@ -83,6 +83,7 @@ public class ReponseService {
                     r.setUserId(rs.getInt("user_id"));
                     r.setMessage(rs.getString("message"));
                     r.setDate(rs.getTimestamp("date_reponse").toLocalDateTime());
+                    rs.getString("priorite");
                     return r;
                 }
             }

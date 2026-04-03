@@ -19,7 +19,7 @@ public class Reponse {
         this.date = date;
     }
 
-    public Reponse(int id, int reclamation_id ,int userId, String message, LocalDateTime date) {
+    public Reponse(int id, int reclamation_id ,int userId, String message, LocalDateTime date ) {
         this.id = id;
         this.reclamation_id = reclamation_id;
         this.userId = userId;
@@ -30,7 +30,6 @@ public class Reponse {
     // getters et setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
-
     public int getReclamationId() { return reclamation_id; }
     public void setReclamationId(int reclamation_id) { this.reclamation_id = reclamation_id; }
     public int getUserId() { return userId; }

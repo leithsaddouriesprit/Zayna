@@ -1587,3 +1587,12 @@
 .choice-box .text {
     -fx-fill: #1A1A1A !important;
 }
+/* Style personnalisé pour la barre de progression */
+.progress-bar .bar {
+    -fx-background-radius: 10;
+}
+
+.progress-bar .track {
+    -fx-background-color: #2A2A2A;
+    -fx-background-radius: 10;
+}
