@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="tn.esprit.workshop.controlleurs.amal.ParentController"
+      spacing="20" alignment="TOP_CENTER"
+      style="
+          -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #2ecc71 0%, #27ae60 50%, #16a085 100%);
+          -fx-background-radius: 30px;
+          -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 30, 0, 0, 15);
+          -fx-padding: 25px;
+          -fx-max-width: 1300px;
+          -fx-font-family: 'Segoe UI', 'Poppins', 'Arial', sans-serif;
+      ">
+
+    <style>
+        /* ===== STYLE GLOBAL ===== */
+        * {
+        -fx-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ===== CONTENEUR PRINCIPAL ===== */
+        .main-container {
+        -fx-background-color: rgba(255, 255, 255, 0.97);
+        -fx-background-radius: 25px;
+        -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 20, 0, 0, 5);
+        -fx-padding: 30px;
+        }
+
+        /* ===== EN-TÊTE ===== */
+        .header {
+        -fx-padding: 0 0 20px 0;
+        -fx-border-width: 0 0 3px 0;
+        -fx-border-color: linear-gradient(from 0% 0% to 100% 100%, #2ecc71 0%, #16a085 100%);
+        -fx-border-insets: 0 0 20px 0;
+        }
+
+        .titre-principal {
+        -fx-font-size: 32px;
+        -fx-font-weight: bold;
+        -fx-text-fill: #1a2639;
+        -fx-effect: dropshadow(gaussian, rgba(46, 204, 113, 0.3), 10, 0, 0, 2);
+        }
+
+        /* ===== LISTE DES ÉCOLES ===== */
+        .schools-section {
+        -fx-background-color: #f8fafd;
+        -fx-background-radius: 20px;
+        -fx-padding: 15px;
+        -fx-border-color: #e0e7ed;
+        -fx-border-width: 2px;
+        -fx-border-radius: 20px;
+        }
+
+        .section-title {
+        -fx-font-size: 20px;
+        -fx-font-weight: bold;
+        -fx-text-fill: #2c3e50;
+        -fx-padding: 0 0 15px 0;
+        }
+
+        .schools-list {
+        -fx-background-color: transparent;
+        -fx-border-color: #e0e7ed;
+        -fx-border-width: 2px;
+        -fx-border-radius: 15px;
+        -fx-background-radius: 15px;
+        }
+
+        .schools-list .list-cell {
+        -fx-background-color: white;
+        -fx-padding: 0;
+        -fx-border-color: transparent transparent #f0f0f0 transparent;
+        }
+
+        .schools-list .list-cell:selected {
+        -fx-background-color: #e8f5e9;
+        }
+
+        .school-card {
+        -fx-background-color: white;
+        -fx-padding: 15px;
+        -fx-border-radius: 15px;
+        }
+
+        .school-card:hover {
+        -fx-background-color: #f5f5f5;
+        }
+
+        .school-name {
+        -fx-font-size: 18px;
+        -fx-font-weight: bold;
+        -fx-text-fill: #2c3e50;
+        }
+
+        .school-location {
+        -fx-font-size: 13px;
+        -fx-text-fill: #7f8c8d;
+        }
+
+        .school-price {
+        -fx-font-size: 16px;
+        -fx-font-weight: bold;
+        -fx-text-fill: #27ae60;
+        }
+
+        /* ===== CARTE DES DÉTAILS DE L'ÉCOLE ===== */
+        .details-section {
+        -fx-background-color: white;
+        -fx-background-radius: 20px;
+        -fx-padding: 20px;
+        -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0, 0, 3);
+        -fx-border-color: #e0e7ed;
+        -fx-border-width: 1px;
+        -fx-border-radius: 20px;
+        }
+
+        .details-title {
+        -fx-font-size: 22px;
+        -fx-font-weight: bold;
+        -fx-text-fill: #2c3e50;
+        -fx-padding: 0 0 15px 0;
+        }
+
+        .detail-item {
+        -fx-padding: 8px 0;
+        }
+
+        .detail-label {
+        -fx-font-weight: bold;
+        -fx-text-fill: #34495e;
+        -fx-min-width: 100px;
+        }
+
+        .detail-value {
+        -fx-text-fill: #2c3e50;
+        }
+
+        .inscription-button {
+        -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #2ecc71 0%, #27ae60 100%);
+        -fx-text-fill: white;
+        -fx-font-weight: bold;
+        -fx-font-size: 16px;
+        -fx-padding: 12px 30px;
+        -fx-background-radius: 30px;
+        -fx-cursor: hand;
+        -fx-effect: dropshadow(gaussian, rgba(46, 204, 113, 0.3), 5, 0, 0, 2);
+        }
+
+        .inscription-button:hover {
+        -fx-scale-x: 1.05;
+        -fx-scale-y: 1.05;
+        -fx-effect: dropshadow(gaussian, rgba(46, 204, 113, 0.4), 10, 0, 0, 4);
+        }
+
+        /* ===== BOUTON TRAJETS ===== */
+        .trajets-button {
+        -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #f39c12 0%, #e67e22 100%);
+        -fx-text-fill: white;
+        -fx-font-weight: bold;
+        -fx-font-size: 14px;
+        -fx-padding: 10px 25px;
+        -fx-background-radius: 25px;
+        -fx-cursor: hand;
+        -fx-effect: dropshadow(gaussian, rgba(243, 156, 18, 0.3), 5, 0, 0, 2);
+        }
+
+        .trajets-button:hover {
+        -fx-scale-x: 1.05;
+        -fx-scale-y: 1.05;
+        -fx-effect: dropshadow(gaussian, rgba(243, 156, 18, 0.4), 10, 0, 0, 4);
+        }
+
+        /* ===== BOUTON CALENDRIER ===== */
+        .calendrier-button {
+        -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #3498db 0%, #2980b9 100%);
+        -fx-text-fill: white;
+        -fx-font-weight: bold;
+        -fx-font-size: 14px;
+        -fx-padding: 10px 25px;
+        -fx-background-radius: 25px;
+        -fx-cursor: hand;
+        -fx-effect: dropshadow(gaussian, rgba(52, 152, 219, 0.3), 5, 0, 0, 2);
+        }
+
+        .calendrier-button:hover {
+        -fx-scale-x: 1.05;
+        -fx-scale-y: 1.05;
+        -fx-effect: dropshadow(gaussian, rgba(52, 152, 219, 0.4), 10, 0, 0, 4);
+        }
+
+        /* ===== BOUTON MÉTÉO ===== */
+        .meteo-button {
+        -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #00b4d8 0%, #0096c7 100%);
+        -fx-text-fill: white;
+        -fx-font-weight: bold;
+        -fx-font-size: 14px;
+        -fx-padding: 10px 25px;
+        -fx-background-radius: 25px;
+        -fx-cursor: hand;
+        -fx-effect: dropshadow(gaussian, rgba(0, 180, 216, 0.3), 5, 0, 0, 2);
+        }
+
+        .meteo-button:hover {
+        -fx-scale-x: 1.05;
+        -fx-scale-y: 1.05;
+        -fx-effect: dropshadow(gaussian, rgba(0, 180, 216, 0.4), 10, 0, 0, 4);
+        }
+
+        /* ===== CARTES DES PROGRAMMES ===== */
+        .programs-section {
+        -fx-padding: 20px 0 0 0;
+        }
+
+        .programs-grid {
+        -fx-hgap: 20px;
+        -fx-vgap: 20px;
+        -fx-padding: 15px 0;
+        }
+
+        .program-card {
+        -fx-background-color: white;
+        -fx-background-radius: 20px;
+        -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0, 0, 3);
+        -fx-padding: 20px;
+        -fx-border-color: #e0e7ed;
+        -fx-border-width: 1px;
+        -fx-border-radius: 20px;
+        -fx-min-width: 280px;
+        -fx-max-width: 280px;
+        }
+
+        .program-card:hover {
+        -fx-scale-x: 1.02;
+        -fx-scale-y: 1.02;
+        -fx-effect: dropshadow(gaussian, rgba(46, 204, 113, 0.3), 15, 0, 0, 5);
+        -fx-border-color: #2ecc71;
+        }
+
+        .program-icon {
+        -fx-background-color: #e8f5e9;
+        -fx-background-radius: 50%;
+        -fx-padding: 10px;
+        -fx-alignment: center;
+        }
+
+        .program-title {
+        -fx-font-size: 18px;
+        -fx-font-weight: bold;
+        -fx-text-fill: #2c3e50;
+        }
+
+        .program-badge {
+        -fx-background-color: #3498db;
+        -fx-background-radius: 20px;
+        -fx-padding: 4px 12px;
+        -fx-text-fill: white;
+        -fx-font-weight: bold;
+        -fx-font-size: 12px;
+        }
+
+        .program-description {
+        -fx-font-size: 13px;
+        -fx-text-fill: #2c3e50;
+        -fx-wrap-text: true;
+        -fx-padding: 10px 0;
+        -fx-font-weight: 500;
+        }
+
+        .program-detail {
+        -fx-padding: 5px 0;
+        -fx-font-size: 14px;
+        }
+
+        .program-detail-icon {
+        -fx-font-size: 16px;
+        -fx-padding: 0 5px 0 0;
+        }
+
+        .program-detail-label {
+        -fx-font-weight: bold;
+        -fx-text-fill: #34495e;
+        }
+
+        .program-price {
+        -fx-font-size: 20px;
+        -fx-font-weight: bold;
+        -fx-text-fill: #27ae60;
+        -fx-padding: 10px 0 0 0;
+        }
+
+        /* ===== MESSAGE D'INFORMATION ===== */
+        .info-message {
+        -fx-background-color: #e8f5e9;
+        -fx-background-radius: 15px;
+        -fx-padding: 20px;
+        -fx-border-color: #a5d6a7;
+        -fx-border-width: 2px;
+        -fx-border-radius: 15px;
+        }
+
+        .info-message .label {
+        -fx-text-fill: #2e7d32;
+        -fx-font-size: 16px;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        .scroll-bar:vertical {
+        -fx-background-color: transparent;
+        -fx-background-radius: 10px;
+        -fx-padding: 5px;
+        }
+
+        .scroll-bar:vertical .thumb {
+        -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #cbd5e0 0%, #a0aec0 100%);
+        -fx-background-radius: 10px;
+        }
+    </style>
+
+    <!-- Conteneur principal -->
+    <VBox spacing="20" alignment="TOP_CENTER" styleClass="main-container">
+
+        <!-- En-tête -->
+        <HBox alignment="CENTER" styleClass="header">
+            <HBox spacing="15" alignment="CENTER">
+                <ImageView fitHeight="50" fitWidth="50">
+                    <Image url="https://img.icons8.com/fluency/48/school.png"/>
+                </ImageView>
+                <Label text="Espace Parent - Inscription Scolaire" styleClass="titre-principal"/>
+            </HBox>
+        </HBox>
+
+        <!-- Grille principale -->
+        <GridPane hgap="25" vgap="20">
+            <!-- Colonne gauche : Liste des écoles -->
+            <VBox spacing="15" GridPane.columnIndex="0" GridPane.rowIndex="0" prefWidth="350" styleClass="schools-section">
+                <Label text="🏫 Écoles disponibles" styleClass="section-title"/>
+                <ListView fx:id="listViewEcoles" prefHeight="500" styleClass="schools-list"/>
+            </VBox>
+
+            <!-- Colonne droite : Détails, Programmes et Trajets -->
+            <VBox spacing="20" GridPane.columnIndex="1" GridPane.rowIndex="0" prefWidth="800">
+
+                <!-- Carte des détails de l'école -->
+                <VBox fx:id="detailsContainer" visible="false" managed="false" styleClass="details-section">
+                    <Label text="📋 Détails de l'école" styleClass="details-title"/>
+
+                    <GridPane hgap="15" vgap="8">
+                        <Label text="🏫 Nom:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="detail-label"/>
+                        <Label fx:id="lblNomEcole" text="-" GridPane.rowIndex="0" GridPane.columnIndex="1" styleClass="detail-value"/>
+
+                        <Label text="📍 Position:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="detail-label"/>
+                        <Label fx:id="lblPositionEcole" text="-" GridPane.rowIndex="1" GridPane.columnIndex="1" styleClass="detail-value"/>
+
+                        <Label text="💰 Prix mensuel:" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="detail-label"/>
+                        <Label fx:id="lblPrixEcole" text="-" GridPane.rowIndex="2" GridPane.columnIndex="1" styleClass="detail-value"/>
+
+                        <Label text="📝 Description:" GridPane.rowIndex="3" GridPane.columnIndex="0" styleClass="detail-label" style="-fx-alignment: TOP_RIGHT;"/>
+                        <Label fx:id="lblDescriptionEcole" text="-" GridPane.rowIndex="3" GridPane.columnIndex="1" wrapText="true" maxWidth="500" styleClass="detail-value"/>
+
+                        <Label text="ℹ️ Infos:" GridPane.rowIndex="4" GridPane.columnIndex="0" styleClass="detail-label" style="-fx-alignment: TOP_RIGHT;"/>
+                        <Label fx:id="lblInfosEcole" text="-" GridPane.rowIndex="4" GridPane.columnIndex="1" wrapText="true" maxWidth="500" styleClass="detail-value"/>
+                    </GridPane>
+
+                    <HBox alignment="CENTER" spacing="15" style="-fx-padding: 20px 0 0 0;">
+                        <Button fx:id="btnInscrire" text="📝 S'inscrire" styleClass="inscription-button" onAction="#inscrireEnfant"/>
+                        <Button fx:id="btnVoirTrajets" text="🚌 Trajets" styleClass="trajets-button" onAction="#voirTrajets"/>
+                        <Button fx:id="btnCalendrier" text="📅 Calendrier" styleClass="calendrier-button" onAction="#voirCalendrier"/>
+                        <Button fx:id="btnMeteo" text="🌤️ Météo" styleClass="meteo-button" onAction="#voirMeteo"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Message quand aucune école n'est sélectionnée -->
+                <VBox fx:id="messageContainer" styleClass="info-message" alignment="CENTER" prefHeight="200">
+                    <ImageView fitHeight="50" fitWidth="50">
+                        <Image url="https://img.icons8.com/color/48/info.png"/>
+                    </ImageView>
+                    <Label text="Sélectionnez une école dans la liste pour voir ses informations, programmes et trajets" textAlignment="CENTER"/>
+                </VBox>
+
+                <!-- Section des programmes en cartes -->
+                <VBox fx:id="programmesContainer" visible="false" managed="false" spacing="15" styleClass="programs-section">
+                    <Label text="📚 Programmes disponibles" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+
+                    <!-- Conteneur pour les cartes de programmes -->
+                    <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;">
+                        <FlowPane fx:id="programmesFlowPane" styleClass="programs-grid" hgap="20" vgap="20"/>
+                    </ScrollPane>
+                </VBox>
+            </VBox>
+        </GridPane>
+
+        <!-- Pied de page -->
+        <HBox alignment="CENTER" style="-fx-padding: 20px 0 0 0; -fx-border-width: 1px 0 0 0; -fx-border-color: #e0e7ed;">
+            <Label text="© 2024 - Espace Parent - Tous droits réservés" style="-fx-text-fill: #7f8c8d;"/>
+        </HBox>
+    </VBox>
+</VBox>
