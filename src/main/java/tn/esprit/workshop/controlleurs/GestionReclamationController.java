@@ -40,53 +40,100 @@ import tn.esprit.workshop.utilis.MyBDConnexion;
 
 public class GestionReclamationController implements Initializable {
 
-    @FXML private Label compteurReclamations;
-    @FXML private ChoiceBox<String> typeChoice;
-    @FXML private TextArea messageField;
-    @FXML private Label reponseAuteurLabel;
-    @FXML private TextArea reponseArea;
-    @FXML private TextField searchField;
-    @FXML private Label statusLabel;
-    @FXML private Label statutReponseLabel;
-    @FXML private Label traductionLabel;
-    @FXML private ChoiceBox<String> langueCibleChoice;
+    @FXML
+    private Label compteurReclamations;
+    @FXML
+    private ChoiceBox<String> typeChoice;
+    @FXML
+    private TextArea messageField;
+    @FXML
+    private Label reponseAuteurLabel;
+    @FXML
+    private TextArea reponseArea;
+    @FXML
+    private TextField searchField;
+    @FXML
+    private Label statusLabel;
+    @FXML
+    private Label statutReponseLabel;
+    @FXML
+    private Label traductionLabel;
+    @FXML
+    private ChoiceBox<String> langueCibleChoice;
     private Map<String, String> languesMap;
     private Reponse reponseCourante;
-    @FXML private Label totalReclamations;
-    @FXML private Label enAttenteCount;
-    @FXML private Label traiteesCount;
-    @FXML private Label detailUserTypeLabel;
-
+    @FXML
+    private Label totalReclamations;
+    @FXML
+    private Label enAttenteCount;
+    @FXML
+    private Label traiteesCount;
+    @FXML
+    private Label detailUserTypeLabel;
+    @FXML
+    private ChoiceBox<String> prioriteChoice;
     // Nouveaux champs FXML
-    @FXML private ChoiceBox<Chauffeur> chauffeurChoice;
-    @FXML private ChoiceBox<Bus> busChoice;
-    @FXML private ChoiceBox<Ecole> ecoleChoice;
-    @FXML private VBox panelChauffeur;
-    @FXML private VBox panelBus;
-    @FXML private VBox panelCantine;
-    @FXML private VBox panelEcole;
-    @FXML private VBox panelAutre;
-    @FXML private VBox panelTrajet;
-    @FXML private TextField chauffeurNomField;
-    @FXML private TextField chauffeurPrenomField;
-    @FXML private TextField busMatriculeField;
-    @FXML private ChoiceBox<String> cantineTypeChoice;
-    @FXML private TextField ecoleNomField;
-    @FXML private TextField autrePrecisionField;
-    @FXML private Label detailUserLabel;
-    @FXML private Label detailTypeLabel;
-    @FXML private TextArea detailMessageArea;
-    @FXML private Label detailDateLabel;
-    @FXML private Label detailInfosLabel;
-    @FXML private TableView<Reclamation> tableReclamation;
-    @FXML private TableColumn<Reclamation, String> colType;
-    @FXML private TableColumn<Reclamation, String> colDescription;
-    @FXML private TableColumn<Reclamation, String> colDetails;
-    @FXML private TableColumn<Reclamation, String> colStatut;
-    @FXML private TableColumn<Reclamation, Timestamp> colDate;
-    @FXML private Button traduireReponseButton;
-    @FXML private Button envoyerButton;
-    @FXML private Label traductionReponseLabel;
+    @FXML
+    private ChoiceBox<Chauffeur> chauffeurChoice;
+    @FXML
+    private ChoiceBox<Bus> busChoice;
+    @FXML
+    private ChoiceBox<Ecole> ecoleChoice;
+    @FXML
+    private VBox panelChauffeur;
+    @FXML
+    private VBox panelBus;
+    @FXML
+    private VBox panelCantine;
+    @FXML
+    private VBox panelEcole;
+    @FXML
+    private VBox panelAutre;
+    @FXML
+    private VBox panelTrajet;
+    @FXML
+    private TextField chauffeurNomField;
+    @FXML
+    private TextField chauffeurPrenomField;
+    @FXML
+    private TextField busMatriculeField;
+    @FXML
+    private ChoiceBox<String> cantineTypeChoice;
+    @FXML
+    private TextField ecoleNomField;
+    @FXML
+    private TextField autrePrecisionField;
+    @FXML
+    private Label detailUserLabel;
+    @FXML
+    private Label detailTypeLabel;
+    @FXML
+    private TextArea detailMessageArea;
+    @FXML
+    private Label detailDateLabel;
+    @FXML
+    private Label detailInfosLabel;
+    @FXML
+    private TableView<Reclamation> tableReclamation;
+    @FXML
+    private TableColumn<Reclamation, String> colType;
+    @FXML
+    private TableColumn<Reclamation, String> colDescription;
+    @FXML
+    private TableColumn<Reclamation, String> colDetails;
+    @FXML
+    private TableColumn<Reclamation, String> colStatut;
+    @FXML
+    private TableColumn<Reclamation, Timestamp> colDate;
+    @FXML
+    private TableColumn<Reclamation, String> colPriorite;
+
+    @FXML
+    private Button traduireReponseButton;
+    @FXML
+    private Button envoyerButton;
+    @FXML
+    private Label traductionReponseLabel;
 
     private final ChauffeurService chauffeurService = new ChauffeurService();
     private final BusService busService = new BusService();
@@ -111,7 +158,8 @@ public class GestionReclamationController implements Initializable {
         // Initialiser les choix pour la cantine
         cantineTypeChoice.getItems().addAll("Qualité des repas", "Quantité insuffisante",
                 "Hygiène", "Service", "Autre");
-
+        prioriteChoice.getItems().addAll("Basse", "Moyenne", "Haute", "Urgente");
+        prioriteChoice.setValue("Moyenne"); // Valeur par défaut
         // Cacher tous les panels au départ
         cacherTousLesPanels();
 
@@ -242,7 +290,34 @@ public class GestionReclamationController implements Initializable {
     private void configurerColonnes() {
         colType.setCellValueFactory(new PropertyValueFactory<>("type"));
         colDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
-
+        colPriorite.setCellValueFactory(new PropertyValueFactory<>("priorite"));
+        colPriorite.setCellFactory(column -> new TableCell<Reclamation, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item);
+                    // Couleurs selon la priorité
+                    switch (item) {
+                        case "Basse":
+                            setStyle("-fx-text-fill: #22c55e; -fx-font-weight: bold;");
+                            break;
+                        case "Moyenne":
+                            setStyle("-fx-text-fill: #f59e0b; -fx-font-weight: bold;");
+                            break;
+                        case "Haute":
+                            setStyle("-fx-text-fill: #f97316; -fx-font-weight: bold;");
+                            break;
+                        case "Urgente":
+                            setStyle("-fx-text-fill: #ef4444; -fx-font-weight: bold; -fx-font-size: 13px;");
+                            break;
+                    }
+                }
+            }
+        });
         colDetails.setCellValueFactory(cellData -> {
             Reclamation r = cellData.getValue();
             String details = "";
@@ -298,10 +373,8 @@ public class GestionReclamationController implements Initializable {
                 } else {
                     setText(item);
                     switch (item) {
-                        case "EN_ATTENTE" ->
-                                setStyle("-fx-text-fill: orange; -fx-font-weight: bold;");
-                        case "TRAITEE" ->
-                                setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+                        case "EN_ATTENTE" -> setStyle("-fx-text-fill: orange; -fx-font-weight: bold;");
+                        case "TRAITEE" -> setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
                         default -> setStyle("");
                     }
                 }
@@ -417,7 +490,9 @@ public class GestionReclamationController implements Initializable {
     private void remplirFormulaireAvecReclamation(Reclamation r) {
         typeChoice.setValue(r.getType());
         messageField.setText(r.getDescription());
-
+        if (prioriteChoice != null && r.getPriorite() != null) {
+            prioriteChoice.setValue(r.getPriorite());
+        }
         // ✅ Remplir les ChoiceBox avec les valeurs de la réclamation
         if (chauffeurChoice != null && r.getIdChauffeur() > 0) {
             try {
@@ -476,6 +551,10 @@ public class GestionReclamationController implements Initializable {
                     Alert.AlertType.WARNING);
             return;
         }
+        String priorite = prioriteChoice.getValue();
+        if (priorite == null) {
+            priorite = "Moyenne"; // Valeur par défaut
+        }
 
         String type = typeChoice.getValue();
         String message = messageField.getText();
@@ -487,13 +566,11 @@ public class GestionReclamationController implements Initializable {
             int parentId = AppSession.getInstance().getParentId();
             idEcoleUtilisateur = getEcoleIdByParentId(parentId);
             System.out.println("Parent - École ID: " + idEcoleUtilisateur);
-        }
-        else if (currentUserRole == CategorieUser.CHAUFFEUR) {
+        } else if (currentUserRole == CategorieUser.CHAUFFEUR) {
             int chauffeurId = AppSession.getInstance().getChauffeurId();
             idEcoleUtilisateur = getEcoleIdByChauffeurId(chauffeurId);
             System.out.println("Chauffeur - École ID: " + idEcoleUtilisateur);
-        }
-        else if (currentUserRole == CategorieUser.MAITRESSE) {
+        } else if (currentUserRole == CategorieUser.MAITRESSE) {
             int maitresseId = AppSession.getInstance().getMaitresseId();
             idEcoleUtilisateur = getEcoleIdByMaitresseId(maitresseId);
             System.out.println("Maîtresse - École ID: " + idEcoleUtilisateur);
@@ -618,55 +695,52 @@ public class GestionReclamationController implements Initializable {
             return;
         }
 
-        // FILTRAGE
-        FiltrageService.ResultatFiltrage resultatFiltrage = filtrageService.analyser(message);
-        if (resultatFiltrage.contientGrossieretes()) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("⚠️ Langage inapproprié");
-            alert.setHeaderText("Des mots inappropriés ont été détectés");
-            VBox content = new VBox(10);
-            content.setPadding(new Insets(20));
+        // ✅ FILTRAGE AVEC BLOCAGE - AUCUN ENVOI SI GROS MOT
+        int userId = currentUserId;
 
-            Label originalLabel = new Label("Message original:");
-            originalLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #e74c3c;");
-            TextArea originalArea = new TextArea(message);
-            originalArea.setEditable(false);
-            originalArea.setPrefRowCount(2);
-            originalArea.setStyle("-fx-background-color: #f8f8f8;");
-
-            Label filtreLabel = new Label("Message filtré proposé:");
-            filtreLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #27ae60;");
-            TextArea filtreArea = new TextArea(resultatFiltrage.getTexteFiltre());
-            filtreArea.setEditable(false);
-            filtreArea.setPrefRowCount(2);
-            filtreArea.setStyle("-fx-background-color: #f8f8f8;");
-
-            content.getChildren().addAll(originalLabel, originalArea, filtreLabel, filtreArea);
-            alert.getDialogPane().setContent(content);
-
-            ButtonType btnFiltre = new ButtonType("✅ Utiliser la version filtrée", ButtonBar.ButtonData.OK_DONE);
-            ButtonType btnModifier = new ButtonType("✏️ Modifier mon message", ButtonBar.ButtonData.NO);
-            ButtonType btnAnnuler = new ButtonType("❌ Annuler", ButtonBar.ButtonData.CANCEL_CLOSE);
-
-            alert.getButtonTypes().setAll(btnFiltre, btnModifier, btnAnnuler);
-
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.isPresent()) {
-                if (result.get() == btnFiltre) {
-                    messageField.setText(resultatFiltrage.getTexteFiltre());
-                    message = resultatFiltrage.getTexteFiltre();
-                    statusLabel.setText("✅ Message filtré automatiquement");
-                } else if (result.get() == btnModifier) {
-                    messageField.requestFocus();
-                    messageField.selectAll();
-                    return;
-                } else {
-                    return;
-                }
-            } else {
-                return;
-            }
+// Vérifier si l'utilisateur est déjà bloqué
+        if (filtrageService.estBloque(userId)) {
+            String tempsRestant = filtrageService.getTempsRestantBlocage(userId);
+            showAlert("Accès refusé",
+                    "❌ Vous êtes bloqué pour " + tempsRestant + " min.\n" +
+                            "Tentatives répétées avec des messages inappropriés.",
+                    Alert.AlertType.ERROR);
+            return;
         }
+
+// Vérifier si le message contient des gros mots
+        if (filtrageService.contientGrossieretes(message)) {
+            // Enregistrer la tentative
+            int tentatives = filtrageService.incrementerTentatives(userId);
+
+            if (tentatives >= 3) {
+                // Bloquer l'utilisateur
+                filtrageService.bloquerUtilisateur(userId);
+                showAlert("⚠️ Compte bloqué",
+                        "❌ Vous êtes bloqué pour 5 minutes.\n" +
+                                "Trop de tentatives avec des messages inappropriés.",
+                        Alert.AlertType.ERROR);
+            } else {
+                // Afficher l'avertissement
+                int restantes = 3 - tentatives;
+                showAlert("⚠️ Message refusé",
+                        "❌ Votre message contient des mots inappropriés.\n" +
+                                "Il vous reste " + restantes + " tentative(s) avant blocage.\n\n" +
+                                "Veuillez reformuler votre message.",
+                        Alert.AlertType.WARNING);
+            }
+            messageField.requestFocus();
+            messageField.selectAll();
+            return; // ❌ Arrêter l'envoi
+
+
+    } else
+
+    {
+        // Message correct, réinitialiser les tentatives
+        filtrageService.resetTentatives(userId);
+    }
+
 
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirmation");
@@ -680,6 +754,7 @@ public class GestionReclamationController implements Initializable {
                         type,
                         message.trim(),
                         "EN_ATTENTE",
+                        priorite,
                         chauffeurNom,
                         chauffeurPrenom,
                         busMatricule,
@@ -746,7 +821,7 @@ public class GestionReclamationController implements Initializable {
             try {
                 selected.setType(type);
                 selected.setDescription(message.trim());
-
+                selected.setPriorite(prioriteChoice.getValue());
                 // ✅ Mettre à jour les champs spécifiques (ceux qui existent)
                 // Pour Chauffeur
                 if (type.equals("Chauffeur") && chauffeurChoice != null && chauffeurChoice.getValue() != null) {

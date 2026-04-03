@@ -23,6 +23,8 @@ public class Reclamation {
     private int idBus;
     private int idMaitresse;
     private int idParent;
+    private String priorite;
+
 
     public Reclamation() {}
 
@@ -45,7 +47,9 @@ public class Reclamation {
         this.statut = statut;
     }
 
-    // Getters & Setters
+    public String getPriorite() { return priorite; }
+    public void setPriorite(String priorite) { this.priorite = priorite; }
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
