@@ -33,6 +33,7 @@ import tn.esprit.workshop.services.leith.ReclamationHistoriqueService;
 import tn.esprit.workshop.services.leith.ReclamationService;
 import tn.esprit.workshop.services.leith.ReponseReclamationService;
 import tn.esprit.workshop.utilis.AppSession;
+import tn.esprit.workshop.utilis.InputModerationUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -803,6 +804,10 @@ public class ReclamationListController implements Initializable {
         dialog.showAndWait().filter(bt -> bt == ButtonType.OK).ifPresent(bt -> {
             String msg = ta.getText() != null ? ta.getText().trim() : "";
             if (msg.isEmpty()) {
+                return;
+            }
+            if (InputModerationUtil.isBlocked(msg)) {
+                showError(InputModerationUtil.MESSAGE_BLOQUE);
                 return;
             }
             String roleDb = ReclamationUiHelper.responderDbRole();

@@ -13,6 +13,7 @@ import tn.esprit.workshop.services.leith.ReclamationHistoriqueService;
 import tn.esprit.workshop.services.leith.ReclamationService;
 import tn.esprit.workshop.services.leith.ReclamationService.ParentEcoleChoice;
 import tn.esprit.workshop.utilis.AppSession;
+import tn.esprit.workshop.utilis.InputModerationUtil;
 
 import java.net.URL;
 import java.sql.SQLException;
@@ -121,6 +122,10 @@ public class ReclamationFormController implements Initializable {
         }
         if (prio == null) {
             showMsg("La priorité est obligatoire.", true);
+            return;
+        }
+        if (InputModerationUtil.isBlocked(objet, desc)) {
+            showMsg(InputModerationUtil.MESSAGE_BLOQUE, true);
             return;
         }
 

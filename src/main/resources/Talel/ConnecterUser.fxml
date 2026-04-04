@@ -56,7 +56,7 @@
 
             <!-- Bouton de connexion -->
             <StackPane>
-                <Button fx:id="loginButton" maxWidth="Infinity" onAction="#handleLogin" prefHeight="45" styleClass="primary-login-btn" text="SE CONNECTER" />
+                <Button fx:id="loginButton" defaultButton="true" maxWidth="Infinity" onAction="#handleLogin" prefHeight="45" styleClass="primary-login-btn" text="SE CONNECTER" />
                 <ProgressIndicator fx:id="loadingIndicator" maxHeight="25" maxWidth="25" visible="false" />
             </StackPane>
 

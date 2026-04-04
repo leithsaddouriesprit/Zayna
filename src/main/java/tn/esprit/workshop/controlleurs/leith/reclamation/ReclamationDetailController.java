@@ -27,6 +27,7 @@ import tn.esprit.workshop.services.leith.ReclamationService;
 import tn.esprit.workshop.services.leith.ReponseReclamationService;
 import tn.esprit.workshop.services.leith.TrajetService;
 import tn.esprit.workshop.utilis.AppSession;
+import tn.esprit.workshop.utilis.InputModerationUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -602,6 +603,10 @@ public class ReclamationDetailController implements Initializable {
         String msg = taReponse.getText() != null ? taReponse.getText().trim() : "";
         if (msg.isEmpty()) {
             showTraitementMsg("Saisissez un message.", true);
+            return;
+        }
+        if (InputModerationUtil.isBlocked(msg)) {
+            showTraitementMsg(InputModerationUtil.MESSAGE_BLOQUE, true);
             return;
         }
         String roleDb = ReclamationUiHelper.responderDbRole();
