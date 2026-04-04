@@ -108,6 +108,14 @@
     -fx-background-color: transparent;
 }
 
+/* Scroll unique : toute la page liste (stats, filtres, cartes) */
+.reclamation-page-scroll {
+    -fx-padding: 0;
+}
+.reclamation-list-scroll-content {
+    -fx-max-width: 1200;
+}
+
 .reclamation-kpi-bar {
     -fx-wrap-text: false;
     -fx-alignment: center-left;
@@ -223,7 +231,37 @@
     -fx-text-fill: rgba(249, 250, 251, 0.78);
     -fx-font-size: 12px;
     -fx-wrap-text: true;
-    -fx-max-height: 52;
+}
+
+/* ~5–6 lignes max sans scroll interne (sécurité visuelle + troncature texte côté Java) */
+.reclamation-card-desc-clamp {
+    -fx-max-height: 102;
+}
+
+.reclamation-card-voir-plus {
+    -fx-text-fill: #93c5fd;
+    -fx-font-size: 11px;
+    -fx-padding: 0 0 2 0;
+    -fx-border-width: 0;
+    -fx-underline: true;
+}
+
+.reclamation-card-middle {
+    -fx-alignment: top-left;
+}
+
+.reclamation-card-badges-flow {
+    -fx-pref-wrap-length: 300;
+}
+
+/* Pied : hauteur réservée côté Java ; alignement stable */
+.reclamation-card-footer {
+    -fx-padding: 4 0 0 0;
+    -fx-alignment: top-left;
+}
+
+.reclamation-card-actions-flow {
+    -fx-padding: 0;
 }
 
 .reclamation-card-meta {
@@ -240,16 +278,6 @@
     -fx-background-radius: 999;
     -fx-border-color: rgba(59, 130, 246, 0.35);
     -fx-border-radius: 999;
-}
-
-.reclamation-card-actions {
-    -fx-padding: 4 0 0 0;
-    -fx-wrap-text: true;
-}
-
-.reclamation-card-actions .button {
-    -fx-font-size: 11px;
-    -fx-padding: 6 10;
 }
 
 /* Badges */
@@ -458,4 +486,149 @@
 }
 .dialog-pane .button {
     -fx-background-radius: 8;
+}
+
+/* ——— Niveau 3 : alertes, assignation, historique, répartition ——— */
+
+.reclamation-alert-banner {
+    -fx-background-color: rgba(15, 23, 42, 0.55);
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 12;
+    -fx-padding: 10 14;
+}
+
+.reclamation-alert-urgent {
+    -fx-text-fill: #fecaca;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+}
+
+.reclamation-alert-info {
+    -fx-text-fill: #bfdbfe;
+    -fx-font-size: 13px;
+}
+
+.reclamation-alert-warn {
+    -fx-text-fill: #fde68a;
+    -fx-font-size: 13px;
+}
+
+.reclamation-alert-ok {
+    -fx-text-fill: rgba(249, 250, 251, 0.55);
+    -fx-font-size: 12px;
+}
+
+.reclamation-stats-bars {
+    -fx-wrap-text: true;
+}
+
+.reclamation-stats-column {
+    -fx-min-width: 200;
+    -fx-max-width: 240;
+}
+
+.reclamation-stats-col-title {
+    -fx-text-fill: #F9FAFB;
+    -fx-font-size: 13px;
+    -fx-font-weight: 800;
+}
+
+.reclamation-dist-label {
+    -fx-text-fill: rgba(249, 250, 251, 0.75);
+    -fx-font-size: 11px;
+}
+
+/* Barres de répartition et taux (même rendu : piste sombre, remplissage bleu, hauteur / arrondi alignés). */
+.reclamation-dist-bar,
+.reclamation-rate-bar {
+    -fx-pref-height: 10;
+    -fx-max-height: 10;
+    -fx-min-height: 10;
+}
+
+.reclamation-dist-bar .track,
+.reclamation-rate-bar .track {
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-background-radius: 5;
+}
+
+.reclamation-dist-bar .bar,
+.reclamation-rate-bar .bar {
+    -fx-background-color: linear-gradient(to right, #3b82f6, #60a5fa);
+    -fx-background-radius: 5;
+    -fx-background-insets: 0;
+}
+
+.reclamation-rate-column {
+    -fx-min-width: 220;
+}
+
+.reclamation-rate-label {
+    -fx-text-fill: rgba(249, 250, 251, 0.8);
+    -fx-font-size: 12px;
+}
+
+/* Actions rapides sur les cartes (FlowPane dans le pied) */
+.reclamation-card-actions-flow .reclamation-card-action-btn {
+    -fx-min-height: 34;
+    -fx-min-width: 96;
+    -fx-padding: 10 16;
+    -fx-font-size: 12px;
+}
+
+.reclamation-card-assign {
+    -fx-text-fill: rgba(249, 250, 251, 0.65);
+    -fx-font-size: 11px;
+}
+
+.reclamation-card-unassigned {
+    -fx-text-fill: #fde68a;
+    -fx-font-weight: 700;
+}
+
+.badge-assign-none {
+    -fx-background-color: rgba(251, 191, 36, 0.25);
+    -fx-text-fill: #fef3c7;
+    -fx-border-color: rgba(251, 191, 36, 0.45);
+    -fx-border-radius: 8;
+}
+
+.badge-assign-ok {
+    -fx-background-color: rgba(34, 197, 94, 0.22);
+    -fx-text-fill: #bbf7d0;
+    -fx-border-color: rgba(34, 197, 94, 0.4);
+    -fx-border-radius: 8;
+}
+
+.reclamation-hist-scroll {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+}
+.reclamation-hist-scroll .viewport {
+    -fx-background-color: rgba(0, 0, 0, 0.15);
+}
+
+.reclamation-hist-row {
+    -fx-background-color: rgba(255, 255, 255, 0.04);
+    -fx-background-radius: 10;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-radius: 10;
+    -fx-padding: 10 12;
+}
+
+.reclamation-hist-date {
+    -fx-text-fill: rgba(249, 250, 251, 0.5);
+    -fx-font-size: 11px;
+}
+
+.reclamation-hist-action {
+    -fx-text-fill: #93c5fd;
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+}
+
+.reclamation-hist-detail {
+    -fx-text-fill: #e2e8f0;
+    -fx-font-size: 12px;
 }

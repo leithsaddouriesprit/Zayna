@@ -26,6 +26,7 @@ public class AdminHomeController implements Initializable {
     @FXML private Label lblPendingChild;
     @FXML private Label lblPendingChauffeur;
     @FXML private Label lblPendingCandidatureEcole;
+    @FXML private Label lblPendingReclamations;
     @FXML private Label lblSchools;
     @FXML private Label lblAssignedChauffeurs;
 
@@ -37,6 +38,7 @@ public class AdminHomeController implements Initializable {
     private final CandidatureService candidatureService = new CandidatureService();
     private final EcoleService ecoleService = new EcoleService();
     private final CandidatureAgentService candidatureAgentService = new CandidatureAgentService();
+    private final ReclamationService reclamationService = new ReclamationService();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -82,6 +84,11 @@ public class AdminHomeController implements Initializable {
                 pendingCandidatureEcole = candidatureAgentService.countByStatut(CandidatureAgentStatut.EN_ATTENTE);
             } catch (SQLException ignored) {}
 
+            int pendingReclamations = 0;
+            try {
+                pendingReclamations = reclamationService.countReclamationsOuvertesGlobale();
+            } catch (SQLException ignored) {}
+
             int schools = 0;
             try { schools = ecoleService.selectAll().size(); } catch (SQLException ignored) {}
 
@@ -97,6 +104,9 @@ public class AdminHomeController implements Initializable {
             if (lblPendingChauffeur != null) lblPendingChauffeur.setText(String.valueOf(pendingChauffeur));
             if (lblPendingCandidatureEcole != null) {
                 lblPendingCandidatureEcole.setText(String.valueOf(pendingCandidatureEcole));
+            }
+            if (lblPendingReclamations != null) {
+                lblPendingReclamations.setText(String.valueOf(pendingReclamations));
             }
             if (lblSchools != null) lblSchools.setText(String.valueOf(schools));
             if (lblAssignedChauffeurs != null) lblAssignedChauffeurs.setText(String.valueOf(assignedChauffeurs));

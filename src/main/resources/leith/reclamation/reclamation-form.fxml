@@ -44,6 +44,13 @@
                 </VBox>
             </HBox>
 
+            <VBox fx:id="boxParentEcole" spacing="6" visible="false" managed="false" maxWidth="640">
+                <Label text="École concernée" styleClass="reclamation-detail-label"/>
+                <ComboBox fx:id="cbEcoleParent" maxWidth="Infinity" styleClass="reclamation-field"/>
+                <Label fx:id="lblParentEcoleHint" wrapText="true" visible="false" managed="false"
+                       styleClass="reclamation-hint"/>
+            </VBox>
+
             <HBox spacing="12">
                 <Button text="Enregistrer" onAction="#enregistrer" styleClass="btn-primary" minWidth="120"/>
                 <Button text="Annuler" onAction="#annuler" styleClass="btn-soft" minWidth="100"/>

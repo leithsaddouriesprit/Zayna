@@ -15,9 +15,17 @@ public class Reclamation {
     private String statut;
     private String roleCreateur;
     private int userId;
+    /** Utilisateur responsable (agent/admin) — nullable. */
+    private Integer userIdAssigne;
+    private String roleAssigne;
+    private Timestamp dateAssignation;
     private Integer idParent;
     private Integer idChauffeur;
     private Integer idMaitresse;
+    /**
+     * École concernée par le ticket lorsqu’elle peut être déterminée à la création (candidature acceptée,
+     * bus du chauffeur, session agent/maîtresse, etc.). Nullable si non déductible.
+     */
     private Integer idEcole;
     private Integer idBus;
     private Integer idTrajet;
@@ -86,6 +94,34 @@ public class Reclamation {
 
     public void setUserId(int userId) {
         this.userId = userId;
+    }
+
+    public Integer getUserIdAssigne() {
+        return userIdAssigne;
+    }
+
+    public void setUserIdAssigne(Integer userIdAssigne) {
+        this.userIdAssigne = userIdAssigne;
+    }
+
+    public String getRoleAssigne() {
+        return roleAssigne;
+    }
+
+    public void setRoleAssigne(String roleAssigne) {
+        this.roleAssigne = roleAssigne;
+    }
+
+    public Timestamp getDateAssignation() {
+        return dateAssignation;
+    }
+
+    public void setDateAssignation(Timestamp dateAssignation) {
+        this.dateAssignation = dateAssignation;
+    }
+
+    public boolean isAssignee() {
+        return userIdAssigne != null && userIdAssigne > 0;
     }
 
     public Integer getIdParent() {

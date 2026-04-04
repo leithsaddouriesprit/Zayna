@@ -121,6 +121,41 @@ public final class ReclamationUiHelper {
         return canRespondOrChangeStatut() && canView(r);
     }
 
+    /** Assignation à un autre utilisateur (liste dédiée) : admin uniquement. */
+    public static boolean canAssignToOtherUsers() {
+        return isAdmin();
+    }
+
+    /**
+     * Retirer l’assignation : admin toujours ; agent seulement si le ticket lui est assigné.
+     */
+    public static boolean canReleaseAssignment(Reclamation r) {
+        if (r == null || !r.isAssignee() || !canRespondOrChangeStatut()) {
+            return false;
+        }
+        if (isAdmin()) {
+            return true;
+        }
+        Integer uid = AppSession.getInstance().getConnectedUserId();
+        return uid != null && uid.equals(r.getUserIdAssigne());
+    }
+
+    /**
+     * @param nomAssigneResolu {@code users.nom} si connu ; sinon passer {@code null} pour le fallback {@code utilisateur #id}.
+     */
+    public static String formatAssignationCourte(Reclamation r, String nomAssigneResolu) {
+        if (r == null || !r.isAssignee()) {
+            return "Non assignée";
+        }
+        String who;
+        if (nomAssigneResolu != null && !nomAssigneResolu.isBlank()) {
+            who = nomAssigneResolu.trim();
+        } else {
+            who = "utilisateur #" + r.getUserIdAssigne();
+        }
+        return "Responsable : " + who + " (" + roleLabelAssignDisplay(r.getRoleAssigne()) + ")";
+    }
+
     public static String categorieEmoji(String categorie) {
         if (categorie == null) {
             return "📋";
@@ -164,6 +199,39 @@ public final class ReclamationUiHelper {
             default:
                 return dbRole;
         }
+    }
+
+    /** Libellé métier pour l’assignation / l’historique (ex. Agent École). */
+    public static String roleLabelAssignDisplay(String dbRole) {
+        if (dbRole == null) {
+            return "—";
+        }
+        switch (dbRole) {
+            case "PARENT":
+                return "Parent";
+            case "CHAUFFEUR":
+                return "Chauffeur";
+            case "MAITRESSE":
+                return "Maîtresse";
+            case "AGENT_ECOLE":
+            case "RESPONSABLEECOLE":
+                return "Agent École";
+            case "ADMIN":
+                return "Admin";
+            default:
+                return roleLabelShort(dbRole);
+        }
+    }
+
+    /**
+     * Affichage du créateur à partir de {@code users.nom} si disponible.
+     * @param nomResolu valeur {@code users.nom} ou {@code null}
+     */
+    public static String formatCreateurDisplay(int userId, String nomResolu) {
+        if (nomResolu != null && !nomResolu.isBlank()) {
+            return nomResolu.trim();
+        }
+        return "Utilisateur #" + userId;
     }
 
     public static boolean isStatutCloture(String statut) {

@@ -76,6 +76,10 @@
                         <Label text="Candidature école en attente" wrapText="true" styleClass="admin-home-card-title"/>
                         <Label fx:id="lblPendingCandidatureEcole" styleClass="admin-home-card-value"/>
                     </VBox>
+                    <VBox spacing="6" alignment="CENTER" maxWidth="Infinity" styleClass="admin-home-card">
+                        <Label text="Réclamations en attente" wrapText="true" styleClass="admin-home-card-title"/>
+                        <Label fx:id="lblPendingReclamations" styleClass="admin-home-card-value"/>
+                    </VBox>
                     <Region VBox.vgrow="ALWAYS"/>
                 </VBox>
 

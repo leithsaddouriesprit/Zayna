@@ -6,13 +6,18 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 import tn.esprit.workshop.controlleurs.leith.SceneNavigator;
 import tn.esprit.workshop.model.leith.Reclamation;
+import tn.esprit.workshop.services.leith.ReclamationHistoriqueService;
 import tn.esprit.workshop.services.leith.ReclamationService;
+import tn.esprit.workshop.services.leith.ReclamationService.ParentEcoleChoice;
 import tn.esprit.workshop.utilis.AppSession;
 
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,9 +30,16 @@ public class ReclamationFormController implements Initializable {
     @FXML private TextArea taDescription;
     @FXML private ComboBox<String> cbCategorie;
     @FXML private ComboBox<String> cbPriorite;
+    @FXML private VBox boxParentEcole;
+    @FXML private ComboBox<ParentEcoleChoice> cbEcoleParent;
+    @FXML private Label lblParentEcoleHint;
     @FXML private Label lblMessage;
 
     private final ReclamationService reclamationService = new ReclamationService();
+    private final ReclamationHistoriqueService historiqueService = new ReclamationHistoriqueService();
+
+    /** Écoles proposées au parent connecté (vide si autre rôle ou erreur). */
+    private List<ParentEcoleChoice> parentEcolesCharges = Collections.emptyList();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -38,6 +50,51 @@ public class ReclamationFormController implements Initializable {
         cbPriorite.getSelectionModel().selectFirst();
         SceneNavigator.applyAppCssToComboBoxPopup(cbCategorie);
         SceneNavigator.applyAppCssToComboBoxPopup(cbPriorite);
+
+        if ("PARENT".equals(ReclamationUiHelper.filterRoleKey())) {
+            AppSession s = AppSession.getInstance();
+            if (s.getParentId() > 0) {
+                try {
+                    parentEcolesCharges = reclamationService.listEcolesLieesAuParent(s.getParentId());
+                } catch (SQLException e) {
+                    LOG.log(Level.WARNING, "écoles liées au parent", e);
+                    parentEcolesCharges = Collections.emptyList();
+                }
+                setupParentEcoleUi();
+            }
+        }
+    }
+
+    private void setupParentEcoleUi() {
+        boxParentEcole.setVisible(true);
+        boxParentEcole.setManaged(true);
+        cbEcoleParent.getItems().setAll(parentEcolesCharges);
+        SceneNavigator.applyAppCssToComboBoxPopup(cbEcoleParent);
+        lblParentEcoleHint.setVisible(false);
+        lblParentEcoleHint.setManaged(false);
+
+        if (parentEcolesCharges.isEmpty()) {
+            lblParentEcoleHint.setText(
+                    "Aucune école n’est liée à vos enfants (candidature acceptée ou enfant actif sur un trajet d’école). "
+                            + "La réclamation sera enregistrée sans école rattachée.");
+            lblParentEcoleHint.setVisible(true);
+            lblParentEcoleHint.setManaged(true);
+            cbEcoleParent.setDisable(true);
+            cbEcoleParent.getSelectionModel().clearSelection();
+            return;
+        }
+
+        cbEcoleParent.setDisable(false);
+        lblParentEcoleHint.setVisible(false);
+        lblParentEcoleHint.setManaged(false);
+
+        if (parentEcolesCharges.size() == 1) {
+            cbEcoleParent.getSelectionModel().selectFirst();
+            cbEcoleParent.setDisable(true);
+        } else {
+            cbEcoleParent.setPromptText("Choisir l’école concernée…");
+            cbEcoleParent.getSelectionModel().clearSelection();
+        }
     }
 
     @FXML
@@ -96,7 +153,18 @@ public class ReclamationFormController implements Initializable {
                         return;
                     }
                     r.setIdParent(s.getParentId());
-                    r.setIdEcole(reclamationService.findLikelyEcoleIdForParent(s.getParentId()));
+                    if (parentEcolesCharges.size() > 1) {
+                        ParentEcoleChoice ch = cbEcoleParent.getSelectionModel().getSelectedItem();
+                        if (ch == null) {
+                            showMsg("Veuillez sélectionner l’école concernée par cette réclamation.", true);
+                            return;
+                        }
+                        r.setIdEcole(ch.idEcole);
+                    } else if (parentEcolesCharges.size() == 1) {
+                        r.setIdEcole(parentEcolesCharges.get(0).idEcole);
+                    } else {
+                        r.setIdEcole(null);
+                    }
                     break;
                 case "CHAUFFEUR":
                     if (s.getChauffeurId() == null) {
@@ -104,13 +172,21 @@ public class ReclamationFormController implements Initializable {
                         return;
                     }
                     r.setIdChauffeur(s.getChauffeurId());
+                    // École du bus affecté à ce chauffeur (si présent en base) ; sinon id_ecole reste null.
+                    r.setIdEcole(reclamationService.findLikelyEcoleIdForChauffeur(s.getChauffeurId()));
                     break;
                 case "MAITRESSE":
                     if (s.getMaitresseId() == null) {
                         showMsg("Profil maîtresse introuvable.", true);
                         return;
                     }
+                    if (s.getEcoleId() == null) {
+                        showMsg("École introuvable pour votre session. Impossible de rattacher la réclamation à une école.",
+                                true);
+                        return;
+                    }
                     r.setIdMaitresse(s.getMaitresseId());
+                    // Une maîtresse est rattachée à une école via la session (même source que les écrans agent).
                     r.setIdEcole(s.getEcoleId());
                     break;
                 case "AGENT_ECOLE":
@@ -122,10 +198,24 @@ public class ReclamationFormController implements Initializable {
                     break;
                 case "ADMIN":
                 default:
+                    // Pas d’école par défaut : compte non rattaché à une école précise.
                     break;
             }
 
             reclamationService.ajouter(r);
+            String rk = ReclamationUiHelper.filterRoleKey();
+            if (rk != null) {
+                historiqueService.enregistrer(
+                        r.getId(),
+                        ReclamationHistoriqueService.ACTION_CREATION,
+                        null,
+                        ReclamationService.STATUT_NOUVELLE,
+                        null,
+                        null,
+                        "Création : " + (r.getObjet() != null ? r.getObjet() : ""),
+                        uid,
+                        rk);
+            }
             AppSession.setFlashMessage("Réclamation enregistrée.");
             SceneNavigator.navigateReclamationList();
         } catch (SQLException e) {

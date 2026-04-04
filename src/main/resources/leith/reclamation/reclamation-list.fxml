@@ -7,54 +7,72 @@
 
 <VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="tn.esprit.workshop.controlleurs.leith.reclamation.ReclamationListController"
-      styleClass="content-area admin-main-panel reclamation-root" spacing="0">
+      styleClass="content-area admin-main-panel reclamation-root" spacing="0" VBox.vgrow="ALWAYS">
     <stylesheets>
         <URL value="@../design/global.css"/>
         <URL value="@../app.css"/>
         <URL value="@reclamation.css"/>
     </stylesheets>
-    <padding>
-        <Insets top="20" right="24" bottom="24" left="24"/>
-    </padding>
 
-    <VBox spacing="6" styleClass="reclamation-detail-header">
-        <Label text="Réclamations" styleClass="reclamation-title"/>
-        <Label text="Tableau de bord, filtres avancés et suivi des tickets par rôle." styleClass="reclamation-sub"/>
-    </VBox>
+    <ScrollPane fitToWidth="true" styleClass="reclamation-scroll reclamation-page-scroll" VBox.vgrow="ALWAYS"
+                hbarPolicy="NEVER" pannable="false">
+        <VBox spacing="0" styleClass="reclamation-list-scroll-content">
+            <padding>
+                <Insets top="20" right="24" bottom="24" left="24"/>
+            </padding>
 
-    <HBox fx:id="kpiBar" styleClass="reclamation-kpi-bar" spacing="10" alignment="CENTER_LEFT">
-        <padding>
-            <Insets bottom="14" top="4"/>
-        </padding>
-    </HBox>
+            <VBox spacing="6" styleClass="reclamation-detail-header">
+                <Label text="Réclamations" styleClass="reclamation-title"/>
+                <Label text="Tableau de bord, filtres avancés et suivi des tickets par rôle." styleClass="reclamation-sub"/>
+            </VBox>
 
-    <VBox spacing="10" styleClass="reclamation-toolbar-block">
-        <HBox styleClass="reclamation-toolbar" alignment="CENTER_LEFT" spacing="10">
-            <TextField fx:id="searchField" promptText="Rechercher (objet ou description)…" prefWidth="240"
-                       styleClass="reclamation-field"/>
-            <ComboBox fx:id="cbStatut" prefWidth="130" promptText="Statut" styleClass="reclamation-field"/>
-            <ComboBox fx:id="cbCategorie" prefWidth="150" promptText="Catégorie" styleClass="reclamation-field"/>
-            <ComboBox fx:id="cbPriorite" prefWidth="130" promptText="Priorité" styleClass="reclamation-field"/>
-            <Button text="Filtrer" onAction="#appliquerFiltres" styleClass="btn-soft" minWidth="90"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Button fx:id="btnNouvelle" text="＋ Nouvelle réclamation" onAction="#nouvelleReclamation"
-                    styleClass="btn-primary" minWidth="190"/>
-        </HBox>
-        <HBox styleClass="reclamation-toolbar" alignment="CENTER_LEFT" spacing="10">
-            <ComboBox fx:id="cbRoleCreateur" prefWidth="160" promptText="Rôle créateur" styleClass="reclamation-field"/>
-            <ComboBox fx:id="cbPeriode" prefWidth="170" promptText="Période" styleClass="reclamation-field"/>
-            <ComboBox fx:id="cbTri" prefWidth="200" promptText="Tri" styleClass="reclamation-field"/>
-            <Label text="Astuce : combinez les filtres ; « TOUS » / « TOUTES » n’applique pas de contrainte."
-                   styleClass="reclamation-hint" wrapText="true" maxWidth="420"/>
-        </HBox>
-    </VBox>
+            <HBox fx:id="kpiBar" styleClass="reclamation-kpi-bar" spacing="10" alignment="CENTER_LEFT">
+                <padding>
+                    <Insets bottom="14" top="4"/>
+                </padding>
+            </HBox>
 
-    <Label fx:id="lblFlash" styleClass="success-message" visible="false" managed="false" wrapText="true"/>
-    <Label fx:id="lblError" styleClass="reclamation-error" visible="false" managed="false" wrapText="true"/>
-    <Label fx:id="lblEmpty" text="Aucune réclamation ne correspond aux critères." styleClass="reclamation-empty-state"
-           visible="false" managed="false" wrapText="true"/>
+            <VBox fx:id="alertBanner" styleClass="reclamation-alert-banner" spacing="6" visible="false" managed="false">
+                <padding>
+                    <Insets bottom="10" left="4" right="4"/>
+                </padding>
+            </VBox>
 
-    <ScrollPane fitToWidth="true" styleClass="reclamation-scroll" VBox.vgrow="ALWAYS" hbarPolicy="NEVER">
-        <FlowPane fx:id="cardsPane" styleClass="reclamation-cards-flow"/>
+            <HBox fx:id="statsDistributionBar" styleClass="reclamation-stats-bars" spacing="16" alignment="TOP_LEFT">
+                <padding>
+                    <Insets bottom="12" left="4" right="4"/>
+                </padding>
+            </HBox>
+
+            <VBox spacing="10" styleClass="reclamation-toolbar-block">
+                <HBox styleClass="reclamation-toolbar" alignment="CENTER_LEFT" spacing="10">
+                    <TextField fx:id="searchField" promptText="Rechercher (objet ou description)…" prefWidth="240"
+                               styleClass="reclamation-field"/>
+                    <ComboBox fx:id="cbStatut" prefWidth="130" promptText="Statut" styleClass="reclamation-field"/>
+                    <ComboBox fx:id="cbCategorie" prefWidth="150" promptText="Catégorie" styleClass="reclamation-field"/>
+                    <ComboBox fx:id="cbPriorite" prefWidth="130" promptText="Priorité" styleClass="reclamation-field"/>
+                    <Button text="Filtrer" onAction="#appliquerFiltres" styleClass="btn-soft" minWidth="90"/>
+                    <Button text="Exporter la liste" onAction="#exporterListe" styleClass="btn-soft" minWidth="128"/>
+                    <Button text="Exporter les stats" onAction="#exporterStats" styleClass="btn-soft" minWidth="128"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="btnNouvelle" text="＋ Nouvelle réclamation" onAction="#nouvelleReclamation"
+                            styleClass="btn-primary" minWidth="190"/>
+                </HBox>
+                <HBox styleClass="reclamation-toolbar" alignment="CENTER_LEFT" spacing="10">
+                    <ComboBox fx:id="cbRoleCreateur" prefWidth="160" promptText="Rôle créateur" styleClass="reclamation-field"/>
+                    <ComboBox fx:id="cbPeriode" prefWidth="170" promptText="Période" styleClass="reclamation-field"/>
+                    <ComboBox fx:id="cbTri" prefWidth="200" promptText="Tri" styleClass="reclamation-field"/>
+                    <Label text="Astuce : combinez les filtres ; « TOUS » / « TOUTES » n’applique pas de contrainte."
+                           styleClass="reclamation-hint" wrapText="true" maxWidth="420"/>
+                </HBox>
+            </VBox>
+
+            <Label fx:id="lblFlash" styleClass="success-message" visible="false" managed="false" wrapText="true"/>
+            <Label fx:id="lblError" styleClass="reclamation-error" visible="false" managed="false" wrapText="true"/>
+            <Label fx:id="lblEmpty" text="Aucune réclamation ne correspond aux critères." styleClass="reclamation-empty-state"
+                   visible="false" managed="false" wrapText="true"/>
+
+            <FlowPane fx:id="cardsPane" styleClass="reclamation-cards-flow"/>
+        </VBox>
     </ScrollPane>
 </VBox>

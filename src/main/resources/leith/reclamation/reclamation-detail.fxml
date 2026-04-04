@@ -33,6 +33,28 @@
             <Label fx:id="lblResumeTraitement" wrapText="true" styleClass="reclamation-detail-hint"/>
         </VBox>
 
+        <VBox styleClass="reclamation-detail-box" spacing="10">
+            <Label text="État du traitement (synthèse)" styleClass="reclamation-detail-label"/>
+            <GridPane hgap="24" vgap="8">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="160" prefWidth="180"/>
+                    <ColumnConstraints hgrow="ALWAYS" minWidth="200"/>
+                </columnConstraints>
+                <Label text="Statut" styleClass="reclamation-detail-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <Label fx:id="lblSynthStatut" styleClass="reclamation-detail-text" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                <Label text="Priorité" styleClass="reclamation-detail-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <Label fx:id="lblSynthPriorite" styleClass="reclamation-detail-text" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                <Label text="Assignation" styleClass="reclamation-detail-label" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                <Label fx:id="lblSynthAssign" styleClass="reclamation-detail-text" wrapText="true" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                <Label text="Nombre de réponses" styleClass="reclamation-detail-label" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                <Label fx:id="lblSynthReponses" styleClass="reclamation-detail-text" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                <Label text="Dernière modification" styleClass="reclamation-detail-label" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                <Label fx:id="lblSynthModif" styleClass="reclamation-detail-text" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                <Label text="Dernière action tracée" styleClass="reclamation-detail-label" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                <Label fx:id="lblSynthDerniereAction" styleClass="reclamation-detail-text" wrapText="true" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+            </GridPane>
+        </VBox>
+
         <VBox styleClass="reclamation-detail-box" spacing="8">
             <Label text="Description" styleClass="reclamation-detail-label"/>
             <Label fx:id="lblDescription" styleClass="reclamation-detail-text" wrapText="true"/>
@@ -43,7 +65,7 @@
                 <ColumnConstraints minWidth="140" prefWidth="160"/>
                 <ColumnConstraints hgrow="ALWAYS" minWidth="200"/>
             </columnConstraints>
-            <Label text="Créateur (user)" styleClass="reclamation-detail-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <Label text="Créateur" styleClass="reclamation-detail-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
             <Label fx:id="lblCreateur" styleClass="reclamation-detail-text" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
             <Label text="Rôle créateur" styleClass="reclamation-detail-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
             <Label fx:id="lblRoleCreateur" styleClass="reclamation-detail-text" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
@@ -51,7 +73,7 @@
             <Label fx:id="lblDateCreation" styleClass="reclamation-detail-text" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
             <Label text="Dernière modification" styleClass="reclamation-detail-label" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
             <Label fx:id="lblDateModification" styleClass="reclamation-detail-text" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
-            <Label text="École" styleClass="reclamation-detail-label" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+            <Label text="École concernée" styleClass="reclamation-detail-label" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
             <Label fx:id="lblEcole" styleClass="reclamation-detail-text" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
             <Label text="Bus" styleClass="reclamation-detail-label" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
             <Label fx:id="lblBus" styleClass="reclamation-detail-text" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
@@ -66,8 +88,30 @@
                    styleClass="reclamation-empty-state-inner" visible="false" managed="false" wrapText="true"/>
         </VBox>
 
+        <VBox spacing="8">
+            <Label text="Historique de traitement" styleClass="reclamation-section-title"/>
+            <ScrollPane maxHeight="260" fitToWidth="true" styleClass="reclamation-hist-scroll" hbarPolicy="NEVER">
+                <VBox fx:id="historiqueBox" spacing="10"/>
+            </ScrollPane>
+            <Label fx:id="lblHistoriqueVide" text="Aucun événement enregistré dans l’historique."
+                   styleClass="reclamation-empty-state-inner" visible="false" managed="false" wrapText="true"/>
+        </VBox>
+
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <Button text="Exporter ce dossier (CSV)" onAction="#exporterDetailCsv" styleClass="btn-soft" minWidth="220"/>
+        </HBox>
+
         <VBox fx:id="boxTraitement" spacing="12" styleClass="reclamation-detail-box" visible="false" managed="false">
-            <Label text="Traitement (agent / administrateur)" styleClass="reclamation-detail-label"/>
+            <Label text="Traitement — assignation" styleClass="reclamation-detail-label"/>
+            <Label fx:id="lblAssignInfo" wrapText="true" styleClass="reclamation-detail-text"/>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Button fx:id="btnPrendreCharge" text="Prendre en charge" onAction="#prendreEnCharge" styleClass="btn-soft"/>
+                <ComboBox fx:id="cbAssignUser" prefWidth="300" styleClass="reclamation-field" visible="false" managed="false"/>
+                <Button fx:id="btnAssigner" text="Assigner" onAction="#assignerUtilisateur" styleClass="btn-soft" visible="false" managed="false"/>
+                <Button fx:id="btnLibererAssign" text="Libérer l’assignation" onAction="#libererAssignation" styleClass="btn-danger-soft" visible="false" managed="false"/>
+            </HBox>
+
+            <Label text="Statut" styleClass="reclamation-detail-label"/>
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <ComboBox fx:id="cbStatut" prefWidth="200" promptText="Nouveau statut" styleClass="reclamation-field"/>
                 <Button text="Mettre à jour le statut" onAction="#mettreAJourStatut" styleClass="btn-soft"/>

@@ -11,6 +11,7 @@ import tn.esprit.workshop.services.leith.BusService;
 import tn.esprit.workshop.services.leith.CandidatureEnfantService;
 import tn.esprit.workshop.services.leith.CandidatureService;
 import tn.esprit.workshop.services.leith.EcoleService;
+import tn.esprit.workshop.services.leith.ReclamationService;
 import tn.esprit.workshop.model.tous.Ecole;
 
 import java.net.URL;
@@ -39,6 +40,7 @@ public class AdminStatsController implements Initializable {
     private final BusService busService = new BusService();
     private final CandidatureEnfantService candidatureEnfantService = new CandidatureEnfantService();
     private final CandidatureService candidatureService = new CandidatureService();
+    private final ReclamationService reclamationService = new ReclamationService();
 
     public static final class SchoolStatsRow {
         private final String ecoleNom;
@@ -109,27 +111,42 @@ public class AdminStatsController implements Initializable {
                     .filter(c -> c.getIdEcole() != 0)
                     .collect(Collectors.groupingBy(c -> c.getIdEcole(), Collectors.counting()));
 
+            Map<Integer, Integer> reclamationsByEcole = reclamationService.countReclamationsByEcoleIdGlobale();
+
             List<SchoolStatsRow> rows = new ArrayList<>();
             // Union of all school ids appearing in any stats map
             Set<Integer> ids = Stream.of(trajetsByEcole.keySet(), enfantsByEcole.keySet(),
-                            busesByEcole.keySet(), pendingChildByEcole.keySet(), acceptedChauffeursByEcole.keySet())
+                            busesByEcole.keySet(), pendingChildByEcole.keySet(), acceptedChauffeursByEcole.keySet(),
+                            reclamationsByEcole.keySet())
                     .flatMap(Set::stream)
                     .collect(Collectors.toCollection(LinkedHashSet::new));
 
             for (Integer id : ids) {
-                String nom = ecoleNames.getOrDefault(id, "École #" + id);
+                String nom = ecoleNames.get(id);
+                if (nom == null || nom.isBlank()) {
+                    nom = "École";
+                }
                 int nbTrajets = trajetsByEcole.getOrDefault(id, 0L).intValue();
                 int nbEnfants = enfantsByEcole.getOrDefault(id, 0L).intValue();
                 int nbBuses = busesByEcole.getOrDefault(id, 0L).intValue();
                 int nbPendingChild = pendingChildByEcole.getOrDefault(id, 0L).intValue();
                 int nbAccepted = acceptedChauffeursByEcole.getOrDefault(id, 0L).intValue();
-                rows.add(new SchoolStatsRow(nom, nbTrajets, nbEnfants, nbBuses, nbPendingChild, nbAccepted, 0));
+                int nbReclamations = reclamationsByEcole.getOrDefault(id, 0);
+                rows.add(new SchoolStatsRow(nom, nbTrajets, nbEnfants, nbBuses, nbPendingChild, nbAccepted, nbReclamations));
             }
 
             tableStats.getItems().setAll(rows);
 
             if (lblTopReclamationsSchool != null) {
-                lblTopReclamationsSchool.setText("0");
+                ReclamationService.TopEcoleReclamations top = reclamationService.getTopEcoleByReclamationsGlobale();
+                if (top == null || top.nombreReclamations <= 0) {
+                    lblTopReclamationsSchool.setText("Aucune donnée");
+                } else {
+                    String nomTop = top.nomEcole != null && !top.nomEcole.isBlank() ? top.nomEcole.trim() : "École";
+                    String unit = top.nombreReclamations > 1 ? "réclamations" : "réclamation";
+                    lblTopReclamationsSchool.setText(String.format(
+                            java.util.Locale.FRANCE, "%s (%d %s)", nomTop, top.nombreReclamations, unit));
+                }
             }
 
             lblTopTrajetsSchool.setText(rows.stream()
@@ -143,7 +160,7 @@ public class AdminStatsController implements Initializable {
         } catch (SQLException e) {
             e.printStackTrace();
             if (lblTopReclamationsSchool != null) {
-                lblTopReclamationsSchool.setText("0");
+                lblTopReclamationsSchool.setText("—");
             }
         }
     }
