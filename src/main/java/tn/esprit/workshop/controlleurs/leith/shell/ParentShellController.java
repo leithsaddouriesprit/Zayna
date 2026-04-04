@@ -72,7 +72,7 @@ public class ParentShellController {
 
     @FXML
     void openDemandeTransport() {
-        loadContent("/leith/parent/ParentDemandeTransport.fxml");
+        loadContent("/amal/ParentInterface.fxml");
     }
 
     @FXML

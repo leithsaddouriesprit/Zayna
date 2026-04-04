@@ -762,6 +762,130 @@
     -fx-border-color: rgba(109, 94, 247, 0.65);
 }
 
+/* Bandeau total programmes (agent) — accent distinct, thème sombre */
+.programme-total-banner {
+    -fx-background-color: linear-gradient(to right, rgba(14, 165, 233, 0.28), rgba(109, 94, 247, 0.22));
+    -fx-background-radius: 14;
+    -fx-border-color: rgba(56, 189, 248, 0.55);
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+    -fx-padding: 14 20;
+}
+.programme-total-banner .label {
+    -fx-text-fill: #e0f2fe;
+    -fx-font-size: 15px;
+    -fx-font-weight: 700;
+    -fx-letter-spacing: 0.02em;
+}
+
+/* Fenêtre météo (parent) */
+.parent-weather-shell {
+    -fx-padding: 0;
+    -fx-max-width: 440;
+}
+.parent-weather-header {
+    -fx-background-color: linear-gradient(to bottom, rgba(109, 94, 247, 0.35), rgba(15, 23, 42, 0.2));
+    -fx-background-radius: 18 18 0 0;
+    -fx-border-color: rgba(255, 255, 255, 0.12);
+    -fx-border-width: 0 0 1 0;
+}
+.parent-weather-temp {
+    -fx-text-fill: #F9FAFB;
+    -fx-font-size: 42px;
+    -fx-font-weight: 800;
+}
+.parent-weather-feels {
+    -fx-text-fill: rgba(249, 250, 251, 0.85);
+    -fx-font-size: 15px;
+    -fx-font-weight: 600;
+}
+.parent-weather-desc {
+    -fx-text-fill: rgba(226, 232, 240, 0.95);
+    -fx-font-size: 16px;
+    -fx-font-weight: 500;
+    -fx-text-alignment: center;
+}
+.parent-weather-stats {
+    -fx-padding: 8 0 4 0;
+}
+.parent-weather-footer {
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-width: 1 0 0 0;
+}
+
+/* Fenêtre calendrier jours fériés (parent) */
+.parent-calendar-root {
+    -fx-padding: 0;
+}
+.parent-calendar-header {
+    -fx-background-color: rgba(255, 255, 255, 0.04);
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-width: 0 0 1 0;
+    -fx-background-radius: 12;
+}
+.parent-calendar-badges {
+    -fx-padding: 4 0 0 0;
+}
+.parent-calendar-badge {
+    -fx-background-color: rgba(109, 94, 247, 0.22);
+    -fx-background-radius: 20;
+    -fx-border-color: rgba(109, 94, 247, 0.45);
+    -fx-border-radius: 20;
+    -fx-border-width: 1;
+    -fx-padding: 8 16;
+    -fx-text-fill: #e9d5ff;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+}
+/* Sélection d’année (calendrier parent) : même esprit que les badges, sans TabPane visible */
+.parent-calendar-year-btn {
+    -fx-background-color: rgba(109, 94, 247, 0.22);
+    -fx-background-radius: 20;
+    -fx-border-color: rgba(109, 94, 247, 0.45);
+    -fx-border-radius: 20;
+    -fx-border-width: 1;
+    -fx-padding: 8 16;
+    -fx-text-fill: #e9d5ff;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+    -fx-cursor: hand;
+}
+.parent-calendar-year-btn:hover {
+    -fx-background-color: rgba(109, 94, 247, 0.30);
+    -fx-border-color: rgba(167, 139, 250, 0.55);
+}
+.parent-calendar-year-btn:selected {
+    -fx-background-color: rgba(109, 94, 247, 0.48);
+    -fx-border-color: rgba(196, 181, 253, 0.9);
+    -fx-text-fill: #f5f3ff;
+}
+.parent-calendar-year-btn:focused {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+.parent-calendar-tabs {
+    -fx-padding: 12 0 8 0;
+}
+.parent-calendar-tabs .tab-header-area {
+    -fx-padding: 0 0 8 0;
+}
+.parent-calendar-tabs .tab {
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-background-radius: 10 10 0 0;
+    -fx-padding: 10 22;
+}
+.parent-calendar-tabs .tab:selected {
+    -fx-background-color: rgba(109, 94, 247, 0.35);
+}
+.parent-calendar-tabs .tab .tab-label {
+    -fx-text-fill: #F9FAFB;
+    -fx-font-weight: 700;
+}
+.parent-calendar-footer {
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-width: 1 0 0 0;
+}
+
 .shell-chat-panel {
     -fx-background-color: #1e293b;
     -fx-background-radius: 16;

@@ -5,15 +5,18 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.stage.Stage;
 import tn.esprit.workshop.model.amal.Programme;
+import tn.esprit.workshop.model.tous.Ecole;
 import tn.esprit.workshop.services.amal.ProgrammeService;
+import tn.esprit.workshop.services.leith.EcoleService;
+import tn.esprit.workshop.utilis.AppSession;
 
 import java.sql.SQLException;
 import java.util.Optional;
 
 public class ProgrammeController {
 
+    @FXML private Label lblEcoleNom;
     @FXML private TextField tfNom;
     @FXML private TextField tfNiveau;
     @FXML private TextField tfDuree;
@@ -27,6 +30,7 @@ public class ProgrammeController {
     @FXML private Label lblTotalProgrammes;
 
     private final ProgrammeService programmeService = new ProgrammeService();
+    private final EcoleService ecoleService = new EcoleService();
 
     private ObservableList<Programme> programmeList = FXCollections.observableArrayList();
 
@@ -34,8 +38,27 @@ public class ProgrammeController {
     public void initialize() {
         setupTableColumns();
         setupTableSelectionListener();
+        refreshEcoleHeader();
         loadTable();
         setupNumericValidation();
+    }
+
+    private void refreshEcoleHeader() {
+        Integer idEcole = AppSession.getInstance().getEcoleId();
+        if (lblEcoleNom == null) {
+            return;
+        }
+        if (idEcole == null) {
+            lblEcoleNom.setText("Aucune école associée à la session.");
+            return;
+        }
+        try {
+            Ecole e = ecoleService.getById(idEcole);
+            String nom = e != null && e.getNomEcole() != null ? e.getNomEcole() : ("École #" + idEcole);
+            lblEcoleNom.setText("École : " + nom);
+        } catch (SQLException ex) {
+            lblEcoleNom.setText("École #" + idEcole);
+        }
     }
 
     private void setupTableColumns() {
@@ -56,8 +79,15 @@ public class ProgrammeController {
     }
 
     private void loadTable() {
+        Integer idEcole = AppSession.getInstance().getEcoleId();
         try {
-            programmeList.setAll(programmeService.selectAllProgrammes());
+            if (idEcole == null) {
+                programmeList.clear();
+                tableProgramme.setItems(programmeList);
+                updateStatistics();
+                return;
+            }
+            programmeList.setAll(programmeService.selectByEcoleId(idEcole));
             tableProgramme.setItems(programmeList);
             updateStatistics();
         } catch (SQLException e) {
@@ -85,12 +115,20 @@ public class ProgrammeController {
     }
 
     @FXML
-    private void clearFields() {
+    void clearFields() {
         tfNom.clear();
         tfNiveau.clear();
         tfDuree.clear();
         tfDescription.clear();
         tableProgramme.getSelectionModel().clearSelection();
+    }
+
+    private boolean validateSessionEcole() {
+        if (AppSession.getInstance().getEcoleId() == null) {
+            showAlert("Session", "Aucune école n'est associée à votre compte agent.", AlertType.WARNING);
+            return false;
+        }
+        return true;
     }
 
     private boolean validateFields() {
@@ -114,14 +152,17 @@ public class ProgrammeController {
 
     @FXML
     private void ajouterProgramme() {
-        if (!validateFields()) return;
+        if (!validateSessionEcole() || !validateFields()) {
+            return;
+        }
 
         try {
             Programme p = new Programme();
+            p.setEcoleId(AppSession.getInstance().getEcoleId());
             p.setNomProgramme(tfNom.getText().trim());
             p.setNiveau(tfNiveau.getText().trim());
             p.setDuree(tfDuree.getText().trim());
-            p.setDescriptionProgramme(tfDescription.getText().trim());
+            p.setDescriptionProgramme(tfDescription.getText() != null ? tfDescription.getText().trim() : "");
 
             programmeService.insertProgramme(p);
             loadTable();
@@ -130,7 +171,6 @@ public class ProgrammeController {
 
         } catch (SQLException e) {
             showAlert("Erreur", "Erreur lors de l'ajout : " + e.getMessage(), AlertType.ERROR);
-            e.printStackTrace();
         }
     }
 
@@ -142,7 +182,9 @@ public class ProgrammeController {
             return;
         }
 
-        if (!validateFields()) return;
+        if (!validateFields()) {
+            return;
+        }
 
         Alert confirm = new Alert(AlertType.CONFIRMATION);
         confirm.setTitle("Confirmation");
@@ -155,7 +197,7 @@ public class ProgrammeController {
                 selected.setNomProgramme(tfNom.getText().trim());
                 selected.setNiveau(tfNiveau.getText().trim());
                 selected.setDuree(tfDuree.getText().trim());
-                selected.setDescriptionProgramme(tfDescription.getText().trim());
+                selected.setDescriptionProgramme(tfDescription.getText() != null ? tfDescription.getText().trim() : "");
 
                 programmeService.updateProgramme(selected);
                 loadTable();
@@ -192,12 +234,6 @@ public class ProgrammeController {
                 showAlert("Erreur", "Erreur lors de la suppression : " + e.getMessage(), AlertType.ERROR);
             }
         }
-    }
-
-    @FXML
-    private void fermerFenetre() {
-        Stage stage = (Stage) tableProgramme.getScene().getWindow();
-        stage.close();
     }
 
     private void showAlert(String title, String message, AlertType type) {

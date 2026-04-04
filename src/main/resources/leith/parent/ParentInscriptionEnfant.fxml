@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.workshop.controlleurs.leith.parent.ParentInscriptionEnfantController"
+            fitToWidth="true" styleClass="root-scroll" hbarPolicy="NEVER">
+    <stylesheets>
+        <URL value="@../design/global.css"/>
+        <URL value="@../app.css"/>
+    </stylesheets>
+    <VBox spacing="18" styleClass="content-area admin-main-panel parent-page" maxWidth="Infinity">
+        <padding>
+            <Insets top="24" right="24" bottom="24" left="24"/>
+        </padding>
+
+        <VBox spacing="18" styleClass="parent-home-frame" fillWidth="true" maxWidth="Infinity">
+            <HBox spacing="14" alignment="CENTER_LEFT">
+                <Button text="← Retour" onAction="#retourDemandeTransport" styleClass="btn-soft" minWidth="120"/>
+                <Region HBox.hgrow="ALWAYS"/>
+            </HBox>
+
+            <VBox spacing="8" styleClass="parent-home-card" maxWidth="Infinity">
+                <Label text="Inscription transport scolaire" styleClass="parent-card-title"/>
+                <Label fx:id="lblEcole" wrapText="true" styleClass="parent-card-text"/>
+                <Label text="L’école ci-dessus est celle choisie à l’écran Demande transport. Le trajet est obligatoire."
+                       wrapText="true" styleClass="parent-card-text"/>
+            </VBox>
+
+            <VBox spacing="12" styleClass="parent-section-panel" maxWidth="Infinity">
+                <Label text="Informations enfant" styleClass="parent-card-title"/>
+                <GridPane fx:id="gridForm" hgap="16" vgap="12" maxWidth="Infinity">
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="140" prefWidth="160" maxWidth="200"/>
+                        <ColumnConstraints hgrow="ALWAYS" minWidth="220"/>
+                    </columnConstraints>
+                    <Label text="Nom *" styleClass="detail-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <TextField fx:id="tfNom" promptText="Nom de l’enfant" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                    <Label text="Prénom *" styleClass="detail-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                    <TextField fx:id="tfPrenom" promptText="Prénom de l’enfant" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                    <Label text="Âge *" styleClass="detail-label" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                    <TextField fx:id="tfAge" promptText="Âge" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                    <Label text="Latitude *" styleClass="detail-label" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                    <TextField fx:id="tfLat" promptText="Ex. 36.8065" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                    <Label text="Longitude *" styleClass="detail-label" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                    <TextField fx:id="tfLng" promptText="Ex. 10.1815" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                    <Label text="Trajet *" styleClass="detail-label" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                    <ComboBox fx:id="comboTrajet" maxWidth="Infinity" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+                </GridPane>
+            </VBox>
+
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <Button fx:id="btnEnvoyer" text="Envoyer la demande" onAction="#envoyer" styleClass="btn-primary" minWidth="180"/>
+            </HBox>
+
+            <Label fx:id="lblMessage" wrapText="true" visible="false" managed="false" styleClass="parent-card-text"/>
+        </VBox>
+    </VBox>
+</ScrollPane>

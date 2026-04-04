@@ -217,7 +217,7 @@ public class SceneNavigator {
     }
 
     /** Applique app.css à la scène et styleClass "root" au nœud racine (palette sombre unique). */
-    private static void applyAppCss(javafx.scene.Scene scene, Parent root) {
+    public static void applyAppCss(javafx.scene.Scene scene, Parent root) {
         java.net.URL cssUrl = SceneNavigator.class.getResource("/leith/app.css");
         if (cssUrl == null) {
             cssUrl = ClassLoader.getSystemResource("leith/app.css");
@@ -569,6 +569,34 @@ public class SceneNavigator {
             stage.show();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error opening ParentDemandeTransport", e);
+        }
+    }
+
+    /** Contenu shell Parent : Demande transport (ParentInterface). */
+    public static void parentShellNavigateDemandeTransport() {
+        if (parentShell != null) {
+            parentShell.loadContent("/amal/ParentInterface.fxml");
+        }
+    }
+
+    /** Contenu shell Parent : inscription enfant (formulaire plein écran). */
+    public static void parentShellNavigateInscriptionEnfant() {
+        if (parentShell != null) {
+            parentShell.loadContent("/leith/parent/ParentInscriptionEnfant.fxml");
+        }
+    }
+
+    /** Contenu shell Parent : calendrier jours fériés. */
+    public static void parentShellNavigateCalendrier() {
+        if (parentShell != null) {
+            parentShell.loadContent("/leith/parent/ParentCalendrier.fxml");
+        }
+    }
+
+    /** Contenu shell Parent : météo. */
+    public static void parentShellNavigateMeteo() {
+        if (parentShell != null) {
+            parentShell.loadContent("/leith/parent/ParentMeteo.fxml");
         }
     }
 

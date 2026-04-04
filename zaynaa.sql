@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 22, 2026 at 12:56 PM
+-- Generation Time: Apr 04, 2026 at 01:28 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -154,6 +154,13 @@ CREATE TABLE `candidature_agent` (
   `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `candidature_agent`
+--
+
+INSERT INTO `candidature_agent` (`id`, `user_id`, `nom`, `prenom`, `id_ecole`, `latitude`, `longitude`, `statut`, `created_at`, `updated_at`) VALUES
+(1, 24, 'ahmed', 'shazli', 2, 36.1815000, 10.1180000, 'APPROUVEE', '2026-03-22 12:13:35', '2026-03-22 12:13:35');
+
 -- --------------------------------------------------------
 
 --
@@ -266,8 +273,7 @@ CREATE TABLE `enfant` (
 
 INSERT INTO `enfant` (`id`, `nom`, `prenom`, `parent_id`, `trajet_id`, `actif`, `on_board`) VALUES
 (1, 'Ali', 'Ben Salah', 1, 1, 1, 0),
-(2, 'monji', 'trigui', 1, 2, 1, 1),
-(3, 'ahmed', 'lehou', 1, 1, 1, 0),
+(2, 'monji', 'trigui', 1, 2, 1, 0),
 (4, 'souhail', 'mansouri', 2, 2, 1, 0);
 
 -- --------------------------------------------------------
@@ -286,6 +292,13 @@ CREATE TABLE `maitresse` (
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `maitresse`
+--
+
+INSERT INTO `maitresse` (`id`, `nom`, `prenom`, `id_ecole`, `id_bus`, `user_id`, `created_at`, `updated_at`) VALUES
+(1, 'ameni', 'ben mokhtar', 2, 5, 29, '2026-03-22 12:27:03', '2026-03-22 12:27:03');
 
 -- --------------------------------------------------------
 
@@ -358,6 +371,21 @@ INSERT INTO `position_bus` (`id`, `id_bus`, `latitude`, `longitude`, `vitesse`, 
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `programme`
+--
+
+CREATE TABLE `programme` (
+  `id` int(11) NOT NULL,
+  `ecoleId` int(11) NOT NULL,
+  `nomProgramme` varchar(255) NOT NULL,
+  `descriptionProgramme` text DEFAULT NULL,
+  `niveau` varchar(50) DEFAULT NULL,
+  `duree` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `trajet`
 --
 
@@ -367,7 +395,7 @@ CREATE TABLE `trajet` (
   `id_bus` int(11) NOT NULL,
   `id_ecole` int(11) NOT NULL,
   `heure_depart` time NOT NULL,
-  `actif` tinyint(1) NOT NULL DEFAULT 1,
+  `prix` decimal(10,2) DEFAULT NULL,
   `statut` varchar(20) NOT NULL DEFAULT 'PLANIFIE'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -375,9 +403,9 @@ CREATE TABLE `trajet` (
 -- Dumping data for table `trajet`
 --
 
-INSERT INTO `trajet` (`id`, `nom`, `id_bus`, `id_ecole`, `heure_depart`, `actif`, `statut`) VALUES
-(1, 'Trajet Test', 1, 2, '07:30:00', 1, 'PLANIFIE'),
-(2, 'Trajet bardo', 5, 2, '07:30:00', 1, 'PLANIFIE');
+INSERT INTO `trajet` (`id`, `nom`, `id_bus`, `id_ecole`, `heure_depart`, `prix`, `statut`) VALUES
+(1, 'Trajet Test', 1, 2, '07:30:00', 150.00, 'PLANIFIE'),
+(2, 'Trajet bardo', 5, 2, '07:30:00', 200.00, 'PLANIFIE');
 
 -- --------------------------------------------------------
 
@@ -417,7 +445,8 @@ INSERT INTO `users` (`id`, `nom`, `email`, `mot_de_passe`, `categorie`, `telepho
 (24, 'ahmed', 'shazli@gmail.com', '$2a$12$cRJXD.L1O.jxlVhpf/VwHeQ07HYimhrccFOv04o24IRBljEenSNEa', 'RESPONSABLEECOLE', '20939784', 'tastour', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, '2026-03-12 00:42:20', NULL),
 (25, 'selim', 'selim@gmail.com', '$2a$12$6Lq0.g2b/I7uLqJOigdjo.wxS3k/tYUMfEEdUpyJ/YwwBtFgfoPIi', 'CHAUFFEUR', '23456789', 'tastour', 'B', '2022-03-16', 'toyota', NULL, NULL, NULL, NULL, NULL, 1300.00, '2026-03-12 01:09:19', NULL),
 (27, 'souhail', 'souhail@gmail.com', '$2a$12$JZ9d3FzJmnz2Ilk6uxupJu88gmLM3frWJz1QwOJl/QvtfOTqUtubS', 'PARENT', '23456789', 'tunis', NULL, NULL, NULL, NULL, NULL, 'medecin', NULL, NULL, 0.00, '2026-03-12 01:58:09', NULL),
-(28, 'mounir', 'troudi@gmail.com', '$2a$12$p4JerxlEVa4HuTL.ImOjWuzkFtvjPLertWOlCyKgiI9ekTKZWjY6G', 'CHAUFFEUR', NULL, NULL, 'B', '2024-03-07', NULL, NULL, NULL, NULL, NULL, NULL, 1555.00, '2026-03-20 19:38:20', NULL);
+(28, 'mounir', 'troudi@gmail.com', '$2a$12$p4JerxlEVa4HuTL.ImOjWuzkFtvjPLertWOlCyKgiI9ekTKZWjY6G', 'CHAUFFEUR', NULL, NULL, 'B', '2024-03-07', NULL, NULL, NULL, NULL, NULL, NULL, 1555.00, '2026-03-20 19:38:20', NULL),
+(29, 'ben mokhtar ameni', 'ameni@gmail.com', '$2a$12$jH23w7sEJcaaNmQJdosZrutCM/0nR2NpOR8NifGXane9lmTvti36q', 'MAITRESSE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, '2026-03-22 12:27:03', NULL);
 
 --
 -- Indexes for dumped tables
@@ -524,6 +553,13 @@ ALTER TABLE `position_bus`
   ADD KEY `idx_position_bus_latest` (`id_bus`,`timestamp`);
 
 --
+-- Indexes for table `programme`
+--
+ALTER TABLE `programme`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_programme_ecole` (`ecoleId`);
+
+--
 -- Indexes for table `trajet`
 --
 ALTER TABLE `trajet`
@@ -570,7 +606,7 @@ ALTER TABLE `candidature`
 -- AUTO_INCREMENT for table `candidature_agent`
 --
 ALTER TABLE `candidature_agent`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `candidature_enfant`
@@ -600,7 +636,7 @@ ALTER TABLE `enfant`
 -- AUTO_INCREMENT for table `maitresse`
 --
 ALTER TABLE `maitresse`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `parent`
@@ -621,16 +657,22 @@ ALTER TABLE `position_bus`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT for table `programme`
+--
+ALTER TABLE `programme`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `trajet`
 --
 ALTER TABLE `trajet`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- Constraints for dumped tables
@@ -712,10 +754,16 @@ ALTER TABLE `position_bus`
   ADD CONSTRAINT `fk_position_bus_bus` FOREIGN KEY (`id_bus`) REFERENCES `bus` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Constraints for table `programme`
+--
+ALTER TABLE `programme`
+  ADD CONSTRAINT `fk_programme_ecole` FOREIGN KEY (`ecoleId`) REFERENCES `ecole` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `trajet`
 --
 ALTER TABLE `trajet`
-  ADD CONSTRAINT `fk_trajet_bus` FOREIGN KEY (`id_bus`) REFERENCES `bus` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_trajet_bus` FOREIGN KEY (`id_bus`) REFERENCES `bus` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_trajet_ecole` FOREIGN KEY (`id_ecole`) REFERENCES `ecole` (`id`) ON DELETE CASCADE;
 COMMIT;
 

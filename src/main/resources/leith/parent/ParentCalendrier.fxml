@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.workshop.controlleurs.leith.parent.ParentCalendrierController"
+      spacing="0" styleClass="content-area admin-main-panel parent-page" maxWidth="Infinity"
+      VBox.vgrow="ALWAYS">
+    <stylesheets>
+        <URL value="@../design/global.css"/>
+        <URL value="@../app.css"/>
+    </stylesheets>
+    <padding>
+        <Insets top="16" right="20" bottom="16" left="20"/>
+    </padding>
+
+    <VBox spacing="12" styleClass="parent-home-frame" fillWidth="true" VBox.vgrow="ALWAYS" maxWidth="Infinity">
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Button text="← Retour" onAction="#retourDemandeTransport" styleClass="btn-soft" minWidth="120"/>
+            <Region HBox.hgrow="ALWAYS"/>
+        </HBox>
+
+        <VBox spacing="10" maxWidth="Infinity" styleClass="parent-calendar-header">
+            <padding>
+                <Insets top="12" right="16" bottom="14" left="16"/>
+            </padding>
+            <Label text="Jours fériés" styleClass="parent-card-title"/>
+            <Label text="Tunisie • données Nager.Date" styleClass="shell-account" wrapText="true"/>
+            <HBox spacing="12" alignment="CENTER_LEFT" styleClass="parent-calendar-badges" maxWidth="Infinity">
+                <ToggleButton fx:id="btnYear2025" mnemonicParsing="false" styleClass="parent-calendar-year-btn"/>
+                <ToggleButton fx:id="btnYear2026" mnemonicParsing="false" styleClass="parent-calendar-year-btn"/>
+                <Region HBox.hgrow="ALWAYS" minWidth="0"/>
+            </HBox>
+        </VBox>
+
+        <StackPane VBox.vgrow="ALWAYS" maxWidth="Infinity" minHeight="0">
+            <VBox fx:id="loadingBox" spacing="12" alignment="CENTER" maxWidth="Infinity" maxHeight="Infinity"
+                  styleClass="parent-section-panel">
+                <ProgressIndicator maxWidth="44" maxHeight="44"/>
+                <Label text="Chargement des jours fériés…" styleClass="parent-card-text"/>
+            </VBox>
+            <VBox fx:id="contentBox" spacing="0" visible="false" managed="false" fillWidth="true"
+                  maxWidth="Infinity" maxHeight="Infinity" VBox.vgrow="ALWAYS"/>
+        </StackPane>
+    </VBox>
+</VBox>

@@ -45,7 +45,7 @@ public class TrackingContextService {
                 trajetId = getTrajetIdForBus(conn, effectiveBusId);
             }
 
-            SelectedChildDto selectedChild = buildSelectedChild(conn, enfantId, trajetId);
+            SelectedChildDto selectedChild = buildSelectedChild(conn, enfantId);
             SelectedBusDto selectedBus = buildSelectedBus(conn, effectiveBusId);
             TrackingSnapshotDto snapshot = buildTrackingSnapshot(conn, effectiveBusId, trajetId);
             // ETA: client is source of truth when it sends trackingSnapshot.etaMinutes; only compute when missing.
@@ -96,7 +96,7 @@ public class TrackingContextService {
     }
 
     private Integer getTrajetIdForBus(Connection conn, int busId) throws SQLException {
-        String sql = "SELECT id FROM trajet WHERE id_bus = ? AND actif = 1 LIMIT 1";
+        String sql = "SELECT id FROM trajet WHERE id_bus = ? LIMIT 1";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, busId);
             ResultSet rs = ps.executeQuery();
@@ -105,7 +105,7 @@ public class TrackingContextService {
         return null;
     }
 
-    private SelectedChildDto buildSelectedChild(Connection conn, Integer enfantId, Integer trajetActifId) throws SQLException {
+    private SelectedChildDto buildSelectedChild(Connection conn, Integer enfantId) throws SQLException {
         if (enfantId == null) return null;
         String sql = "SELECT id, nom, prenom, trajet_id, on_board FROM enfant WHERE id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {

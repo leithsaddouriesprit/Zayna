@@ -489,7 +489,7 @@ public class MapTrackingController {
             }
         }
 
-        // 3) via bus (trajet actif)
+        // 3) via bus (trajet du bus)
         try {
             Trajet t = trajetService.getByBusId(busId);
             if (t != null) return t.getTrajetId();

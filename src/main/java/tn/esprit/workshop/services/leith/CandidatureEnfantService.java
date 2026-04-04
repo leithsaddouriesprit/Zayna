@@ -21,7 +21,14 @@ public class CandidatureEnfantService {
     }
 
     public void insert(int parentId, int idEcole, String nomEnfant, String prenomEnfant, int age, double latitude, double longitude) throws SQLException {
-        String sql = "INSERT INTO candidature_enfant (parent_id, id_ecole, nom_enfant, prenom_enfant, age, latitude, longitude, statut, date_demande) VALUES (?, ?, ?, ?, ?, ?, ?, 'ENVOYEE', CURRENT_TIMESTAMP)";
+        insert(parentId, idEcole, nomEnfant, prenomEnfant, age, latitude, longitude, null);
+    }
+
+    /**
+     * Insère une candidature enfant ; {@code trajetId} optionnel (enregistré en base si non null et &gt; 0).
+     */
+    public void insert(int parentId, int idEcole, String nomEnfant, String prenomEnfant, int age, double latitude, double longitude, Integer trajetId) throws SQLException {
+        String sql = "INSERT INTO candidature_enfant (parent_id, id_ecole, nom_enfant, prenom_enfant, age, latitude, longitude, statut, trajet_id, date_demande) VALUES (?, ?, ?, ?, ?, ?, ?, 'ENVOYEE', ?, CURRENT_TIMESTAMP)";
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, parentId);
             ps.setInt(2, idEcole);
@@ -30,6 +37,11 @@ public class CandidatureEnfantService {
             ps.setInt(5, age);
             ps.setDouble(6, latitude);
             ps.setDouble(7, longitude);
+            if (trajetId != null && trajetId > 0) {
+                ps.setInt(8, trajetId);
+            } else {
+                ps.setNull(8, Types.INTEGER);
+            }
             ps.executeUpdate();
         }
     }

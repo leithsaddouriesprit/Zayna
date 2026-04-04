@@ -109,10 +109,13 @@ public class ArretService implements CRUD<Arret> {
             Trajet t = new Trajet();
             t.setTrajetId(rs.getInt("id"));
             t.setNom(rs.getString("nom"));
-            t.setIdBus(rs.getInt("id_bus"));
+            int idBus = rs.getInt("id_bus");
+            if (!rs.wasNull()) t.setIdBus(idBus);
             t.setIdEcole(rs.getInt("id_ecole"));
-            t.setHeureDepart(rs.getTime("heure_depart").toLocalTime());
-            t.setActif(rs.getBoolean("actif"));
+            java.sql.Time ht = rs.getTime("heure_depart");
+            if (ht != null) t.setHeureDepart(ht.toLocalTime());
+            double px = rs.getDouble("prix");
+            t.setPrix(rs.wasNull() ? 0.0 : px);
             t.setStatut(rs.getString("statut"));
             return t;
         }

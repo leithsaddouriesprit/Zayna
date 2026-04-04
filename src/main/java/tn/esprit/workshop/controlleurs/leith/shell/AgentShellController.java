@@ -124,6 +124,11 @@ public class AgentShellController {
     }
 
     @FXML
+    void openProgrammes() {
+        loadContent("/amal/Programme.fxml");
+    }
+
+    @FXML
     void openCandidaturesChauffeur() {
         loadContent("/leith/agent/AgentCandidaturesChauffeur.fxml");
     }

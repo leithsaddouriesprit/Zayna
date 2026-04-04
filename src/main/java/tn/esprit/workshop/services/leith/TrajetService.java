@@ -5,6 +5,7 @@ import tn.esprit.workshop.services.CRUD;
 import tn.esprit.workshop.utilis.MyBDConnexion;
 
 import java.sql.*;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,17 +18,36 @@ public class TrajetService implements CRUD<Trajet> {
         return MyBDConnexion.getInstance().getConnection();
     }
 
+    private static void mapRowToTrajet(Trajet t, ResultSet rs) throws SQLException {
+        t.setTrajetId(rs.getInt("id"));
+        t.setNom(rs.getString("nom"));
+        int idBus = rs.getInt("id_bus");
+        if (!rs.wasNull()) {
+            t.setIdBus(idBus);
+        } else {
+            t.setIdBus(0);
+        }
+        t.setIdEcole(rs.getInt("id_ecole"));
+        Time ht = rs.getTime("heure_depart");
+        if (ht != null) {
+            t.setHeureDepart(ht.toLocalTime());
+        }
+        double px = rs.getDouble("prix");
+        t.setPrix(rs.wasNull() ? 0.0 : px);
+        t.setStatut(rs.getString("statut"));
+    }
+
     @Override
     public void insertOne(Trajet t) throws SQLException {
         String idBusVal = (t.getIdBus() == 0) ? "NULL" : String.valueOf(t.getIdBus());
         String req =
-                "INSERT INTO trajet (nom, id_bus, id_ecole, heure_depart, actif, statut) VALUES (" +
+                "INSERT INTO trajet (nom, id_bus, id_ecole, heure_depart, prix, statut) VALUES (" +
                         "'" + t.getNom().replace("'", "''") + "', " +
                         idBusVal + ", " +
                         t.getIdEcole() + ", " +
-                        "'" + t.getHeureDepart() + "', " +
-                        t.isActif() + ", " +
-                        "'" + (t.getStatut() != null ? t.getStatut() : "PLANIFIE") + "'" +
+                        "'" + (t.getHeureDepart() != null ? t.getHeureDepart() : LocalTime.MIDNIGHT) + "', " +
+                        t.getPrix() + ", " +
+                        "'" + (t.getStatut() != null ? t.getStatut().replace("'", "''") : "PLANIFIE") + "'" +
                         ")";
         Statement st = getConnection().createStatement();
         st.executeUpdate(req);
@@ -41,9 +61,9 @@ public class TrajetService implements CRUD<Trajet> {
                         "nom='" + t.getNom().replace("'", "''") + "', " +
                         "id_bus=" + idBusVal + ", " +
                         "id_ecole=" + t.getIdEcole() + ", " +
-                        "heure_depart='" + t.getHeureDepart() + "', " +
-                        "actif=" + t.isActif() + ", " +
-                        "statut='" + (t.getStatut() != null ? t.getStatut() : "PLANIFIE") + "'" +
+                        "heure_depart='" + (t.getHeureDepart() != null ? t.getHeureDepart() : LocalTime.MIDNIGHT) + "', " +
+                        "prix=" + t.getPrix() + ", " +
+                        "statut='" + (t.getStatut() != null ? t.getStatut().replace("'", "''") : "PLANIFIE") + "'" +
                         " WHERE id=" + t.getTrajetId();
 
         Statement st = getConnection().createStatement();
@@ -66,13 +86,7 @@ public class TrajetService implements CRUD<Trajet> {
 
         while (rs.next()) {
             Trajet t = new Trajet();
-            t.setTrajetId(rs.getInt("id"));
-            t.setNom(rs.getString("nom"));
-            t.setIdBus(rs.getInt("id_bus"));
-            t.setIdEcole(rs.getInt("id_ecole"));
-            t.setHeureDepart(rs.getTime("heure_depart").toLocalTime());
-            t.setActif(rs.getBoolean("actif"));
-            t.setStatut(rs.getString("statut"));
+            mapRowToTrajet(t, rs);
             list.add(t);
         }
         return list;
@@ -91,13 +105,7 @@ public class TrajetService implements CRUD<Trajet> {
 
         if (rs.next()) {
             Trajet t = new Trajet();
-            t.setTrajetId(rs.getInt("id"));
-            t.setNom(rs.getString("nom"));
-            t.setIdBus(rs.getInt("id_bus"));
-            t.setIdEcole(rs.getInt("id_ecole"));
-            t.setHeureDepart(rs.getTime("heure_depart").toLocalTime());
-            t.setActif(rs.getBoolean("actif"));
-            t.setStatut(rs.getString("statut"));
+            mapRowToTrajet(t, rs);
             return t;
         }
 
@@ -107,25 +115,19 @@ public class TrajetService implements CRUD<Trajet> {
 
     public Trajet getByBusId(int busId) throws SQLException {
 
-        String sql = "SELECT * FROM trajet WHERE id_bus = ? AND actif = 1 LIMIT 1";
+        String sql = "SELECT * FROM trajet WHERE id_bus = ? LIMIT 1";
 
-       PreparedStatement ps = getConnection().prepareStatement(sql);
+        PreparedStatement ps = getConnection().prepareStatement(sql);
 
-            ps.setInt(1, busId);
+        ps.setInt(1, busId);
 
-            ResultSet rs = ps.executeQuery();
+        ResultSet rs = ps.executeQuery();
 
-            if (rs.next()) {
-                Trajet t = new Trajet();
-                t.setTrajetId(rs.getInt("id"));
-                t.setNom(rs.getString("nom"));
-                t.setIdBus(rs.getInt("id_bus"));
-                t.setIdEcole(rs.getInt("id_ecole"));
-                t.setHeureDepart(rs.getTime("heure_depart").toLocalTime());
-                t.setActif(rs.getBoolean("actif"));
-                t.setStatut(rs.getString("statut"));
-                return t;
-            }
+        if (rs.next()) {
+            Trajet t = new Trajet();
+            mapRowToTrajet(t, rs);
+            return t;
+        }
 
 
         return null;
@@ -138,15 +140,7 @@ public class TrajetService implements CRUD<Trajet> {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     Trajet t = new Trajet();
-                    t.setTrajetId(rs.getInt("id"));
-                    t.setNom(rs.getString("nom"));
-                    int idBus = rs.getInt("id_bus");
-                    if (!rs.wasNull()) t.setIdBus(idBus);
-                    t.setIdEcole(rs.getInt("id_ecole"));
-                    java.sql.Time ht = rs.getTime("heure_depart");
-                    if (ht != null) t.setHeureDepart(ht.toLocalTime());
-                    t.setActif(rs.getBoolean("actif"));
-                    t.setStatut(rs.getString("statut"));
+                    mapRowToTrajet(t, rs);
                     return t;
                 }
             }
@@ -163,15 +157,7 @@ public class TrajetService implements CRUD<Trajet> {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Trajet t = new Trajet();
-                    t.setTrajetId(rs.getInt("id"));
-                    t.setNom(rs.getString("nom"));
-                    int idBus = rs.getInt("id_bus");
-                    if (!rs.wasNull()) t.setIdBus(idBus);
-                    t.setIdEcole(rs.getInt("id_ecole"));
-                    java.sql.Time ht = rs.getTime("heure_depart");
-                    if (ht != null) t.setHeureDepart(ht.toLocalTime());
-                    t.setActif(rs.getBoolean("actif"));
-                    t.setStatut(rs.getString("statut"));
+                    mapRowToTrajet(t, rs);
                     list.add(t);
                 }
             }

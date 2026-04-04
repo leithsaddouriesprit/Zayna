@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.workshop.controlleurs.leith.parent.ParentMeteoController"
+      spacing="18" styleClass="content-area admin-main-panel parent-page" maxWidth="Infinity">
+    <stylesheets>
+        <URL value="@../design/global.css"/>
+        <URL value="@../app.css"/>
+    </stylesheets>
+    <padding>
+        <Insets top="24" right="24" bottom="24" left="24"/>
+    </padding>
+
+    <VBox spacing="18" styleClass="parent-home-frame" fillWidth="true" maxWidth="Infinity">
+        <HBox spacing="14" alignment="CENTER_LEFT">
+            <Button text="← Retour" onAction="#retourDemandeTransport" styleClass="btn-soft" minWidth="120"/>
+            <Region HBox.hgrow="ALWAYS"/>
+        </HBox>
+
+        <VBox spacing="4" styleClass="parent-home-card" maxWidth="Infinity">
+            <Label text="Météo actuelle" styleClass="title-md"/>
+            <Label fx:id="lblContexte" wrapText="true" styleClass="parent-card-text"/>
+        </VBox>
+
+        <VBox styleClass="card parent-weather-shell" maxWidth="Infinity" spacing="0">
+            <StackPane maxWidth="Infinity" minHeight="280">
+                <VBox fx:id="loadingBox" spacing="16" alignment="CENTER">
+                    <ProgressIndicator maxWidth="48" maxHeight="48"/>
+                    <Label text="Récupération de la météo…" styleClass="parent-card-text"/>
+                </VBox>
+                <VBox fx:id="resultBox" spacing="0" visible="false" managed="false" alignment="TOP_CENTER"
+                      maxWidth="Infinity" fillWidth="true">
+                    <VBox alignment="TOP_CENTER" spacing="14" styleClass="parent-weather-header" maxWidth="Infinity">
+                        <padding>
+                            <Insets top="20" right="24" bottom="12" left="24"/>
+                        </padding>
+                        <Label fx:id="lblEmoji" style="-fx-font-size: 68px;"/>
+                        <Label fx:id="lblTemp" styleClass="parent-weather-temp"/>
+                        <Label fx:id="lblRessenti" styleClass="parent-weather-feels"/>
+                        <Label fx:id="lblDescription" wrapText="true" maxWidth="380" styleClass="parent-weather-desc"/>
+                    </VBox>
+                    <Separator/>
+                    <GridPane hgap="28" vgap="12" alignment="CENTER" styleClass="parent-weather-stats" maxWidth="Infinity">
+                        <padding>
+                            <Insets top="14" right="24" bottom="20" left="24"/>
+                        </padding>
+                        <Label text="Humidité" styleClass="detail-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                        <Label fx:id="lblHumidite" styleClass="detail-value" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                        <Label text="Vent" styleClass="detail-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                        <Label fx:id="lblVent" styleClass="detail-value" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                    </GridPane>
+                </VBox>
+                <VBox fx:id="errorBox" spacing="10" alignment="CENTER" visible="false" managed="false" maxWidth="Infinity">
+                    <padding>
+                        <Insets top="24" right="20" bottom="24" left="20"/>
+                    </padding>
+                    <Label fx:id="lblErreur" wrapText="true" styleClass="parent-card-text"/>
+                </VBox>
+            </StackPane>
+        </VBox>
+    </VBox>
+</VBox>

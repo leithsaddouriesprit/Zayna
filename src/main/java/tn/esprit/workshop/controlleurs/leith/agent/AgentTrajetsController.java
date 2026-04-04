@@ -22,7 +22,7 @@ public class AgentTrajetsController implements Initializable {
     @FXML private TableColumn<Trajet, String> colNom;
     @FXML private TableColumn<Trajet, Number> colIdBus;
     @FXML private TableColumn<Trajet, String> colHeure;
-    @FXML private TableColumn<Trajet, Boolean> colActif;
+    @FXML private TableColumn<Trajet, Number> colPrix;
     @FXML private TableColumn<Trajet, String> colStatut;
     @FXML private Button btnModifier;
     @FXML private Button btnSupprimer;
@@ -37,7 +37,7 @@ public class AgentTrajetsController implements Initializable {
         colIdBus.setCellValueFactory(c -> new javafx.beans.property.SimpleIntegerProperty(c.getValue().getIdBus()));
         colHeure.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(
                 c.getValue().getHeureDepart() != null ? c.getValue().getHeureDepart().toString() : ""));
-        colActif.setCellValueFactory(c -> new javafx.beans.property.SimpleBooleanProperty(c.getValue().isActif()));
+        colPrix.setCellValueFactory(c -> new javafx.beans.property.SimpleDoubleProperty(c.getValue().getPrix()));
         colStatut.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(
                 c.getValue().getStatut() != null ? c.getValue().getStatut() : ""));
 
@@ -131,8 +131,7 @@ public class AgentTrajetsController implements Initializable {
         TextField tfNom = new TextField(existing != null ? existing.getNom() : "");
         TextField tfIdBus = new TextField(existing != null && existing.getIdBus() != 0 ? String.valueOf(existing.getIdBus()) : "");
         TextField tfHeure = new TextField(existing != null && existing.getHeureDepart() != null ? existing.getHeureDepart().toString() : "08:00");
-        CheckBox chkActif = new CheckBox("Actif");
-        chkActif.setSelected(existing == null || existing.isActif());
+        TextField tfPrix = new TextField(existing != null ? String.valueOf(existing.getPrix()) : "0");
         TextField tfStatut = new TextField(existing != null && existing.getStatut() != null ? existing.getStatut() : "PLANIFIE");
 
         javafx.scene.layout.GridPane gp = new javafx.scene.layout.GridPane();
@@ -140,7 +139,7 @@ public class AgentTrajetsController implements Initializable {
         gp.add(new Label("Nom:"), 0, 0); gp.add(tfNom, 1, 0);
         gp.add(new Label("Id Bus (0=vide):"), 0, 1); gp.add(tfIdBus, 1, 1);
         gp.add(new Label("Heure départ (HH:mm):"), 0, 2); gp.add(tfHeure, 1, 2);
-        gp.add(chkActif, 1, 3);
+        gp.add(new Label("Prix:"), 0, 3); gp.add(tfPrix, 1, 3);
         gp.add(new Label("Statut:"), 0, 4); gp.add(tfStatut, 1, 4);
         d.getDialogPane().setContent(gp);
 
@@ -172,7 +171,13 @@ public class AgentTrajetsController implements Initializable {
             }
             t.setHeureDepart(heure);
             t.setIdEcole(idEcole);
-            t.setActif(chkActif.isSelected());
+            String prixStr = tfPrix.getText() != null ? tfPrix.getText().trim().replace(',', '.') : "0";
+            try {
+                t.setPrix(Double.parseDouble(prixStr.isEmpty() ? "0" : prixStr));
+            } catch (NumberFormatException e) {
+                new Alert(Alert.AlertType.WARNING, "❌ Prix invalide (nombre attendu).").showAndWait();
+                return null;
+            }
             t.setStatut(tfStatut.getText() != null && !tfStatut.getText().trim().isEmpty() ? tfStatut.getText().trim() : "PLANIFIE");
             return t;
         });

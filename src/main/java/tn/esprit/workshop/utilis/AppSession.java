@@ -23,6 +23,13 @@ public final class AppSession {
     /** maitresse.id pour l’espace maîtresse. */
     private Integer maitresseId;
 
+    /** Parent : rétablir la sélection d’école au retour sur Demande transport. */
+    private Integer pendingDemandeTransportEcoleRestoreId;
+    /** Parent : école cible pour la page inscription (consommé au chargement). */
+    private Integer pendingInscriptionEcoleId;
+    /** Parent : école pour la page météo (coords / repli Tunis). */
+    private Integer pendingMeteoEcoleId;
+
     private AppSession() {
     }
 
@@ -100,5 +107,35 @@ public final class AppSession {
 
     public void setMaitresseId(Integer maitresseId) {
         this.maitresseId = maitresseId;
+    }
+
+    public void setPendingDemandeTransportEcoleRestoreId(Integer id) {
+        this.pendingDemandeTransportEcoleRestoreId = id;
+    }
+
+    public Integer getAndClearPendingDemandeTransportEcoleRestoreId() {
+        Integer id = pendingDemandeTransportEcoleRestoreId;
+        pendingDemandeTransportEcoleRestoreId = null;
+        return id;
+    }
+
+    public void setPendingInscriptionEcoleId(Integer id) {
+        this.pendingInscriptionEcoleId = id;
+    }
+
+    public Integer getAndClearPendingInscriptionEcoleId() {
+        Integer id = pendingInscriptionEcoleId;
+        pendingInscriptionEcoleId = null;
+        return id;
+    }
+
+    public void setPendingMeteoEcoleId(Integer id) {
+        this.pendingMeteoEcoleId = id;
+    }
+
+    public Integer getAndClearPendingMeteoEcoleId() {
+        Integer id = pendingMeteoEcoleId;
+        pendingMeteoEcoleId = null;
+        return id;
     }
 }
