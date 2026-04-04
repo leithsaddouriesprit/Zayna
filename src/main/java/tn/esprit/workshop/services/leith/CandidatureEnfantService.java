@@ -114,6 +114,48 @@ public class CandidatureEnfantService {
         return null;
     }
 
+    /**
+     * Supprime la candidature si elle appartient au parent et n’est pas acceptée
+     * (une candidature acceptée est liée à un enfant créé côté agent).
+     */
+    public boolean deleteByParent(int candidatureId, int parentId) throws SQLException {
+        String sql = "DELETE FROM candidature_enfant WHERE id = ? AND parent_id = ? AND statut <> ?";
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setInt(1, candidatureId);
+            ps.setInt(2, parentId);
+            ps.setString(3, STATUT_ACCEPTEE);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    /**
+     * Met à jour une candidature encore en attente (ENVOYEE) pour le parent concerné.
+     *
+     * @return {@code true} si une ligne a été mise à jour
+     */
+    public boolean updateEnVoyeeByParent(int candidatureId, int parentId,
+                                         String nomEnfant, String prenomEnfant, int age,
+                                         double latitude, double longitude, Integer trajetId) throws SQLException {
+        String sql = "UPDATE candidature_enfant SET nom_enfant = ?, prenom_enfant = ?, age = ?, latitude = ?, longitude = ?, trajet_id = ? "
+                + "WHERE id = ? AND parent_id = ? AND statut = ?";
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setString(1, nomEnfant);
+            ps.setString(2, prenomEnfant);
+            ps.setInt(3, age);
+            ps.setDouble(4, latitude);
+            ps.setDouble(5, longitude);
+            if (trajetId != null && trajetId > 0) {
+                ps.setInt(6, trajetId);
+            } else {
+                ps.setNull(6, Types.INTEGER);
+            }
+            ps.setInt(7, candidatureId);
+            ps.setInt(8, parentId);
+            ps.setString(9, STATUT_ENVOYEE);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
     private CandidatureEnfant mapRow(ResultSet rs) throws SQLException {
         CandidatureEnfant c = new CandidatureEnfant();
         c.setId(rs.getInt("id"));

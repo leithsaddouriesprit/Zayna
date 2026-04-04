@@ -35,6 +35,10 @@ public class SceneNavigator {
 
     public static void registerParentShell(ParentShellController c) { parentShell = c; }
     public static void unregisterParentShell() { parentShell = null; }
+
+    public static boolean isInParentShell() {
+        return parentShell != null;
+    }
     public static void registerChauffeurShell(ChauffeurShellController c) { chauffeurShell = c; }
     public static void unregisterChauffeurShell() { chauffeurShell = null; }
     public static void registerAgentShell(AgentShellController c) { agentShell = c; }
@@ -583,6 +587,27 @@ public class SceneNavigator {
     public static void parentShellNavigateInscriptionEnfant() {
         if (parentShell != null) {
             parentShell.loadContent("/leith/parent/ParentInscriptionEnfant.fxml");
+        }
+    }
+
+    /** Contenu shell Parent : modification d’une candidature enfant ENVOYEE. */
+    public static void parentShellNavigateModifierCandidatureEnfant() {
+        if (parentShell != null) {
+            parentShell.loadContent("/leith/parent/ParentModifierCandidatureEnfant.fxml");
+            return;
+        }
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    SceneNavigator.class.getResource("/leith/parent/ParentModifierCandidatureEnfant.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            javafx.scene.Scene scene = new javafx.scene.Scene(root, 640, 560);
+            applyAppCss(scene, root);
+            stage.setTitle("Zayna – Modifier candidature");
+            stage.setScene(scene);
+            stage.show();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error opening ParentModifierCandidatureEnfant", e);
         }
     }
 

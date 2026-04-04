@@ -804,6 +804,19 @@
     -fx-spacing: 7;
 }
 
+/* Menu latéral Agent : défilement vertical si toutes les sections sont ouvertes */
+.shell-sidebar-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-padding: 0;
+}
+.shell-sidebar-scroll .viewport {
+    -fx-background-color: transparent;
+}
+.shell-sidebar-scroll .corner {
+    -fx-background-color: transparent;
+}
+
 .sidebar-group {
     -fx-background-color: transparent;
     -fx-text-fill: #FFFFFF;
@@ -1519,5 +1532,15 @@
     -fx-background-color: rgba(255,255,255,0.02);
     -fx-border-color: rgba(255,255,255,0.10);
     -fx-border-width: 0 1 1 1;
+}
+
+/* Messages suivi candidature Parent (labels) */
+.success-message {
+    -fx-text-fill: #4CAF50;
+    -fx-font-weight: bold;
+}
+
+.error-message {
+    -fx-text-fill: #FF4C4C;
 }
 

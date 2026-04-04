@@ -6,6 +6,7 @@ import javafx.stage.Stage;
 import tn.esprit.workshop.model.Talel.talel2.Parent;
 import tn.esprit.workshop.model.Talel.talel2.User;
 import tn.esprit.workshop.services.Talel.ServiceParent;
+import tn.esprit.workshop.utilis.ZaynaInputConstraints;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.application.Platform;
@@ -44,6 +45,10 @@ public class ControleurParent {
         lblMessage.setVisible(false);
         lblMessage.setManaged(true);
         lblMessage.setWrapText(true);
+        ZaynaInputConstraints.apply(txtNom, ZaynaInputConstraints.lettersAndSpacesOnly(ZaynaInputConstraints.LEN_PARENT_NOM_PRENOM));
+        ZaynaInputConstraints.apply(txtPrenom, ZaynaInputConstraints.lettersAndSpacesOnly(ZaynaInputConstraints.LEN_PARENT_NOM_PRENOM));
+        ZaynaInputConstraints.apply(txtEmail, ZaynaInputConstraints.emailInput(ZaynaInputConstraints.LEN_USERS_EMAIL));
+        ZaynaInputConstraints.apply(txtTelephone, ZaynaInputConstraints.digitsOnly(8));
     }
 
     @FXML
@@ -60,23 +65,23 @@ public class ControleurParent {
 
             // VALIDATION CHAMP PAR CHAMP avec messages précis et focus
 
-            // 1. Validation du nom
-            if (nom.isEmpty()) {
-                afficherMessage("❌ Le nom est obligatoire", "error");
+            String errNom = ZaynaInputConstraints.validatePersonName(nom, ZaynaInputConstraints.LEN_PARENT_NOM_PRENOM, "Le nom");
+            if (errNom != null) {
+                afficherMessage("❌ " + errNom, "error");
                 txtNom.requestFocus();
                 return;
             }
 
-            // 2. Validation du prénom
-            if (prenom.isEmpty()) {
-                afficherMessage("❌ Le prénom est obligatoire", "error");
+            String errPrenom = ZaynaInputConstraints.validatePersonName(prenom, ZaynaInputConstraints.LEN_PARENT_NOM_PRENOM, "Le prénom");
+            if (errPrenom != null) {
+                afficherMessage("❌ " + errPrenom, "error");
                 txtPrenom.requestFocus();
                 return;
             }
 
-            // 3. Validation de l'email
-            if (email.isEmpty()) {
-                afficherMessage("❌ L'email est obligatoire", "error");
+            String errEmail = ZaynaInputConstraints.validateEmail(email, ZaynaInputConstraints.LEN_USERS_EMAIL);
+            if (errEmail != null) {
+                afficherMessage("❌ " + errEmail, "error");
                 txtEmail.requestFocus();
                 return;
             }
@@ -88,23 +93,9 @@ public class ControleurParent {
                 return;
             }
 
-            // 5. Validation du téléphone
-            if (telephone.isEmpty()) {
-                afficherMessage("❌ Le téléphone est obligatoire", "error");
-                txtTelephone.requestFocus();
-                return;
-            }
-
-            // 6. Validation du format email (CORRIGÉ : regex plus stricte)
-            if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
-                afficherMessage("❌ Format d'email invalide (ex: nom@domaine.com)", "error");
-                txtEmail.requestFocus();
-                return;
-            }
-
-            // 7. Validation du téléphone (8 chiffres)
-            if (!telephone.matches("\\d{8}")) {
-                afficherMessage("❌ Le téléphone doit contenir exactement 8 chiffres", "error");
+            String errTel = ZaynaInputConstraints.validatePhone8(telephone, true);
+            if (errTel != null) {
+                afficherMessage("❌ " + errTel, "error");
                 txtTelephone.requestFocus();
                 return;
             }

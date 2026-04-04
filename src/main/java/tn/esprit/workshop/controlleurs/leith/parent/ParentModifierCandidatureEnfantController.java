@@ -6,10 +6,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
-
-import java.util.function.UnaryOperator;
 import javafx.scene.layout.Priority;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 import tn.esprit.workshop.controlleurs.leith.SceneNavigator;
+import tn.esprit.workshop.model.leith.CandidatureEnfant;
 import tn.esprit.workshop.model.leith.Trajet;
 import tn.esprit.workshop.model.tous.Ecole;
 import tn.esprit.workshop.services.leith.CandidatureEnfantService;
@@ -22,15 +23,16 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Formulaire d’inscription enfant dans le shell Parent (pas de dialogue modal).
+ * Édition d’une candidature enfant ENVOYEE dans le shell Parent (UPDATE, pas INSERT).
  */
-public class ParentInscriptionEnfantController implements Initializable {
+public class ParentModifierCandidatureEnfantController implements Initializable {
 
-    private static final Logger LOG = Logger.getLogger(ParentInscriptionEnfantController.class.getName());
+    private static final Logger LOG = Logger.getLogger(ParentModifierCandidatureEnfantController.class.getName());
 
     @FXML private Label lblEcole;
     @FXML private TextField tfNom;
@@ -40,15 +42,17 @@ public class ParentInscriptionEnfantController implements Initializable {
     @FXML private TextField tfLng;
     @FXML private ComboBox<Trajet> comboTrajet;
     @FXML private Label lblMessage;
-    @FXML private Button btnEnvoyer;
+    @FXML private Button btnEnregistrer;
     @FXML private GridPane gridForm;
 
     private final EcoleService ecoleService = new EcoleService();
     private final TrajetService trajetService = new TrajetService();
     private final CandidatureEnfantService candidatureEnfantService = new CandidatureEnfantService();
 
+    private int candidatureId;
     private int idEcole;
     private Ecole ecole;
+    private CandidatureEnfant candidature;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -83,12 +87,29 @@ public class ParentInscriptionEnfantController implements Initializable {
             }
         });
 
-        Integer pending = AppSession.getInstance().getAndClearPendingInscriptionEcoleId();
-        if (pending == null || pending <= 0) {
-            Platform.runLater(SceneNavigator::parentShellNavigateDemandeTransport);
+        Integer pendingId = AppSession.getInstance().getAndClearPendingEditCandidatureEnfantId();
+        int parentId = AppSession.getInstance().getParentId();
+        if (pendingId == null || pendingId <= 0 || parentId <= 0) {
+            abortToSuivi();
             return;
         }
-        idEcole = pending;
+        candidatureId = pendingId;
+        try {
+            candidature = candidatureEnfantService.getById(candidatureId);
+        } catch (SQLException e) {
+            LOG.log(Level.SEVERE, "load candidature", e);
+            candidature = null;
+        }
+        if (candidature == null || candidature.getParentId() != parentId) {
+            abortToSuivi();
+            return;
+        }
+        if (!CandidatureEnfantService.STATUT_ENVOYEE.equals(candidature.getStatut())) {
+            abortToSuivi();
+            return;
+        }
+
+        idEcole = candidature.getIdEcole();
         try {
             ecole = ecoleService.getById(idEcole);
         } catch (SQLException e) {
@@ -96,26 +117,40 @@ public class ParentInscriptionEnfantController implements Initializable {
             ecole = null;
         }
         if (ecole == null) {
-            Platform.runLater(SceneNavigator::parentShellNavigateDemandeTransport);
+            abortToSuivi();
             return;
         }
 
         lblEcole.setText("École : " + (ecole.getNomEcole() != null ? ecole.getNomEcole() : ("#" + idEcole)));
 
+        tfNom.setText(candidature.getNomEnfant() != null ? candidature.getNomEnfant() : "");
+        tfPrenom.setText(candidature.getPrenomEnfant() != null ? candidature.getPrenomEnfant() : "");
+        if (candidature.getAge() > 0) {
+            tfAge.setText(String.valueOf(candidature.getAge()));
+        }
+        tfLat.setText(formatCoord(candidature.getLatitude()));
+        tfLng.setText(formatCoord(candidature.getLongitude()));
+
         try {
             List<Trajet> trajets = trajetService.selectByEcoleId(idEcole);
             comboTrajet.setItems(FXCollections.observableArrayList(trajets));
-            comboTrajet.setPromptText("Choisir un trajet");
+            Integer tid = candidature.getTrajetId();
+            if (tid != null && tid > 0) {
+                for (Trajet t : trajets) {
+                    if (t.getTrajetId() == tid) {
+                        comboTrajet.getSelectionModel().select(t);
+                        break;
+                    }
+                }
+            }
             if (trajets.isEmpty()) {
                 comboTrajet.setDisable(true);
-                btnEnvoyer.setDisable(true);
-                showMessage("Aucun trajet n’est disponible pour cette école. Impossible d’envoyer une candidature.", true);
+                btnEnregistrer.setDisable(true);
             }
         } catch (SQLException e) {
             LOG.log(Level.SEVERE, "load trajets", e);
             comboTrajet.setDisable(true);
-            btnEnvoyer.setDisable(true);
-            showMessage("Impossible de charger les trajets.", true);
+            btnEnregistrer.setDisable(true);
         }
 
         GridPane.setHgrow(tfNom, Priority.ALWAYS);
@@ -126,7 +161,17 @@ public class ParentInscriptionEnfantController implements Initializable {
         GridPane.setHgrow(comboTrajet, Priority.ALWAYS);
     }
 
-    /** Chiffres uniquement, au plus 2 caractères (3–18). */
+    private static String formatCoord(double v) {
+        if (Double.isNaN(v) || Double.isInfinite(v)) {
+            return "";
+        }
+        String s = Double.toString(v);
+        if (s.endsWith(".0")) {
+            return s.substring(0, s.length() - 2);
+        }
+        return s;
+    }
+
     private void setupAgeTextField() {
         UnaryOperator<TextFormatter.Change> filter = change -> {
             String t = change.getControlNewText();
@@ -144,9 +189,6 @@ public class ParentInscriptionEnfantController implements Initializable {
         tfAge.setTextFormatter(new TextFormatter<>(filter));
     }
 
-    /**
-     * @return l’âge si valide, sinon {@code null} (message affiché)
-     */
     private Integer parseAndValidateAge() {
         String err = ZaynaInputConstraints.validateChildAge3to18(tfAge.getText());
         if (err != null) {
@@ -157,17 +199,46 @@ public class ParentInscriptionEnfantController implements Initializable {
     }
 
     @FXML
-    private void retourDemandeTransport() {
-        AppSession.getInstance().setPendingDemandeTransportEcoleRestoreId(idEcole);
-        SceneNavigator.parentShellNavigateDemandeTransport();
+    private void retourSuivi() {
+        SceneNavigator.openParentSuiviCandidaturesEnfant();
+        if (!SceneNavigator.isInParentShell()) {
+            closeStandaloneWindow();
+        }
+    }
+
+    private void closeStandaloneWindow() {
+        Window w = resolveWindow();
+        if (w instanceof Stage) {
+            ((Stage) w).close();
+        }
+    }
+
+    private Window resolveWindow() {
+        if (btnEnregistrer != null && btnEnregistrer.getScene() != null) {
+            return btnEnregistrer.getScene().getWindow();
+        }
+        if (lblEcole != null && lblEcole.getScene() != null) {
+            return lblEcole.getScene().getWindow();
+        }
+        return null;
+    }
+
+    /** Retour au suivi ; ferme la fenêtre si l’édition était ouverte hors shell Parent. */
+    private void abortToSuivi() {
+        Platform.runLater(() -> {
+            SceneNavigator.openParentSuiviCandidaturesEnfant();
+            if (!SceneNavigator.isInParentShell()) {
+                closeStandaloneWindow();
+            }
+        });
     }
 
     @FXML
-    private void envoyer() {
+    private void enregistrer() {
         hideMessage();
         int parentId = AppSession.getInstance().getParentId();
-        if (parentId <= 0) {
-            showMessage("Session parent invalide. Reconnectez-vous.", true);
+        if (parentId <= 0 || candidature == null) {
+            showMessage("Session invalide.", true);
             return;
         }
 
@@ -189,6 +260,7 @@ public class ParentInscriptionEnfantController implements Initializable {
             return;
         }
         int age = ageBoxed;
+
         String errLat = ZaynaInputConstraints.validateLatitude(tfLat.getText());
         if (errLat != null) {
             showMessage(errLat, true);
@@ -207,13 +279,25 @@ public class ParentInscriptionEnfantController implements Initializable {
             showMessage("Veuillez sélectionner un trajet de transport.", true);
             return;
         }
+        if (t.getIdEcole() != idEcole) {
+            showMessage("Le trajet choisi ne correspond pas à l’école de la candidature.", true);
+            return;
+        }
 
         try {
-            candidatureEnfantService.insert(parentId, idEcole, nom, prenom, age, lat, lng, t.getTrajetId());
-            resetFormAfterSuccess();
-            showMessage("Candidature envoyée avec succès", false);
+            boolean ok = candidatureEnfantService.updateEnVoyeeByParent(
+                    candidatureId, parentId, nom, prenom, age, lat, lng, t.getTrajetId());
+            if (!ok) {
+                showMessage("Impossible de mettre à jour (candidature déjà traitée ou introuvable).", true);
+                return;
+            }
+            AppSession.setFlashMessage("Modifications effectuées avec succès");
+            SceneNavigator.openParentSuiviCandidaturesEnfant();
+            if (!SceneNavigator.isInParentShell()) {
+                closeStandaloneWindow();
+            }
         } catch (SQLException e) {
-            LOG.log(Level.SEVERE, "insert candidature", e);
+            LOG.log(Level.SEVERE, "update candidature", e);
             showMessage("Enregistrement impossible. Réessayez plus tard.", true);
         }
     }
@@ -230,14 +314,5 @@ public class ParentInscriptionEnfantController implements Initializable {
     private void hideMessage() {
         lblMessage.setVisible(false);
         lblMessage.setManaged(false);
-    }
-
-    private void resetFormAfterSuccess() {
-        tfNom.clear();
-        tfPrenom.clear();
-        tfAge.clear();
-        tfLat.clear();
-        tfLng.clear();
-        comboTrajet.getSelectionModel().clearSelection();
     }
 }

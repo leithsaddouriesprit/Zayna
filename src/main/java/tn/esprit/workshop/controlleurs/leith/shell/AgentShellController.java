@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -25,6 +26,7 @@ public class AgentShellController {
 
     @FXML private StackPane contentArea;
     @FXML private Label lblAccountInfo;
+    @FXML private ScrollPane agentSidebarScroll;
     @FXML private VBox agentNavBody;
     @FXML private VBox agentChatPanel;
     @FXML private StackPane agentChatContent;
@@ -43,14 +45,20 @@ public class AgentShellController {
         });
         Integer uid = AppSession.getInstance().getConnectedUserId();
         if (uid != null && !new CandidatureAgentService().isAccessApproved(uid)) {
-            if (agentNavBody != null) {
+            if (agentSidebarScroll != null) {
+                agentSidebarScroll.setVisible(false);
+                agentSidebarScroll.setManaged(false);
+            } else if (agentNavBody != null) {
                 agentNavBody.setVisible(false);
                 agentNavBody.setManaged(false);
             }
             loadContent("/leith/agent/AgentCandidatureEcolePending.fxml");
             return;
         }
-        if (agentNavBody != null) {
+        if (agentSidebarScroll != null) {
+            agentSidebarScroll.setVisible(true);
+            agentSidebarScroll.setManaged(true);
+        } else if (agentNavBody != null) {
             agentNavBody.setVisible(true);
             agentNavBody.setManaged(true);
         }

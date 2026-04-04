@@ -12,6 +12,7 @@ import tn.esprit.workshop.controlleurs.leith.SceneNavigator;
 import tn.esprit.workshop.model.leith.MaitresseEcoleRow;
 import tn.esprit.workshop.services.leith.MaitresseMetierService;
 import tn.esprit.workshop.utilis.AppSession;
+import tn.esprit.workshop.utilis.ZaynaInputConstraints;
 
 import java.net.URL;
 import java.sql.SQLException;
@@ -107,6 +108,9 @@ public class AgentMaitressesListeController implements Initializable {
         TextField fNom = new TextField(row.getNom());
         TextField fPrenom = new TextField(row.getPrenom());
         TextField fEmail = new TextField(row.getEmail());
+        ZaynaInputConstraints.apply(fNom, ZaynaInputConstraints.lettersAndSpacesOnly(ZaynaInputConstraints.LEN_MAITRESSE_NOM_PRENOM));
+        ZaynaInputConstraints.apply(fPrenom, ZaynaInputConstraints.lettersAndSpacesOnly(ZaynaInputConstraints.LEN_MAITRESSE_NOM_PRENOM));
+        ZaynaInputConstraints.apply(fEmail, ZaynaInputConstraints.emailInput(ZaynaInputConstraints.LEN_USERS_EMAIL));
         PasswordField fPw = new PasswordField();
         fPw.setPromptText("Laisser vide pour ne pas changer");
         ComboBox<MaitresseMetierService.BusOption> combo = new ComboBox<>();
@@ -145,6 +149,25 @@ public class AgentMaitressesListeController implements Initializable {
             return;
         }
 
+        String vn = fNom.getText() != null ? fNom.getText().trim() : "";
+        String vp = fPrenom.getText() != null ? fPrenom.getText().trim() : "";
+        String ve = fEmail.getText() != null ? fEmail.getText().trim().toLowerCase() : "";
+        String e1 = ZaynaInputConstraints.validatePersonName(vn, ZaynaInputConstraints.LEN_MAITRESSE_NOM_PRENOM, "Le nom");
+        if (e1 != null) {
+            new Alert(Alert.AlertType.WARNING, e1).showAndWait();
+            return;
+        }
+        String e2 = ZaynaInputConstraints.validatePersonName(vp, ZaynaInputConstraints.LEN_MAITRESSE_NOM_PRENOM, "Le prénom");
+        if (e2 != null) {
+            new Alert(Alert.AlertType.WARNING, e2).showAndWait();
+            return;
+        }
+        String e3 = ZaynaInputConstraints.validateEmail(ve, ZaynaInputConstraints.LEN_USERS_EMAIL);
+        if (e3 != null) {
+            new Alert(Alert.AlertType.WARNING, e3).showAndWait();
+            return;
+        }
+
         MaitresseMetierService.BusOption bus = combo.getSelectionModel().getSelectedItem();
         Integer idBus = (bus == null || bus.getId() <= 0) ? null : bus.getId();
         String pw = fPw.getText();
@@ -152,7 +175,7 @@ public class AgentMaitressesListeController implements Initializable {
 
         new Thread(() -> {
             try {
-                service.updateMaitresse(ecoleId, row.getMaitresseId(), fNom.getText(), fPrenom.getText(), fEmail.getText(), idBus, newPw);
+                service.updateMaitresse(ecoleId, row.getMaitresseId(), vn, vp, ve, idBus, newPw);
                 Platform.runLater(this::reload);
             } catch (Exception e) {
                 Platform.runLater(() -> new Alert(Alert.AlertType.ERROR, e.getMessage()).showAndWait());

@@ -30,7 +30,7 @@
     </top>
 
     <left>
-        <VBox spacing="8" styleClass="shell-sidebar sidebar admin-shell-sidebar">
+        <VBox spacing="8" styleClass="shell-sidebar sidebar admin-shell-sidebar" maxWidth="Infinity">
             <VBox styleClass="admin-brand-box">
                 <ImageView fitHeight="40.0" fitWidth="78.0" preserveRatio="true" styleClass="admin-brand-logo">
                     <image>
@@ -41,7 +41,9 @@
                 <Label text="Agent école" styleClass="admin-brand-subtitle"/>
             </VBox>
 
-            <VBox fx:id="agentNavBody" spacing="8">
+            <ScrollPane fx:id="agentSidebarScroll" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                        styleClass="shell-sidebar-scroll" maxHeight="Infinity" VBox.vgrow="ALWAYS">
+                <VBox fx:id="agentNavBody" spacing="8" maxWidth="Infinity">
             <ToggleButton text="Accueil" onAction="#goHome" maxWidth="Infinity" styleClass="admin-nav-item" selected="true" toggleGroup="$navGroup"/>
             <ToggleButton text="Programmes" onAction="#openProgrammes" maxWidth="Infinity" styleClass="admin-nav-item" toggleGroup="$navGroup"/>
 
@@ -92,7 +94,8 @@
             </TitledPane>
 
             <ToggleButton text="Gestion réclamations" onAction="#openGestionReclamations" maxWidth="Infinity" styleClass="admin-nav-item" toggleGroup="$navGroup"/>
-            </VBox>
+                </VBox>
+            </ScrollPane>
         </VBox>
     </left>
 

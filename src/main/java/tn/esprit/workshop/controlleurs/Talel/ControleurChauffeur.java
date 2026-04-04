@@ -7,6 +7,7 @@ import javafx.stage.Stage;
 import tn.esprit.workshop.model.Talel.talel2.Chauffeur;
 import tn.esprit.workshop.model.Talel.talel2.User;
 import tn.esprit.workshop.services.Talel.ServiceChauffeur;
+import tn.esprit.workshop.utilis.ZaynaInputConstraints;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.application.Platform;
@@ -58,6 +59,14 @@ public class ControleurChauffeur {
             lblMessage.setWrapText(true); // ← CORRIGÉ
         }
 
+        ZaynaInputConstraints.apply(txtNom, ZaynaInputConstraints.lettersAndSpacesOnly(ZaynaInputConstraints.LEN_CHAUFFEUR_NOM_PRENOM));
+        if (txtPrenom != null) {
+            ZaynaInputConstraints.apply(txtPrenom, ZaynaInputConstraints.lettersAndSpacesOnly(ZaynaInputConstraints.LEN_CHAUFFEUR_NOM_PRENOM));
+        }
+        ZaynaInputConstraints.apply(txtEmail, ZaynaInputConstraints.emailInput(ZaynaInputConstraints.LEN_USERS_EMAIL));
+        ZaynaInputConstraints.apply(txtTelephone, ZaynaInputConstraints.digitsOnly(8));
+        ZaynaInputConstraints.apply(txtSalaire, ZaynaInputConstraints.positiveDecimalMoney());
+
         System.out.println("=== ControleurChauffeur initialisé ===");
     }
 
@@ -78,21 +87,22 @@ public class ControleurChauffeur {
             String vehicule = txtVehicule.getText().trim();
             String salaireText = txtSalaire.getText().trim();
 
-            // Validation champs par champs avec focus
-            if (nom.isEmpty()) {
-                afficherMessage("❌ Le nom est obligatoire", "error");
+            String errNom = ZaynaInputConstraints.validatePersonName(nom, ZaynaInputConstraints.LEN_CHAUFFEUR_NOM_PRENOM, "Le nom");
+            if (errNom != null) {
+                afficherMessage("❌ " + errNom, "error");
                 txtNom.requestFocus();
                 return;
             }
-            if (prenom.isEmpty()) {
-                afficherMessage("❌ Le prénom est obligatoire", "error");
+            String errPrenom = ZaynaInputConstraints.validatePersonName(prenom, ZaynaInputConstraints.LEN_CHAUFFEUR_NOM_PRENOM, "Le prénom");
+            if (errPrenom != null) {
+                afficherMessage("❌ " + errPrenom, "error");
                 if (txtPrenom != null) txtPrenom.requestFocus();
                 return;
             }
 
-            // Validation de l'email
-            if (email.isEmpty()) {
-                afficherMessage("❌ L'email est obligatoire", "error");
+            String errEmail = ZaynaInputConstraints.validateEmail(email, ZaynaInputConstraints.LEN_USERS_EMAIL);
+            if (errEmail != null) {
+                afficherMessage("❌ " + errEmail, "error");
                 txtEmail.requestFocus();
                 return;
             }
@@ -123,16 +133,9 @@ public class ControleurChauffeur {
                 return;
             }
 
-            // 6. Validation du format email
-            if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
-                afficherMessage("❌ Format d'email invalide (ex: nom@domaine.com)", "error");
-                txtEmail.requestFocus();
-                return;
-            }
-
-            // 7. Validation du téléphone (optionnel)
-            if (!telephone.isEmpty() && !telephone.matches("\\d{8}")) {
-                afficherMessage("❌ Le téléphone doit contenir 8 chiffres", "error");
+            String errTel = ZaynaInputConstraints.validatePhone8(telephone, false);
+            if (errTel != null) {
+                afficherMessage("❌ " + errTel, "error");
                 txtTelephone.requestFocus();
                 return;
             }
@@ -149,27 +152,13 @@ public class ControleurChauffeur {
                 return;
             }
 
-            // 9. Validation du salaire
-            if (salaireText.isEmpty()) {
-                afficherMessage("❌ Le salaire est obligatoire", "error");
+            String errSal = ZaynaInputConstraints.validateSalaryDecimal(salaireText);
+            if (errSal != null) {
+                afficherMessage("❌ " + errSal, "error");
                 txtSalaire.requestFocus();
                 return;
             }
-
-            // 10. Parsing du salaire
-            double salaire;
-            try {
-                salaire = Double.parseDouble(salaireText);
-                if (salaire < 0) {
-                    afficherMessage("❌ Le salaire ne peut pas être négatif", "error");
-                    txtSalaire.requestFocus();
-                    return;
-                }
-            } catch (NumberFormatException e) {
-                afficherMessage("❌ Le salaire doit être un nombre valide (ex: 1500.00)", "error");
-                txtSalaire.requestFocus();
-                return;
-            }
+            double salaire = Double.parseDouble(salaireText.trim().replace(',', '.'));
 
             // Création de l'objet Chauffeur (users.nom = nom ; chauffeur.nom + chauffeur.prenom)
             Chauffeur chauffeur = new Chauffeur();

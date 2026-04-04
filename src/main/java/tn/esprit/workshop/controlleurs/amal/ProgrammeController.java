@@ -10,6 +10,7 @@ import tn.esprit.workshop.model.tous.Ecole;
 import tn.esprit.workshop.services.amal.ProgrammeService;
 import tn.esprit.workshop.services.leith.EcoleService;
 import tn.esprit.workshop.utilis.AppSession;
+import tn.esprit.workshop.utilis.ZaynaInputConstraints;
 
 import java.sql.SQLException;
 import java.util.Optional;
@@ -40,7 +41,7 @@ public class ProgrammeController {
         setupTableSelectionListener();
         refreshEcoleHeader();
         loadTable();
-        setupNumericValidation();
+        ZaynaInputConstraints.apply(tfDuree, ZaynaInputConstraints.positiveIntegerDigits(ZaynaInputConstraints.MAX_PROGRAMME_DUREE_DIGITS));
     }
 
     private void refreshEcoleHeader() {
@@ -99,14 +100,6 @@ public class ProgrammeController {
         lblTotalProgrammes.setText("Total programmes: " + programmeList.size());
     }
 
-    private void setupNumericValidation() {
-        tfDuree.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("\\d*")) {
-                tfDuree.setText(oldValue);
-            }
-        });
-    }
-
     private void remplirChamps(Programme p) {
         tfNom.setText(p.getNomProgramme());
         tfNiveau.setText(p.getNiveau());
@@ -144,6 +137,12 @@ public class ProgrammeController {
         }
         if (tfDuree.getText().trim().isEmpty()) {
             showAlert("Erreur", "La durée est obligatoire !", AlertType.WARNING);
+            tfDuree.requestFocus();
+            return false;
+        }
+        String errDuree = ZaynaInputConstraints.validateProgramDuration(tfDuree.getText());
+        if (errDuree != null) {
+            showAlert("Erreur", errDuree, AlertType.WARNING);
             tfDuree.requestFocus();
             return false;
         }

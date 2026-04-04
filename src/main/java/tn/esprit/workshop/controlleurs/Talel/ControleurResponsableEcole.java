@@ -7,6 +7,7 @@ import javafx.stage.Stage;
 import tn.esprit.workshop.model.Talel.talel2.ResponsableEcole;
 import tn.esprit.workshop.model.Talel.talel2.User;
 import tn.esprit.workshop.services.Talel.ServiceResponsableEcole;
+import tn.esprit.workshop.utilis.ZaynaInputConstraints;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
@@ -52,6 +53,25 @@ public class ControleurResponsableEcole {
         // S'assurer que le label message est bien configuré
         lblMessage.setVisible(false);
         lblMessage.setManaged(true);
+
+        int nomPrenomMax = ZaynaInputConstraints.LEN_AGENT_ECOLE_NOM_PRENOM;
+        if (nomField != null) {
+            ZaynaInputConstraints.apply(nomField, ZaynaInputConstraints.lettersAndSpacesOnly(nomPrenomMax));
+        }
+        if (prenomField != null) {
+            ZaynaInputConstraints.apply(prenomField, ZaynaInputConstraints.lettersAndSpacesOnly(nomPrenomMax));
+        }
+        ZaynaInputConstraints.apply(txtEmail, ZaynaInputConstraints.emailInput(ZaynaInputConstraints.LEN_USERS_EMAIL));
+        if (txtNomEcole != null) {
+            ZaynaInputConstraints.apply(txtNomEcole, ZaynaInputConstraints.lettersAndSpacesOnly(ZaynaInputConstraints.LEN_ECOLE_NOM));
+        }
+        if (txtLatitude != null) {
+            ZaynaInputConstraints.apply(txtLatitude, ZaynaInputConstraints.signedDecimalCoordinate());
+        }
+        if (txtLongitude != null) {
+            ZaynaInputConstraints.apply(txtLongitude, ZaynaInputConstraints.signedDecimalCoordinate());
+        }
+        ZaynaInputConstraints.apply(txtTelephone, ZaynaInputConstraints.digitsOnly(8));
     }
 
     @FXML
@@ -71,81 +91,58 @@ public class ControleurResponsableEcole {
             String telephone = txtTelephone.getText().trim();
             String adresse = txtAdresse.getText().trim();
 
-            // Validation des champs obligatoires
-            if (nom.isEmpty()) {
-                afficherMessage("❌ Le nom est obligatoire", "error");
+            String errNom = ZaynaInputConstraints.validatePersonName(nom, ZaynaInputConstraints.LEN_AGENT_ECOLE_NOM_PRENOM, "Le nom");
+            if (errNom != null) {
+                afficherMessage("❌ " + errNom, "error");
                 if (nomField != null) nomField.requestFocus();
                 return;
             }
-            if (prenom.isEmpty()) {
-                afficherMessage("❌ Le prénom est obligatoire", "error");
+            String errPrenom = ZaynaInputConstraints.validatePersonName(prenom, ZaynaInputConstraints.LEN_AGENT_ECOLE_NOM_PRENOM, "Le prénom");
+            if (errPrenom != null) {
+                afficherMessage("❌ " + errPrenom, "error");
                 if (prenomField != null) prenomField.requestFocus();
                 return;
             }
-            if (email.isEmpty()) {
-                afficherMessage("❌ L'email est obligatoire", "error");
+
+            String errEmail = ZaynaInputConstraints.validateEmail(email, ZaynaInputConstraints.LEN_USERS_EMAIL);
+            if (errEmail != null) {
+                afficherMessage("❌ " + errEmail, "error");
                 txtEmail.requestFocus();
                 return;
             }
+
             if (passwordClair.isEmpty()) {
                 afficherMessage("❌ Le mot de passe est obligatoire", "error");
                 txtMotDePasse.requestFocus();
                 return;
             }
-            if (nomEcole.isEmpty()) {
-                afficherMessage("❌ Le nom de l'école est obligatoire", "error");
+
+            String errEcole = ZaynaInputConstraints.validateSchoolNameLettersOnly(nomEcole, ZaynaInputConstraints.LEN_ECOLE_NOM);
+            if (errEcole != null) {
+                afficherMessage("❌ " + errEcole, "error");
                 if (txtNomEcole != null) txtNomEcole.requestFocus();
                 return;
             }
-            if (latText.isEmpty()) {
-                afficherMessage("❌ La latitude est obligatoire", "error");
+
+            String errLat = ZaynaInputConstraints.validateLatitude(latText);
+            if (errLat != null) {
+                afficherMessage("❌ " + errLat, "error");
                 if (txtLatitude != null) txtLatitude.requestFocus();
                 return;
             }
-            if (lngText.isEmpty()) {
-                afficherMessage("❌ La longitude est obligatoire", "error");
+            String errLng = ZaynaInputConstraints.validateLongitude(lngText);
+            if (errLng != null) {
+                afficherMessage("❌ " + errLng, "error");
                 if (txtLongitude != null) txtLongitude.requestFocus();
                 return;
             }
 
-            // Validation latitude / longitude (numériques et plages)
-            double lat;
-            double lng;
-            try {
-                lat = Double.parseDouble(latText.replace(',', '.'));
-                if (lat < -90 || lat > 90) {
-                    afficherMessage("❌ La latitude doit être entre -90 et 90", "error");
-                    if (txtLatitude != null) txtLatitude.requestFocus();
-                    return;
-                }
-            } catch (NumberFormatException e) {
-                afficherMessage("❌ Latitude invalide (nombre attendu, ex: 36.8065)", "error");
-                if (txtLatitude != null) txtLatitude.requestFocus();
-                return;
-            }
-            try {
-                lng = Double.parseDouble(lngText.replace(',', '.'));
-                if (lng < -180 || lng > 180) {
-                    afficherMessage("❌ La longitude doit être entre -180 et 180", "error");
-                    if (txtLongitude != null) txtLongitude.requestFocus();
-                    return;
-                }
-            } catch (NumberFormatException e) {
-                afficherMessage("❌ Longitude invalide (nombre attendu, ex: 10.1815)", "error");
-                if (txtLongitude != null) txtLongitude.requestFocus();
-                return;
-            }
+            double lat = Double.parseDouble(latText.replace(',', '.'));
+            double lng = Double.parseDouble(lngText.replace(',', '.'));
 
-            // Validation email
-            if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
-                afficherMessage("❌ Format d'email invalide (ex: nom@domaine.com)", "error");
-                txtEmail.requestFocus();
-                return;
-            }
-
-            // Validation téléphone (optionnel mais doit être valide si présent)
-            if (!telephone.isEmpty() && !telephone.matches("\\d{8}")) {
-                afficherMessage("❌ Le téléphone doit contenir 8 chiffres", "error");
+            String errTel = ZaynaInputConstraints.validatePhone8(telephone, false);
+            if (errTel != null) {
+                afficherMessage("❌ " + errTel, "error");
                 txtTelephone.requestFocus();
                 return;
             }

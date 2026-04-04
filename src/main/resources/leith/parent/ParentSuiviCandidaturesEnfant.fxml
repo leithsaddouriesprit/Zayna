@@ -21,6 +21,7 @@
                 <TableColumn fx:id="colAge" text="Âge" prefWidth="50"/>
                 <TableColumn fx:id="colStatut" text="Statut" prefWidth="100"/>
                 <TableColumn fx:id="colDate" text="Date demande" prefWidth="140"/>
+                <TableColumn fx:id="colActions" text="Actions" prefWidth="200" resizable="false"/>
             </columns>
         </TableView>
         <Label fx:id="lblMessage" text="" styleClass="section-subtitle"/>

@@ -7,6 +7,9 @@ public final class AppSession {
 
     private static final AppSession INSTANCE = new AppSession();
 
+    /** Message ponctuel affiché une fois au prochain écran (ex. retour suivi candidature). */
+    private static String flashMessage;
+
     private int parentId;
     private Integer selectedEnfantId;
     private Integer chauffeurId;
@@ -29,12 +32,24 @@ public final class AppSession {
     private Integer pendingInscriptionEcoleId;
     /** Parent : école pour la page météo (coords / repli Tunis). */
     private Integer pendingMeteoEcoleId;
+    /** Parent : id candidature_enfant à modifier (consommé au chargement de l’écran édition). */
+    private Integer pendingEditCandidatureEnfantId;
 
     private AppSession() {
     }
 
     public static AppSession getInstance() {
         return INSTANCE;
+    }
+
+    public static void setFlashMessage(String message) {
+        flashMessage = message;
+    }
+
+    public static String consumeFlashMessage() {
+        String msg = flashMessage;
+        flashMessage = null;
+        return msg;
     }
 
     public int getParentId() {
@@ -136,6 +151,16 @@ public final class AppSession {
     public Integer getAndClearPendingMeteoEcoleId() {
         Integer id = pendingMeteoEcoleId;
         pendingMeteoEcoleId = null;
+        return id;
+    }
+
+    public void setPendingEditCandidatureEnfantId(Integer id) {
+        this.pendingEditCandidatureEnfantId = id;
+    }
+
+    public Integer getAndClearPendingEditCandidatureEnfantId() {
+        Integer id = pendingEditCandidatureEnfantId;
+        pendingEditCandidatureEnfantId = null;
         return id;
     }
 }

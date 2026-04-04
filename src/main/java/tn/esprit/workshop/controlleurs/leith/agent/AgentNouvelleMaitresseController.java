@@ -10,18 +10,14 @@ import javafx.scene.control.TextField;
 import tn.esprit.workshop.controlleurs.leith.SceneNavigator;
 import tn.esprit.workshop.services.leith.MaitresseMetierService;
 import tn.esprit.workshop.utilis.AppSession;
+import tn.esprit.workshop.utilis.ZaynaInputConstraints;
 
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.regex.Pattern;
-
 public class AgentNouvelleMaitresseController implements Initializable {
-
-    private static final Pattern EMAIL_PATTERN = Pattern.compile(
-            "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
     @FXML private TextField fieldNom;
     @FXML private TextField fieldPrenom;
@@ -34,6 +30,9 @@ public class AgentNouvelleMaitresseController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        ZaynaInputConstraints.apply(fieldNom, ZaynaInputConstraints.lettersAndSpacesOnly(ZaynaInputConstraints.LEN_MAITRESSE_NOM_PRENOM));
+        ZaynaInputConstraints.apply(fieldPrenom, ZaynaInputConstraints.lettersAndSpacesOnly(ZaynaInputConstraints.LEN_MAITRESSE_NOM_PRENOM));
+        ZaynaInputConstraints.apply(fieldEmail, ZaynaInputConstraints.emailInput(ZaynaInputConstraints.LEN_USERS_EMAIL));
         SceneNavigator.applyAppCssToComboBoxPopup(comboBus);
         reloadBuses();
     }
@@ -86,8 +85,19 @@ public class AgentNouvelleMaitresseController implements Initializable {
             lblMessage.setText("Veuillez remplir le nom, le prénom, l'email et le mot de passe.");
             return;
         }
-        if (!EMAIL_PATTERN.matcher(email).matches()) {
-            lblMessage.setText("Veuillez saisir une adresse email valide.");
+        String errNom = ZaynaInputConstraints.validatePersonName(nom, ZaynaInputConstraints.LEN_MAITRESSE_NOM_PRENOM, "Le nom");
+        if (errNom != null) {
+            lblMessage.setText(errNom);
+            return;
+        }
+        String errPrenom = ZaynaInputConstraints.validatePersonName(prenom, ZaynaInputConstraints.LEN_MAITRESSE_NOM_PRENOM, "Le prénom");
+        if (errPrenom != null) {
+            lblMessage.setText(errPrenom);
+            return;
+        }
+        String errEmail = ZaynaInputConstraints.validateEmail(email, ZaynaInputConstraints.LEN_USERS_EMAIL);
+        if (errEmail != null) {
+            lblMessage.setText(errEmail);
             return;
         }
         MaitresseMetierService.BusOption bus = comboBus.getSelectionModel().getSelectedItem();
