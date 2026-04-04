@@ -33,6 +33,7 @@ public class ChauffeurShellController {
     @FXML private Button btnSidebarPostuler;
     @FXML private Button btnSidebarSuivi;
     @FXML private Button btnSidebarEspace;
+    @FXML private Button btnSidebarReclamations;
 
     private final CandidatureService candidatureService = new CandidatureService();
 
@@ -57,7 +58,7 @@ public class ChauffeurShellController {
     }
 
     private void markActive(Button target) {
-        Button[] all = new Button[] { btnSidebarHome, btnSidebarPostuler, btnSidebarSuivi, btnSidebarEspace };
+        Button[] all = new Button[] { btnSidebarHome, btnSidebarPostuler, btnSidebarSuivi, btnSidebarEspace, btnSidebarReclamations };
         for (Button b : all) {
             if (b == null) continue;
             b.getStyleClass().remove("admin-nav-item-active");
@@ -139,6 +140,7 @@ public class ChauffeurShellController {
             else if ("/leith/PostulerChauffeur.fxml".equals(fxmlPath)) markActive(btnSidebarPostuler);
             else if ("/leith/SuiviCandidature.fxml".equals(fxmlPath)) markActive(btnSidebarSuivi);
             else if ("/leith/EspaceChauffeur.fxml".equals(fxmlPath)) markActive(btnSidebarEspace);
+            else if (fxmlPath != null && fxmlPath.contains("/reclamation/reclamation-")) markActive(btnSidebarReclamations);
             FXMLLoader loader = new FXMLLoader(SceneNavigator.class.getResource(fxmlPath));
             Parent root = loader.load();
             Object controller = loader.getController();
@@ -176,6 +178,11 @@ public class ChauffeurShellController {
     @FXML
     void openEspaceChauffeur() {
         loadContent("/leith/EspaceChauffeur.fxml");
+    }
+
+    @FXML
+    void openReclamations() {
+        SceneNavigator.navigateReclamationList();
     }
 
     @FXML

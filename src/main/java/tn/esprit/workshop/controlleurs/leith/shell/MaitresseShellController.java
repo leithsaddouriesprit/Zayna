@@ -63,6 +63,11 @@ public class MaitresseShellController {
     }
 
     @FXML
+    void openReclamations() {
+        SceneNavigator.navigateReclamationList();
+    }
+
+    @FXML
     void logout() {
         SceneNavigator.unregisterMaitresseShell();
         Stage stage = contentArea != null && contentArea.getScene() != null ? (Stage) contentArea.getScene().getWindow() : null;

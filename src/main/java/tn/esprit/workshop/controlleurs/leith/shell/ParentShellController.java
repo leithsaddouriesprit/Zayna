@@ -81,8 +81,8 @@ public class ParentShellController {
     }
 
     @FXML
-    void openReclamer() {
-        loadContent("/leith/parent/ParentReclamerPlaceholder.fxml");
+    void openReclamations() {
+        SceneNavigator.navigateReclamationList();
     }
 
     @FXML

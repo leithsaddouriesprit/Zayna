@@ -34,6 +34,8 @@ public final class AppSession {
     private Integer pendingMeteoEcoleId;
     /** Parent : id candidature_enfant à modifier (consommé au chargement de l’écran édition). */
     private Integer pendingEditCandidatureEnfantId;
+    /** Réclamations : ouverture du détail par id (consommé au chargement). */
+    private Integer pendingReclamationDetailId;
 
     private AppSession() {
     }
@@ -161,6 +163,16 @@ public final class AppSession {
     public Integer getAndClearPendingEditCandidatureEnfantId() {
         Integer id = pendingEditCandidatureEnfantId;
         pendingEditCandidatureEnfantId = null;
+        return id;
+    }
+
+    public void setPendingReclamationDetailId(Integer id) {
+        this.pendingReclamationDetailId = id;
+    }
+
+    public Integer getAndClearPendingReclamationDetailId() {
+        Integer id = pendingReclamationDetailId;
+        pendingReclamationDetailId = null;
         return id;
     }
 }

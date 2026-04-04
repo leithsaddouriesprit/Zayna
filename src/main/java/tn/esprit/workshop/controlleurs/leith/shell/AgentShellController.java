@@ -193,7 +193,7 @@ public class AgentShellController {
 
     @FXML
     void openGestionReclamations() {
-        loadContent("/leith/agent/AgentReclamationsPlaceholder.fxml");
+        SceneNavigator.navigateReclamationList();
     }
 
     @FXML

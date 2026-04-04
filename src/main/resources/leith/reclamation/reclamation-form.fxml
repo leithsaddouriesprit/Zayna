@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.workshop.controlleurs.leith.reclamation.ReclamationFormController"
+            fitToWidth="true" styleClass="root-scroll" hbarPolicy="NEVER">
+    <stylesheets>
+        <URL value="@../design/global.css"/>
+        <URL value="@../app.css"/>
+        <URL value="@reclamation.css"/>
+    </stylesheets>
+    <VBox styleClass="content-area admin-main-panel reclamation-root" spacing="16" maxWidth="Infinity">
+        <padding>
+            <Insets top="20" right="24" bottom="24" left="24"/>
+        </padding>
+
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Button text="← Retour à la liste" onAction="#annuler" styleClass="btn-soft" minWidth="140"/>
+        </HBox>
+
+        <Label text="Nouvelle réclamation" styleClass="reclamation-title"/>
+        <Label text="Décrivez votre demande. Les champs marqués * sont obligatoires." styleClass="reclamation-sub"/>
+
+        <VBox styleClass="reclamation-detail-box" spacing="14" maxWidth="640">
+            <Label text="Objet *" styleClass="reclamation-detail-label"/>
+            <TextField fx:id="tfObjet" promptText="Sujet court" styleClass="reclamation-field"/>
+
+            <Label text="Description *" styleClass="reclamation-detail-label"/>
+            <TextArea fx:id="taDescription" promptText="Détail de la réclamation…" wrapText="true" prefRowCount="6"
+                      styleClass="reclamation-field"/>
+
+            <HBox spacing="20">
+                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                    <Label text="Catégorie *" styleClass="reclamation-detail-label"/>
+                    <ComboBox fx:id="cbCategorie" maxWidth="Infinity" styleClass="reclamation-field"/>
+                </VBox>
+                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                    <Label text="Priorité *" styleClass="reclamation-detail-label"/>
+                    <ComboBox fx:id="cbPriorite" maxWidth="Infinity" styleClass="reclamation-field"/>
+                </VBox>
+            </HBox>
+
+            <HBox spacing="12">
+                <Button text="Enregistrer" onAction="#enregistrer" styleClass="btn-primary" minWidth="120"/>
+                <Button text="Annuler" onAction="#annuler" styleClass="btn-soft" minWidth="100"/>
+            </HBox>
+
+            <Label fx:id="lblMessage" wrapText="true" visible="false" managed="false" styleClass="reclamation-detail-text"/>
+        </VBox>
+    </VBox>
+</ScrollPane>

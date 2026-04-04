@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.workshop.controlleurs.leith.reclamation.ReclamationDetailController"
+            fitToWidth="true" styleClass="root-scroll" hbarPolicy="NEVER">
+    <stylesheets>
+        <URL value="@../design/global.css"/>
+        <URL value="@../app.css"/>
+        <URL value="@reclamation.css"/>
+    </stylesheets>
+    <VBox styleClass="content-area admin-main-panel reclamation-root" spacing="16" maxWidth="Infinity">
+        <padding>
+            <Insets top="20" right="24" bottom="24" left="24"/>
+        </padding>
+
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Button text="← Retour à la liste" onAction="#retourListe" styleClass="btn-soft" minWidth="160"/>
+        </HBox>
+
+        <VBox styleClass="reclamation-detail-hero" spacing="10">
+            <HBox styleClass="reclamation-detail-header" alignment="CENTER_LEFT" spacing="14">
+                <Label fx:id="lblEmoji" styleClass="reclamation-card-emoji" text="📋"/>
+                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                    <Label fx:id="lblObjet" styleClass="reclamation-title" wrapText="true"/>
+                    <HBox spacing="8" fx:id="badgeRow" alignment="CENTER_LEFT"/>
+                </VBox>
+            </HBox>
+            <Label fx:id="lblResumeTraitement" wrapText="true" styleClass="reclamation-detail-hint"/>
+        </VBox>
+
+        <VBox styleClass="reclamation-detail-box" spacing="8">
+            <Label text="Description" styleClass="reclamation-detail-label"/>
+            <Label fx:id="lblDescription" styleClass="reclamation-detail-text" wrapText="true"/>
+        </VBox>
+
+        <GridPane hgap="24" vgap="10" styleClass="reclamation-detail-box">
+            <columnConstraints>
+                <ColumnConstraints minWidth="140" prefWidth="160"/>
+                <ColumnConstraints hgrow="ALWAYS" minWidth="200"/>
+            </columnConstraints>
+            <Label text="Créateur (user)" styleClass="reclamation-detail-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <Label fx:id="lblCreateur" styleClass="reclamation-detail-text" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+            <Label text="Rôle créateur" styleClass="reclamation-detail-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <Label fx:id="lblRoleCreateur" styleClass="reclamation-detail-text" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+            <Label text="Créée le" styleClass="reclamation-detail-label" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+            <Label fx:id="lblDateCreation" styleClass="reclamation-detail-text" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+            <Label text="Dernière modification" styleClass="reclamation-detail-label" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+            <Label fx:id="lblDateModification" styleClass="reclamation-detail-text" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+            <Label text="École" styleClass="reclamation-detail-label" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+            <Label fx:id="lblEcole" styleClass="reclamation-detail-text" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+            <Label text="Bus" styleClass="reclamation-detail-label" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+            <Label fx:id="lblBus" styleClass="reclamation-detail-text" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+            <Label text="Trajet" styleClass="reclamation-detail-label" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+            <Label fx:id="lblTrajet" styleClass="reclamation-detail-text" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+        </GridPane>
+
+        <VBox spacing="8">
+            <Label text="Fil de discussion" styleClass="reclamation-section-title"/>
+            <VBox fx:id="reponsesBox" spacing="12" styleClass="reclamation-timeline"/>
+            <Label fx:id="lblAucuneReponse" text="Aucune réponse pour le moment — l’équipe vous répondra ici."
+                   styleClass="reclamation-empty-state-inner" visible="false" managed="false" wrapText="true"/>
+        </VBox>
+
+        <VBox fx:id="boxTraitement" spacing="12" styleClass="reclamation-detail-box" visible="false" managed="false">
+            <Label text="Traitement (agent / administrateur)" styleClass="reclamation-detail-label"/>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <ComboBox fx:id="cbStatut" prefWidth="200" promptText="Nouveau statut" styleClass="reclamation-field"/>
+                <Button text="Mettre à jour le statut" onAction="#mettreAJourStatut" styleClass="btn-soft"/>
+            </HBox>
+            <Label text="Répondre" styleClass="reclamation-detail-label"/>
+            <TextArea fx:id="taReponse" promptText="Votre message…" wrapText="true" prefRowCount="4"
+                      styleClass="reclamation-field"/>
+            <Button text="Envoyer la réponse" onAction="#envoyerReponse" styleClass="btn-primary" minWidth="180"/>
+            <Label fx:id="lblTraitementMsg" wrapText="true" visible="false" managed="false" styleClass="reclamation-detail-text"/>
+        </VBox>
+    </VBox>
+</ScrollPane>

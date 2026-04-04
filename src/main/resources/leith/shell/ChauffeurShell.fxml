@@ -41,6 +41,7 @@
             <Button fx:id="btnSidebarPostuler" text="Postuler" onAction="#openPostuler" maxWidth="Infinity" styleClass="admin-nav-item"/>
             <Button fx:id="btnSidebarSuivi" text="Suivi candidature" onAction="#openSuiviCandidature" maxWidth="Infinity" styleClass="admin-nav-item"/>
             <Button fx:id="btnSidebarEspace" text="Espace Chauffeur" onAction="#openEspaceChauffeur" maxWidth="Infinity" styleClass="admin-nav-item"/>
+            <Button fx:id="btnSidebarReclamations" text="Réclamations" onAction="#openReclamations" maxWidth="Infinity" styleClass="admin-nav-item"/>
         </VBox>
     </left>
 

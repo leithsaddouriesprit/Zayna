@@ -1,0 +1,461 @@
+/* Module Réclamations — thème sombre, champs lisibles, niveau 2 */
+
+.reclamation-root {
+    -fx-background-color: transparent;
+}
+
+.reclamation-toolbar-block {
+    -fx-spacing: 10;
+    -fx-padding: 0 0 8 0;
+}
+
+.reclamation-toolbar {
+    -fx-spacing: 12;
+    -fx-padding: 0 0 4 0;
+    -fx-alignment: center-left;
+}
+
+.reclamation-hint {
+    -fx-text-fill: rgba(249, 250, 251, 0.45);
+    -fx-font-size: 11px;
+}
+
+.reclamation-title {
+    -fx-text-fill: #F9FAFB;
+    -fx-font-size: 22px;
+    -fx-font-weight: 800;
+}
+
+.reclamation-sub {
+    -fx-text-fill: rgba(249, 250, 251, 0.65);
+    -fx-font-size: 13px;
+}
+
+.reclamation-section-title {
+    -fx-text-fill: #F9FAFB;
+    -fx-font-size: 16px;
+    -fx-font-weight: 800;
+}
+
+/* ——— Champs : texte et prompt lisibles (évite blanc sur blanc) ——— */
+
+.reclamation-field {
+    -fx-background-color: rgba(30, 41, 59, 0.92);
+    -fx-background-radius: 10;
+    -fx-border-color: rgba(255, 255, 255, 0.16);
+    -fx-border-radius: 10;
+    -fx-text-fill: #F9FAFB;
+    -fx-prompt-text-fill: rgba(249, 250, 251, 0.5);
+    -fx-padding: 8 12;
+}
+
+.reclamation-field:focused {
+    -fx-border-color: rgba(96, 165, 250, 0.65);
+    -fx-background-color: rgba(30, 41, 59, 0.98);
+}
+
+.reclamation-field:disabled {
+    -fx-opacity: 0.55;
+}
+
+.text-area.reclamation-field {
+    -fx-control-inner-background: rgba(30, 41, 59, 0.95);
+    -fx-background-color: rgba(30, 41, 59, 0.92);
+    -fx-text-fill: #F9FAFB;
+    -fx-prompt-text-fill: rgba(249, 250, 251, 0.5);
+}
+
+.text-area.reclamation-field .content {
+    -fx-background-color: rgba(30, 41, 59, 0.95);
+}
+
+.text-area.reclamation-field:focused {
+    -fx-border-color: rgba(96, 165, 250, 0.65);
+}
+
+/* ComboBox : zone éditable + liste */
+.combo-box.reclamation-field > .list-cell {
+    -fx-text-fill: #F9FAFB;
+    -fx-background-color: transparent;
+}
+
+.combo-box.reclamation-field .arrow-button {
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+}
+.combo-box.reclamation-field .arrow {
+    -fx-background-color: #e2e8f0;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: #1e293b;
+}
+.combo-box-popup .list-cell {
+    -fx-text-fill: #F9FAFB;
+    -fx-background-color: #1e293b;
+}
+.combo-box-popup .list-cell:hover,
+.combo-box-popup .list-cell:filled:selected,
+.combo-box-popup .list-cell:filled:selected:hover {
+    -fx-background-color: rgba(59, 130, 246, 0.35);
+    -fx-text-fill: #F9FAFB;
+}
+
+.reclamation-scroll {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+}
+.reclamation-scroll .viewport {
+    -fx-background-color: transparent;
+}
+
+.reclamation-kpi-bar {
+    -fx-wrap-text: false;
+    -fx-alignment: center-left;
+}
+
+.reclamation-kpi-card {
+    -fx-background-color: rgba(255, 255, 255, 0.06);
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 12;
+    -fx-min-width: 108;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0.15, 0, 2);
+}
+
+.reclamation-kpi-title {
+    -fx-text-fill: rgba(249, 250, 251, 0.6);
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+}
+
+.reclamation-kpi-value {
+    -fx-text-fill: #F9FAFB;
+    -fx-font-size: 20px;
+    -fx-font-weight: 800;
+}
+
+.kpi-neutral { -fx-border-color: rgba(148, 163, 184, 0.35); }
+.kpi-info { -fx-border-color: rgba(59, 130, 246, 0.45); }
+.kpi-warn { -fx-border-color: rgba(251, 191, 36, 0.5); }
+.kpi-success { -fx-border-color: rgba(34, 197, 94, 0.45); }
+.kpi-muted { -fx-border-color: rgba(148, 163, 184, 0.25); }
+.kpi-danger { -fx-border-color: rgba(248, 113, 113, 0.45); }
+.kpi-urgent {
+    -fx-border-color: rgba(239, 68, 68, 0.75);
+    -fx-background-color: rgba(239, 68, 68, 0.12);
+}
+
+.reclamation-cards-flow {
+    -fx-hgap: 16;
+    -fx-vgap: 16;
+    -fx-padding: 4 0 24 0;
+}
+
+.reclamation-card {
+    -fx-background-color: rgba(255, 255, 255, 0.06);
+    -fx-background-radius: 14;
+    -fx-border-color: rgba(255, 255, 255, 0.12);
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+    -fx-padding: 14 16;
+    -fx-spacing: 10;
+    -fx-pref-width: 340;
+    -fx-max-width: 400;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 12, 0.2, 0, 4);
+}
+
+.reclamation-card:hover {
+    -fx-border-color: rgba(96, 165, 250, 0.45);
+}
+
+.reclamation-card-closed {
+    -fx-opacity: 0.88;
+}
+
+/* Bordure priorité sur la carte */
+.reclamation-card-prio-BASSE {
+    -fx-border-color: rgba(107, 114, 128, 0.55);
+}
+.reclamation-card-prio-MOYENNE {
+    -fx-border-color: rgba(96, 165, 250, 0.4);
+}
+.reclamation-card-prio-HAUTE {
+    -fx-border-color: rgba(251, 146, 60, 0.75);
+    -fx-border-width: 2;
+}
+.reclamation-card-prio-URGENTE {
+    -fx-border-color: #EF4444;
+    -fx-border-width: 2;
+    -fx-background-color: rgba(239, 68, 68, 0.08);
+    -fx-effect: dropshadow(gaussian, rgba(239, 68, 68, 0.35), 14, 0.25, 0, 0);
+}
+
+.rec-prio-sigle {
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+    -fx-padding: 4 8;
+    -fx-background-radius: 8;
+    -fx-min-width: 28;
+    -fx-alignment: center;
+}
+.rec-prio-sigle-BASSE { -fx-text-fill: #e5e7eb; -fx-background-color: rgba(107, 114, 128, 0.5); }
+.rec-prio-sigle-MOYENNE { -fx-text-fill: #0c4a6e; -fx-background-color: #93C5FD; }
+.rec-prio-sigle-HAUTE { -fx-text-fill: #431407; -fx-background-color: #FDBA74; }
+.rec-prio-sigle-URGENTE {
+    -fx-text-fill: #fef2f2;
+    -fx-background-color: #DC2626;
+    -fx-effect: dropshadow(gaussian, rgba(220,38,38,0.5), 6, 0.3, 0, 0);
+}
+
+.reclamation-card-title {
+    -fx-text-fill: #F9FAFB;
+    -fx-font-size: 15px;
+    -fx-font-weight: 800;
+    -fx-wrap-text: true;
+}
+
+.reclamation-card-emoji {
+    -fx-font-size: 22px;
+    -fx-min-width: 32;
+}
+
+.reclamation-card-desc {
+    -fx-text-fill: rgba(249, 250, 251, 0.78);
+    -fx-font-size: 12px;
+    -fx-wrap-text: true;
+    -fx-max-height: 52;
+}
+
+.reclamation-card-meta {
+    -fx-text-fill: rgba(249, 250, 251, 0.5);
+    -fx-font-size: 11px;
+}
+
+.reclamation-reply-count {
+    -fx-text-fill: #e2e8f0;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+    -fx-padding: 4 10;
+    -fx-background-color: rgba(59, 130, 246, 0.2);
+    -fx-background-radius: 999;
+    -fx-border-color: rgba(59, 130, 246, 0.35);
+    -fx-border-radius: 999;
+}
+
+.reclamation-card-actions {
+    -fx-padding: 4 0 0 0;
+    -fx-wrap-text: true;
+}
+
+.reclamation-card-actions .button {
+    -fx-font-size: 11px;
+    -fx-padding: 6 10;
+}
+
+/* Badges */
+.rec-badge {
+    -fx-background-radius: 8;
+    -fx-padding: 4 10;
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+}
+
+.badge-categorie {
+    -fx-background-color: rgba(167, 139, 250, 0.35);
+    -fx-text-fill: #ede9fe;
+    -fx-border-color: rgba(167, 139, 250, 0.5);
+    -fx-border-radius: 8;
+}
+
+.badge-statut-NOUVELLE {
+    -fx-background-color: #93C5FD;
+    -fx-text-fill: #0c4a6e;
+}
+.badge-statut-EN_COURS {
+    -fx-background-color: #FDBA74;
+    -fx-text-fill: #7c2d12;
+}
+.badge-statut-REPONDUE {
+    -fx-background-color: #86EFAC;
+    -fx-text-fill: #14532d;
+}
+.badge-statut-FERMEE {
+    -fx-background-color: #9CA3AF;
+    -fx-text-fill: #111827;
+}
+.badge-statut-REJETEE {
+    -fx-background-color: #FCA5A5;
+    -fx-text-fill: #7f1d1d;
+}
+
+.badge-prio-BASSE {
+    -fx-background-color: #6B7280;
+    -fx-text-fill: #f9fafb;
+}
+.badge-prio-MOYENNE {
+    -fx-background-color: #60A5FA;
+    -fx-text-fill: #0c4a6e;
+}
+.badge-prio-HAUTE {
+    -fx-background-color: #FB923C;
+    -fx-text-fill: #431407;
+}
+.badge-prio-URGENTE {
+    -fx-background-color: #EF4444;
+    -fx-text-fill: #fef2f2;
+}
+
+/* Détail */
+.reclamation-detail-hero {
+    -fx-background-color: rgba(255, 255, 255, 0.04);
+    -fx-background-radius: 16;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 16;
+    -fx-padding: 16 18;
+}
+
+.reclamation-detail-header {
+    -fx-spacing: 12;
+    -fx-padding: 0;
+}
+
+.reclamation-detail-hint {
+    -fx-text-fill: rgba(249, 250, 251, 0.72);
+    -fx-font-size: 13px;
+}
+
+.reclamation-detail-box {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-background-radius: 14;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 14;
+    -fx-padding: 16;
+    -fx-spacing: 10;
+}
+
+.reclamation-detail-label {
+    -fx-text-fill: rgba(249, 250, 251, 0.65);
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+}
+
+.reclamation-detail-text {
+    -fx-text-fill: #F9FAFB;
+    -fx-font-size: 14px;
+    -fx-wrap-text: true;
+}
+
+/* Timeline réponses */
+.reclamation-timeline {
+    -fx-padding: 4 0 8 0;
+}
+
+.reclamation-timeline-row {
+    -fx-alignment: center-left;
+    -fx-max-width: Infinity;
+}
+
+.timeline-align-staff {
+    -fx-padding: 0 0 0 24;
+}
+
+.timeline-align-user {
+    -fx-padding: 0 24 0 0;
+}
+
+.reclamation-timeline-avatar {
+    -fx-font-size: 20px;
+    -fx-min-width: 32;
+    -fx-alignment: center;
+}
+
+.reclamation-reply-bubble {
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-padding: 10 14;
+    -fx-spacing: 6;
+    -fx-max-width: Infinity;
+}
+
+.reply-from-staff {
+    -fx-background-color: rgba(59, 130, 246, 0.18);
+    -fx-border-color: rgba(59, 130, 246, 0.4);
+}
+
+.reply-from-user {
+    -fx-background-color: rgba(148, 163, 184, 0.12);
+    -fx-border-color: rgba(148, 163, 184, 0.28);
+}
+
+.reply-role-badge {
+    -fx-background-color: rgba(15, 23, 42, 0.55);
+    -fx-text-fill: #e2e8f0;
+    -fx-font-size: 10px;
+}
+
+.reclamation-reply-meta {
+    -fx-text-fill: rgba(249, 250, 251, 0.55);
+    -fx-font-size: 11px;
+}
+
+.reclamation-reply-msg {
+    -fx-text-fill: #e2e8f0;
+    -fx-font-size: 13px;
+    -fx-wrap-text: true;
+}
+
+.reclamation-empty {
+    -fx-text-fill: rgba(249, 250, 251, 0.5);
+    -fx-font-size: 14px;
+    -fx-padding: 32;
+}
+
+.reclamation-empty-state {
+    -fx-text-fill: rgba(249, 250, 251, 0.55);
+    -fx-font-size: 14px;
+    -fx-padding: 28 8 16 8;
+}
+
+.reclamation-empty-state-inner {
+    -fx-text-fill: rgba(249, 250, 251, 0.5);
+    -fx-font-size: 13px;
+    -fx-padding: 16;
+    -fx-background-color: rgba(255, 255, 255, 0.04);
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-radius: 12;
+}
+
+.reclamation-error {
+    -fx-text-fill: #FCA5A5;
+    -fx-font-size: 13px;
+}
+
+/* Boutons module */
+.btn-danger-soft {
+    -fx-background-color: rgba(239, 68, 68, 0.2);
+    -fx-text-fill: #fecaca;
+    -fx-border-color: rgba(239, 68, 68, 0.45);
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+.btn-danger-soft:hover {
+    -fx-background-color: rgba(239, 68, 68, 0.32);
+}
+
+/* Dialog JavaFX (réponse rapide) */
+.dialog-pane {
+    -fx-background-color: #0f172a;
+}
+.dialog-pane .header-panel {
+    -fx-background-color: #0f172a;
+}
+.dialog-pane .header-panel .label {
+    -fx-text-fill: #F9FAFB;
+}
+.dialog-pane .content.label {
+    -fx-text-fill: #e2e8f0;
+}
+.dialog-pane .button {
+    -fx-background-radius: 8;
+}

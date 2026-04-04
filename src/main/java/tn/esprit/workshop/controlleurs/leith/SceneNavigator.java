@@ -646,4 +646,45 @@ public class SceneNavigator {
         }
     }
 
+    // ---------- Module Réclamations (shells Leith) ----------
+    public static final String RECLAMATION_LIST_FXML = "/leith/reclamation/reclamation-list.fxml";
+    public static final String RECLAMATION_FORM_FXML = "/leith/reclamation/reclamation-form.fxml";
+    public static final String RECLAMATION_DETAIL_FXML = "/leith/reclamation/reclamation-detail.fxml";
+
+    public static void navigateReclamationList() {
+        loadReclamationIntoActiveShell(RECLAMATION_LIST_FXML);
+    }
+
+    public static void navigateReclamationForm() {
+        loadReclamationIntoActiveShell(RECLAMATION_FORM_FXML);
+    }
+
+    public static void navigateReclamationDetail() {
+        loadReclamationIntoActiveShell(RECLAMATION_DETAIL_FXML);
+    }
+
+    private static void loadReclamationIntoActiveShell(String fxmlPath) {
+        if (parentShell != null) {
+            parentShell.loadContent(fxmlPath);
+            return;
+        }
+        if (agentShell != null) {
+            agentShell.loadContent(fxmlPath);
+            return;
+        }
+        if (adminShell != null) {
+            adminShell.loadContent(fxmlPath);
+            return;
+        }
+        if (chauffeurShell != null) {
+            chauffeurShell.loadContent(fxmlPath);
+            return;
+        }
+        if (maitresseShell != null) {
+            maitresseShell.loadContent(fxmlPath);
+            return;
+        }
+        LOGGER.warning("Réclamations : aucun shell actif pour charger " + fxmlPath);
+    }
+
 }

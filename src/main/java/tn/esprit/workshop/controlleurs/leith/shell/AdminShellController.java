@@ -132,6 +132,11 @@ public class AdminShellController {
     }
 
     @FXML
+    void openReclamations() {
+        SceneNavigator.navigateReclamationList();
+    }
+
+    @FXML
     void logout() {
         doLogout();
     }

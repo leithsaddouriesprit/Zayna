@@ -64,6 +64,8 @@
                     </VBox>
                 </content>
             </TitledPane>
+
+            <ToggleButton text="Réclamations" onAction="#openReclamations" maxWidth="Infinity" styleClass="admin-nav-item" toggleGroup="$navGroup"/>
         </VBox>
     </left>
 
