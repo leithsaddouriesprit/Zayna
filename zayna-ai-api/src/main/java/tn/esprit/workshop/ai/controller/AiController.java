@@ -6,10 +6,14 @@ import tn.esprit.workshop.ai.service.*;
 
 import java.util.Locale;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/ai")
 public class AiController {
+
+    private static final Logger LOG = Logger.getLogger(AiController.class.getName());
 
     private final OllamaClient ollama;
     private final ContextBuilderService contextBuilder;
@@ -45,7 +49,18 @@ public class AiController {
     @PostMapping("/chat")
     public StructuredChatResponse chat(@RequestBody ChatRequest req) {
         String userMessage = req.userMessage != null ? req.userMessage : req.message;
+        LOG.log(Level.INFO, "AI /chat request: parentId={0}, enfantId={1}, busId={2}, hasSelectedChild={3}, hasSelectedBus={4}, hasSnapshot={5}, message={6}",
+                new Object[]{
+                        req.parentId,
+                        req.enfantId,
+                        req.busId,
+                        req.selectedChild != null,
+                        req.selectedBus != null,
+                        req.trackingSnapshot != null,
+                        userMessage
+                });
         if (userMessage == null || userMessage.isBlank()) {
+            LOG.info("AI /chat -> missing context: empty message");
             return StructuredChatResponse.missingContext(
                     "Veuillez poser une question.",
                     java.util.List.of("message"),
@@ -80,16 +95,20 @@ public class AiController {
 
         StructuredChatResponse missing = contextValidator.validateAndReturnMissingContextIfNeeded(userMessage, contract);
         if (missing != null) {
+            LOG.log(Level.INFO, "AI /chat -> context validator fallback: intent={0}, missingFields={1}",
+                    new Object[]{missing.getIntent(), missing.getMissing_fields()});
             return missing;
         }
 
         var intent = intentDetection.detect(userMessage);
+        LOG.log(Level.INFO, "AI /chat detected intent: {0}", intent);
         if (intent == Intent.SUMMARY_STATUS && contract.selectedChild != null) {
             StructuredChatResponse summary = buildSummaryResponse(contract);
             if (summary != null) return summary;
         }
         StructuredChatResponse deterministic = deterministicAnswer.answerIfPossible(intent, contract);
         if (deterministic != null) {
+            LOG.log(Level.INFO, "AI /chat deterministic response used: intent={0}", deterministic.getIntent());
             return deterministic;
         }
 
@@ -97,13 +116,16 @@ public class AiController {
         String raw = ollama.generate(prompt);
         StructuredChatResponse parsed = responseParser.parse(raw);
         if (parsed != null) {
+            LOG.log(Level.INFO, "AI /chat LLM response parsed successfully: intent={0}", parsed.getIntent());
             return parsed;
         }
         raw = ollama.generate(promptBuilder.buildRepairPrompt(raw));
         parsed = responseParser.parse(raw);
         if (parsed != null) {
+            LOG.log(Level.INFO, "AI /chat LLM repair response parsed successfully: intent={0}", parsed.getIntent());
             return parsed;
         }
+        LOG.warning("AI /chat falling back to generic response");
         return responseParser.fallbackResponse(userMessage);
     }
 

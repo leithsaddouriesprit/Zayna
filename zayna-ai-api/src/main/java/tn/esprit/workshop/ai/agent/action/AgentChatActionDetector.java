@@ -70,19 +70,38 @@ public class AgentChatActionDetector {
             return un;
         }
 
-        // --- Candidatures chauffeur ---
-        if (isChauffeurCandidatureContext(n) && !n.contains("enfant")) {
-            ActionParseResult cr = tryChauffeurCand(raw, n, ecoleId, data);
-            if (!(cr instanceof ActionParseResult.NoAction)) {
-                return cr;
+        // --- Candidatures (ordre important) ---
+        if (n.contains("candidature")) {
+            // Si le rôle est explicitement chauffeur, on force le flux chauffeur.
+            if (n.contains("chauffeur") && !n.contains("enfant")) {
+                ActionParseResult cr = tryChauffeurCand(raw, n, ecoleId, data);
+                if (!(cr instanceof ActionParseResult.NoAction)) {
+                    return cr;
+                }
+            } else {
+                // Par défaut sur "candidature" sans rôle explicite, on tente enfant.
+                ActionParseResult er = tryEnfantCand(raw, n, ecoleId, data);
+                if (!(er instanceof ActionParseResult.NoAction)) {
+                    return er;
+                }
+                ActionParseResult cr = tryChauffeurCand(raw, n, ecoleId, data);
+                if (!(cr instanceof ActionParseResult.NoAction)) {
+                    return cr;
+                }
             }
-        }
-
-        // --- Candidatures enfant ---
-        if (isEnfantCandidatureContext(n)) {
-            ActionParseResult er = tryEnfantCand(raw, n, ecoleId, data);
-            if (!(er instanceof ActionParseResult.NoAction)) {
-                return er;
+        } else {
+            // Compatibilité historique.
+            if (isChauffeurCandidatureContext(n) && !n.contains("enfant")) {
+                ActionParseResult cr = tryChauffeurCand(raw, n, ecoleId, data);
+                if (!(cr instanceof ActionParseResult.NoAction)) {
+                    return cr;
+                }
+            }
+            if (isEnfantCandidatureContext(n)) {
+                ActionParseResult er = tryEnfantCand(raw, n, ecoleId, data);
+                if (!(er instanceof ActionParseResult.NoAction)) {
+                    return er;
+                }
             }
         }
 
@@ -183,7 +202,32 @@ public class AgentChatActionDetector {
         if (!isApproveVerb(n) && !isRejectVerb(n)) {
             return ActionParseResult.NoAction.INSTANCE;
         }
+        Integer candidatureId = parseCandidatureId(raw);
+        if (candidatureId != null) {
+            AgentChatDataService.ResolvedEnfantCand one = data.findPendingEnfantCandidatureById(ecoleId, candidatureId);
+            if (one == null) {
+                return new ActionParseResult.Clarify("Je n'ai trouvé aucune candidature enfant en attente avec cet identifiant.");
+            }
+            if (isRejectVerb(n)) {
+                return new ActionParseResult.Proposal(AgentChatActionPayload.rejectEnfant(one.id(), one.label()));
+            }
+            Integer trajetFromMsg = parseTrajetId(raw);
+            Integer trajetFromRow = data.getEnfantCandidatureTrajetId(one.id(), ecoleId);
+            Integer trajet = trajetFromMsg != null ? trajetFromMsg : trajetFromRow;
+            if (trajet == null) {
+                return new ActionParseResult.Clarify(
+                        "Pour accepter cette candidature enfant, indiquez le numéro de trajet de votre école "
+                                + "(ex. « accepter la candidature 5 sur le trajet 3 »).");
+            }
+            if (!data.trajetBelongsToEcole(trajet, ecoleId)) {
+                return new ActionParseResult.Clarify("Ce trajet n'appartient pas à votre école.");
+            }
+            return new ActionParseResult.Proposal(AgentChatActionPayload.approveEnfant(one.id(), one.label(), trajet));
+        }
         String name = extractCandidaturePersonName(raw, n, "enfant");
+        if (name == null || name.isBlank()) {
+            name = extractNameAfterCandidature(raw);
+        }
         if (name == null || name.isBlank()) {
             return new ActionParseResult.Clarify(
                     "Je n'ai pas identifié le nom de l'enfant. Exemple : accepter la candidature enfant de Sara Ben Ali.");
@@ -213,6 +257,34 @@ public class AgentChatActionDetector {
             return new ActionParseResult.Clarify("Ce trajet n'appartient pas à votre école.");
         }
         return new ActionParseResult.Proposal(AgentChatActionPayload.approveEnfant(one.id(), one.label(), trajet));
+    }
+
+    private static Integer parseCandidatureId(String raw) {
+        Matcher m = Pattern.compile("(?i)candidature\\s*(?:enfant\\s*)?(?:#|id\\s*)?\\s*([0-9]+)").matcher(raw);
+        if (m.find()) {
+            try {
+                return Integer.parseInt(m.group(1).trim());
+            } catch (NumberFormatException ignored) {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    private static String extractNameAfterCandidature(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return null;
+        }
+        Matcher m = Pattern.compile("(?i)candidature\\s+(?:enfant\\s+)?(.+)").matcher(raw.trim());
+        if (!m.find()) {
+            return null;
+        }
+        String tail = cleanName(m.group(1));
+        tail = tail.replaceAll("(?i)^(de|du|d')\\s+", "").trim();
+        if (tail.matches("^[0-9]+$")) {
+            return null;
+        }
+        return tail.isBlank() ? null : tail;
     }
 
     private ActionParseResult tryAssignMaitresse(String raw, int ecoleId, AgentChatDataService data) {
@@ -249,6 +321,14 @@ public class AgentChatActionDetector {
         }
         if (mName == null || mName.isBlank() || busTok == null || busTok.isBlank()) {
             return ActionParseResult.NoAction.INSTANCE;
+        }
+        String normalizedName = AgentChatTextNormalizer.forMatching(mName);
+        if (normalizedName.equals("maitresse")
+                || normalizedName.equals("la maitresse")
+                || normalizedName.equals("une maitresse")
+                || normalizedName.equals("les maitresses")) {
+            return new ActionParseResult.Clarify(
+                    "Pour affecter une maîtresse, précisez son nom (ex. « affecter [Prénom Nom] au bus 12 »).");
         }
         List<AgentChatDataService.ResolvedMaitresse> mlist = data.findMaitressesByNameForEcole(ecoleId, mName);
         if (mlist.isEmpty()) {

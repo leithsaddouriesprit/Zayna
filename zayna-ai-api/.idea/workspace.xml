@@ -5,25 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0082d293-a5d2-4b02-b0d2-6af92ec50d13" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/parent/ParentModifierCandidatureEnfantController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/utilis/ZaynaInputConstraints.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../src/main/resources/leith/parent/ParentModifierCandidatureEnfant.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/Talel/ControleurChauffeur.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/Talel/ControleurChauffeur.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/Talel/ControleurParent.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/Talel/ControleurParent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/Talel/ControleurResponsableEcole.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/Talel/ControleurResponsableEcole.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/amal/ProgrammeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/amal/ProgrammeController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/SceneNavigator.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/SceneNavigator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/agent/AgentMaitressesListeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/agent/AgentMaitressesListeController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/agent/AgentNouvelleMaitresseController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/agent/AgentNouvelleMaitresseController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/parent/ParentInscriptionEnfantController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/parent/ParentInscriptionEnfantController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/parent/ParentSuiviCandidaturesEnfantController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/parent/ParentSuiviCandidaturesEnfantController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/shell/AgentShellController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/shell/AgentShellController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/services/leith/CandidatureEnfantService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/services/leith/CandidatureEnfantService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/utilis/AppSession.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/utilis/AppSession.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src/main/resources/leith/design/global.css" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/resources/leith/design/global.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src/main/resources/leith/parent/ParentSuiviCandidaturesEnfant.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/resources/leith/parent/ParentSuiviCandidaturesEnfant.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src/main/resources/leith/shell/AgentShell.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/resources/leith/shell/AgentShell.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/AI/ChatAIController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/AI/ChatAIController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/resources/Talel/ConnecterUser.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/resources/Talel/ConnecterUser.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/agent/AgentChatController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/agent/AgentChatController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/agent/AgentChatDataService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/agent/AgentChatDataService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/agent/AgentChatIntentDetector.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/agent/AgentChatIntentDetector.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/agent/AgentChatIntentType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/agent/AgentChatIntentType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/agent/AgentChatService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/agent/AgentChatService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/agent/action/AgentChatActionDetector.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/agent/action/AgentChatActionDetector.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/agent/action/AgentChatActionExecutor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/agent/action/AgentChatActionExecutor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/controller/AiController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/controller/AiController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/service/OllamaClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/service/OllamaClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../zaynaa.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../zaynaa.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,29 +70,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;Spring Boot.ZaynaAiApiApplication.executor&quot;: &quot;Run&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Leith/Desktop/Projet GUI/Zayna/zayna-ai-api&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "Spring Boot.ZaynaAiApiApplication.executor": "Run",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/Leith/Desktop/Projet GUI/Zayna/zayna-ai-api",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="tn.esprit.workshop.zaynaaiapi" />
@@ -150,6 +145,7 @@
       <workItem from="1775143889164" duration="1270000" />
       <workItem from="1775145813002" duration="679000" />
       <workItem from="1775264786919" duration="1096000" />
+      <workItem from="1775742926504" duration="5516000" />
     </task>
     <servers />
   </component>

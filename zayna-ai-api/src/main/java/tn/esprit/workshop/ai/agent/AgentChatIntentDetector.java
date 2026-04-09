@@ -56,6 +56,11 @@ public class AgentChatIntentDetector {
             return Detection.of(AgentChatIntentType.GREETING_SMALLTALK);
         }
 
+        if (n.contains("candidature")
+                && matchesAny(n, "\\b(accepte|accepter|valide|valider|approuve|approuver)\\b")) {
+            return Detection.of(AgentChatIntentType.ACCEPT_CANDIDATURE_ENFANT);
+        }
+
         if (containsAnyLiteral(n, "toute la base", "toutes les ecoles", "all schools", "globalement dans le systeme")) {
             return Detection.of(AgentChatIntentType.OUT_OF_SCOPE_GLOBAL);
         }
@@ -590,7 +595,7 @@ public class AgentChatIntentDetector {
     }
 
     private static boolean hasListCue(String n) {
-        if (Pattern.compile("\\bliste\\b").matcher(n).find()) {
+        if (Pattern.compile("\\b(liste|lister)\\b").matcher(n).find()) {
             return true;
         }
         if (Pattern.compile("\\b(afficher|affiche|montre|voir)\\b").matcher(n).find()) {

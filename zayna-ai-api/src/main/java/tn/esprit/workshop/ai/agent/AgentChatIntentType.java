@@ -63,6 +63,7 @@ public enum AgentChatIntentType {
 
     SEARCH_MAITRESSE,
     SEARCH_BUS,
+    ACCEPT_CANDIDATURE_ENFANT,
 
     GENERAL_SCHOOL_INFO,
 

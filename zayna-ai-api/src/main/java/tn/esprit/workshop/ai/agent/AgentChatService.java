@@ -105,16 +105,21 @@ public class AgentChatService {
             if (msg.isBlank()) {
                 return AgentChatResponseDto.ok("Veuillez poser une question sur votre école.", "EMPTY");
             }
+            String normalized = AgentChatTextNormalizer.forMatching(msg);
+            LOG.log(Level.INFO, "Agent chat input: raw={0}, normalized={1}, userId={2}, ecoleId={3}",
+                    new Object[]{msg, normalized, req.userId, ecoleId});
 
             // --- Level 3 : nouvelle détection d'action (avant lecture) ---
             AgentChatActionDetector.ActionParseResult ar = actionDetector.parse(msg, ecoleId, data);
             if (ar instanceof AgentChatActionDetector.ActionParseResult.Clarify clarify) {
+                LOG.log(Level.INFO, "Agent chat action clarify: {0}", clarify.message());
                 String intentTag = AgentChatActionDetector.MSG_ACTION_FORBIDDEN.equals(clarify.message())
                         ? "FORBIDDEN"
                         : "ACTION_CLARIFY";
                 return AgentChatResponseDto.ok(clarify.message(), intentTag);
             }
             if (ar instanceof AgentChatActionDetector.ActionParseResult.Proposal proposal) {
+                LOG.log(Level.INFO, "Agent chat action proposal detected: {0}", proposal.payload().type());
                 String token = pendingActionStore.put(req.userId, ecoleId, proposal.payload());
                 String text = AgentChatActionDetector.buildProposalText(proposal.payload());
                 return AgentChatResponseDto.proposal(text, token, "ACTION_PROPOSAL");
@@ -122,7 +127,7 @@ public class AgentChatService {
 
             // --- Level 2 : lecture ---
             AgentChatIntentDetector.Detection d = intentDetector.detect(msg);
-            System.out.println("INTENT = " + d.type());
+            LOG.log(Level.INFO, "Agent chat intent detected: {0}", d.type());
 
             AgentChatResponseDto response = switch (d.type()) {
                 case OUT_OF_SCOPE_GLOBAL -> AgentChatResponseDto.ok(
@@ -138,11 +143,10 @@ public class AgentChatService {
                     yield AgentChatResponseDto.ok(nonBlankOr(reply, NO_RESULT), d.type().name());
                 }
             };
-            System.out.println("QUERY OK");
+            LOG.info("Agent chat query handled successfully");
             return response;
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Agent chat handle failed", e);
-            System.out.println("INTENT ERROR: " + e.getClass().getSimpleName() + " — " + e.getMessage());
             return AgentChatResponseDto.ok(TECHNICAL_MSG, "TECHNICAL_FAILURE");
         }
     }

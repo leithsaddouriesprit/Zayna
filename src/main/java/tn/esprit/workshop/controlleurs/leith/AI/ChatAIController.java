@@ -310,11 +310,26 @@ public class ChatAIController {
                 HttpRequest req = HttpRequest.newBuilder()
                         .uri(URI.create(API_CHAT_URL))
                         .header("Content-Type", "application/json")
+                        .timeout(java.time.Duration.ofSeconds(60))
                         .POST(HttpRequest.BodyPublishers.ofString(json))
                         .build();
 
                 HttpResponse<String> res = http.send(req, HttpResponse.BodyHandlers.ofString());
                 String body = res.body();
+                int status = res.statusCode();
+                if (status < 200 || status >= 300) {
+                    LOG.log(Level.WARNING, "AI chat HTTP {0}, payload={1}, body={2}",
+                            new Object[]{status, json, body});
+                    Platform.runLater(() -> {
+                        removeTypingIndicator();
+                        appendAssistantMessage("Le service AI est indisponible (HTTP " + status + "). Réessayez.");
+                        btnSend.setDisable(false);
+                        scrollChatToBottom();
+                    });
+                    return;
+                }
+                LOG.log(Level.FINE, "AI chat HTTP {0}, payload={1}, body={2}",
+                        new Object[]{status, json, body});
                 Platform.runLater(() -> {
                     removeTypingIndicator();
                     displayStructuredResponse(body);

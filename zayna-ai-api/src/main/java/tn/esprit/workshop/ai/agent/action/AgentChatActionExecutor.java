@@ -82,7 +82,7 @@ public class AgentChatActionExecutor {
             throw new AgentActionExecutionException(
                     "Impossible d’approuver cette candidature enfant (déjà traitée ou hors périmètre).");
         }
-        return "La candidature enfant de « " + p.enfantDisplayName() + " » a été approuvée avec succès.";
+        return "✅ La candidature de " + p.enfantDisplayName() + " a été acceptée.";
     }
 
     private String rejectEnfant(int ecoleId, Integer cid, String name) throws AgentActionExecutionException {

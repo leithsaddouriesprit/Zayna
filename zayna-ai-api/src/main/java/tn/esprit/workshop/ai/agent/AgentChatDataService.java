@@ -1011,6 +1011,21 @@ public class AgentChatDataService {
         return matches;
     }
 
+    public ResolvedEnfantCand findPendingEnfantCandidatureById(int ecoleId, int candidatureId) {
+        List<ResolvedEnfantCand> rows = jdbc.query(
+                """
+                        SELECT id, prenom_enfant, nom_enfant FROM candidature_enfant
+                        WHERE id_ecole = ? AND statut = 'ENVOYEE' AND id = ?
+                        LIMIT 1
+                        """,
+                (rs, rowNum) -> new ResolvedEnfantCand(
+                        rs.getInt("id"),
+                        (nullToEmpty(rs.getString("prenom_enfant")) + " " + nullToEmpty(rs.getString("nom_enfant"))).trim()),
+                ecoleId,
+                candidatureId);
+        return rows.isEmpty() ? null : rows.get(0);
+    }
+
     /**
      * Retire des mots parasites souvent dictés avec le nom (« nom », « prénom », etc.) sans toucher au reste.
      */

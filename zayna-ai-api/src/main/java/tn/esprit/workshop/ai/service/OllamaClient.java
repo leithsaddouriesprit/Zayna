@@ -9,9 +9,14 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Service
 public class OllamaClient {
+
+    private static final Logger LOG = Logger.getLogger(OllamaClient.class.getName());
 
     @Value("${ai.model}")
     private String model;
@@ -47,21 +52,28 @@ public class OllamaClient {
             HttpRequest req = HttpRequest.newBuilder()
                     .uri(URI.create(ollamaUrl))
                     .header("Content-Type", "application/json")
+                    .timeout(Duration.ofSeconds(60))
                     .POST(HttpRequest.BodyPublishers.ofString(body))
                     .build();
 
             HttpResponse<String> res =
                     http.send(req, HttpResponse.BodyHandlers.ofString());
+            if (res.statusCode() < 200 || res.statusCode() >= 300) {
+                LOG.log(Level.WARNING, "Ollama HTTP {0}, body={1}", new Object[]{res.statusCode(), res.body()});
+                return "Erreur Ollama HTTP " + res.statusCode();
+            }
 
             JsonNode json = mapper.readTree(res.body());
 
             if (json.has("error")) {
+                LOG.log(Level.WARNING, "Ollama returned error field: {0}", json.get("error").asText());
                 return "Erreur Ollama: " + json.get("error").asText();
             }
 
             return json.path("response").asText("").trim();
 
         } catch (Exception e) {
+            LOG.log(Level.WARNING, "Ollama call failed", e);
             return "Erreur OllamaClient: " + e.getMessage();
         }
     }
