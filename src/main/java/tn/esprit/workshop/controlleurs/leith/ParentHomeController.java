@@ -1,9 +1,8 @@
 package tn.esprit.workshop.controlleurs.leith;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import tn.esprit.workshop.model.leith.Enfant;
 import tn.esprit.workshop.services.leith.EnfantService;
@@ -19,6 +18,7 @@ public class ParentHomeController {
     private static final Logger LOG = Logger.getLogger(ParentHomeController.class.getName());
 
     @FXML private ListView<Enfant> listEnfants;
+    @FXML private Label lblEmptyState;
     @FXML private Button btnTracking;
     @FXML private Button btnAskZayna;
 
@@ -29,18 +29,7 @@ public class ParentHomeController {
     public void initialize() {
         int parentId = AppSession.getInstance().getParentId();
         loadEnfants(parentId);
-        if (listEnfants.getItems().isEmpty()) {
-            javafx.application.Platform.runLater(() -> {
-                Alert a = new Alert(Alert.AlertType.INFORMATION);
-                a.setTitle("Mes enfants");
-                a.setHeaderText("Aucun enfant");
-                a.setContentText("Vous n'avez pas encore d'enfant enregistré. Souhaitez-vous faire une demande de transport scolaire ?");
-                a.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
-                if (a.showAndWait().orElse(ButtonType.NO) == ButtonType.YES) {
-                    SceneNavigator.openParentDemandeTransport();
-                }
-            });
-        }
+        updateEmptyState();
         listEnfants.setCellFactory(lv -> new javafx.scene.control.ListCell<>() {
             @Override
             protected void updateItem(Enfant item, boolean empty) {
@@ -68,8 +57,26 @@ public class ParentHomeController {
         try {
             List<Enfant> enfants = enfantService.getByParentId(parentId);
             listEnfants.getItems().setAll(enfants);
+            updateEmptyState();
         } catch (SQLException e) {
             LOG.log(Level.SEVERE, "Erreur chargement enfants pour parentId=" + parentId, e);
+            if (lblEmptyState != null) {
+                lblEmptyState.setText("Impossible de charger vos enfants pour le moment.");
+                lblEmptyState.setVisible(true);
+                lblEmptyState.setManaged(true);
+            }
+        }
+    }
+
+    private void updateEmptyState() {
+        if (lblEmptyState == null || listEnfants == null) {
+            return;
+        }
+        boolean empty = listEnfants.getItems() == null || listEnfants.getItems().isEmpty();
+        lblEmptyState.setVisible(empty);
+        lblEmptyState.setManaged(empty);
+        if (empty) {
+            lblEmptyState.setText("Aucun enfant trouvé.");
         }
     }
 

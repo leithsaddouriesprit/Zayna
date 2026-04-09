@@ -492,6 +492,10 @@ public class ReclamationListController implements Initializable {
 
     @FXML
     private void nouvelleReclamation() {
+        if (!ReclamationUiHelper.canCreateReclamation()) {
+            showError("Accès refusé : les chauffeurs non acceptés ne peuvent pas gérer les réclamations.");
+            return;
+        }
         SceneNavigator.navigateReclamationForm();
     }
 

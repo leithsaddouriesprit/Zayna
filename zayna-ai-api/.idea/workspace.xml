@@ -5,20 +5,30 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0082d293-a5d2-4b02-b0d2-6af92ec50d13" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/AI/ChatAIController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/AI/ChatAIController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src/main/resources/Talel/ConnecterUser.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/resources/Talel/ConnecterUser.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/Talel/ControleurChauffeur.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/Talel/ControleurChauffeur.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/Talel/OublierController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/Talel/OublierController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/amal/ProgrammeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/amal/ProgrammeController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/EspaceChauffeurController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/EspaceChauffeurController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/ParentHomeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/ParentHomeController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/agent/AgentCandidatureEcolePendingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/agent/AgentCandidatureEcolePendingController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/agent/AgentCandidaturesChauffeurController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/agent/AgentCandidaturesChauffeurController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/agent/AgentNouvelleMaitresseController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/agent/AgentNouvelleMaitresseController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/maitresse/MaitresseEnfantsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/maitresse/MaitresseEnfantsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/parent/ParentDashboardController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/parent/ParentDashboardController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/reclamation/ReclamationDetailController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/reclamation/ReclamationDetailController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/reclamation/ReclamationFormController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/reclamation/ReclamationFormController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/reclamation/ReclamationListController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/reclamation/ReclamationListController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/reclamation/ReclamationUiHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/reclamation/ReclamationUiHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/shell/ChauffeurShellController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/controlleurs/leith/shell/ChauffeurShellController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/services/leith/CandidatureAgentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/services/leith/CandidatureAgentService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/services/leith/CandidatureEnfantService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/services/leith/CandidatureEnfantService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/services/leith/EnfantService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/services/leith/EnfantService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/services/leith/ReclamationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/services/leith/ReclamationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/services/leith/WeatherService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/tn/esprit/workshop/services/leith/WeatherService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/resources/amal/Programme.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/resources/amal/Programme.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/resources/leith/EspaceChauffeur.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/resources/leith/EspaceChauffeur.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/resources/leith/ParentHome.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/resources/leith/ParentHome.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/agent/AgentChatController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/agent/AgentChatController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/agent/AgentChatDataService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/agent/AgentChatDataService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/agent/AgentChatIntentDetector.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/agent/AgentChatIntentDetector.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/agent/AgentChatIntentType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/agent/AgentChatIntentType.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/agent/AgentChatService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/agent/AgentChatService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/agent/action/AgentChatActionDetector.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/agent/action/AgentChatActionDetector.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/agent/action/AgentChatActionExecutor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/agent/action/AgentChatActionExecutor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/controller/AiController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/controller/AiController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/service/OllamaClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/workshop/ai/service/OllamaClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../zaynaa.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../zaynaa.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -145,7 +155,7 @@
       <workItem from="1775143889164" duration="1270000" />
       <workItem from="1775145813002" duration="679000" />
       <workItem from="1775264786919" duration="1096000" />
-      <workItem from="1775742926504" duration="5516000" />
+      <workItem from="1775742926504" duration="6238000" />
     </task>
     <servers />
   </component>

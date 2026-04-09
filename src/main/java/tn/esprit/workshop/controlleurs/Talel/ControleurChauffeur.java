@@ -12,6 +12,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.application.Platform;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 public class ControleurChauffeur {
@@ -66,6 +67,24 @@ public class ControleurChauffeur {
         ZaynaInputConstraints.apply(txtEmail, ZaynaInputConstraints.emailInput(ZaynaInputConstraints.LEN_USERS_EMAIL));
         ZaynaInputConstraints.apply(txtTelephone, ZaynaInputConstraints.digitsOnly(8));
         ZaynaInputConstraints.apply(txtSalaire, ZaynaInputConstraints.positiveDecimalMoney());
+        if (dateObtentionPermis != null) {
+            dateObtentionPermis.setEditable(false);
+            dateObtentionPermis.setPromptText("dd/MM/yyyy");
+            dateObtentionPermis.setConverter(new javafx.util.StringConverter<>() {
+                private final DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                @Override
+                public String toString(LocalDate date) {
+                    return date == null ? "" : fmt.format(date);
+                }
+                @Override
+                public LocalDate fromString(String text) {
+                    if (text == null || text.isBlank()) {
+                        return null;
+                    }
+                    return LocalDate.parse(text, fmt);
+                }
+            });
+        }
 
         System.out.println("=== ControleurChauffeur initialisé ===");
     }

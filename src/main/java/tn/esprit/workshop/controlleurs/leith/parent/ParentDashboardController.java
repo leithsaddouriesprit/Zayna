@@ -45,6 +45,12 @@ public class ParentDashboardController {
         WeatherInfo info = (city != null && !city.isBlank())
                 ? weatherService.fetchForCity(city)
                 : weatherService.fetchForDefaultCity();
+        if ((info == null || !info.isAvailable())
+                && city != null
+                && !city.isBlank()
+                && !weatherService.getDefaultCity().equalsIgnoreCase(city.trim())) {
+            info = weatherService.fetchForDefaultCity();
+        }
         if (info != null && info.isAvailable() && lblWeatherTemp != null && lblWeatherStatus != null) {
             double t = info.getTemperatureCelsius() != null ? info.getTemperatureCelsius() : Double.NaN;
             String tempText = Double.isNaN(t)

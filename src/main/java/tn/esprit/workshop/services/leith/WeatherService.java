@@ -35,6 +35,10 @@ public class WeatherService {
         return fetchForCity(DEFAULT_CITY);
     }
 
+    public String getDefaultCity() {
+        return DEFAULT_CITY;
+    }
+
     public WeatherInfo fetchForCity(String city) {
         if (apiKey == null || apiKey.isBlank() || city == null || city.isBlank()) {
             System.out.println("[WeatherService] API key absente ou ville vide, retour en mode indisponible.");

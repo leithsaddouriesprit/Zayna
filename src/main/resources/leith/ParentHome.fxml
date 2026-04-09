@@ -22,6 +22,7 @@
         <Label text="Mes enfants" styleClass="admin-page-title"/>
         <Label text="Sélectionnez un enfant :" styleClass="admin-page-subtitle" style="-fx-text-fill: #f1c40f;"/>
         <ListView fx:id="listEnfants" VBox.vgrow="ALWAYS" styleClass="table-view parent-list-view"/>
+        <Label fx:id="lblEmptyState" text="Aucun enfant trouvé." visible="false" managed="false" styleClass="shell-account"/>
 
         <HBox spacing="12" alignment="CENTER_LEFT">
             <Button fx:id="btnTracking" text="Tracking" onAction="#openTracking" disable="true" styleClass="btn-primary"/>

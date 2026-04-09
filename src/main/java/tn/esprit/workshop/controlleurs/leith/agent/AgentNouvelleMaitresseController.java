@@ -66,7 +66,6 @@ public class AgentNouvelleMaitresseController implements Initializable {
         if (!comboBus.getItems().isEmpty()) {
             comboBus.getSelectionModel().select(0);
         }
-        lblMessage.setText("");
     }
 
     @FXML
@@ -117,11 +116,16 @@ public class AgentNouvelleMaitresseController implements Initializable {
                     lblMessage.setStyle("-fx-text-fill: #86efac;");
                     lblMessage.setText("Maîtresse créée avec succès.");
                     onReset();
+                    reloadBuses();
                 });
-            } catch (Exception ignored) {
+            } catch (Exception ex) {
                 Platform.runLater(() -> {
                     lblMessage.setStyle("-fx-text-fill: #fca5a5;");
-                    lblMessage.setText("Création de la maîtresse impossible.");
+                    String msg = ex.getMessage() != null ? ex.getMessage().trim() : "";
+                    if (msg.isEmpty()) {
+                        msg = "Création de la maîtresse impossible.";
+                    }
+                    lblMessage.setText(msg);
                 });
             }
         }).start();

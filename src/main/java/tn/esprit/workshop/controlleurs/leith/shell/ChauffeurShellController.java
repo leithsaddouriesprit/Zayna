@@ -36,6 +36,7 @@ public class ChauffeurShellController {
     @FXML private Button btnSidebarReclamations;
 
     private final CandidatureService candidatureService = new CandidatureService();
+    private boolean reclamationsAllowed = false;
 
     @FXML
     public void initialize() {
@@ -80,6 +81,7 @@ public class ChauffeurShellController {
         boolean postuler = true;
         boolean suivi = false;
         boolean espace = false;
+        boolean reclamations = false;
         Integer chauffeurId = AppSession.getInstance().getChauffeurId();
         if (chauffeurId != null) {
             try {
@@ -102,6 +104,7 @@ public class ChauffeurShellController {
                         postuler = false;
                         suivi = true;
                         espace = true;
+                        reclamations = true;
                     } else {
                         postuler = true;
                         suivi = false;
@@ -118,6 +121,12 @@ public class ChauffeurShellController {
         if (btnSidebarPostuler != null) btnSidebarPostuler.setDisable(!postuler);
         if (btnSidebarSuivi != null) btnSidebarSuivi.setDisable(!suivi);
         if (btnSidebarEspace != null) btnSidebarEspace.setDisable(!espace);
+        if (btnSidebarReclamations != null) {
+            btnSidebarReclamations.setDisable(!reclamations);
+            btnSidebarReclamations.setVisible(reclamations);
+            btnSidebarReclamations.setManaged(reclamations);
+        }
+        reclamationsAllowed = reclamations;
         return new ChauffeurNavState(postuler, suivi, espace);
     }
 
@@ -182,6 +191,10 @@ public class ChauffeurShellController {
 
     @FXML
     void openReclamations() {
+        updateChauffeurNavigationState();
+        if (!reclamationsAllowed) {
+            return;
+        }
         SceneNavigator.navigateReclamationList();
     }
 

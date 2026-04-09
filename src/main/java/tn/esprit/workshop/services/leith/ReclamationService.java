@@ -773,6 +773,12 @@ public class ReclamationService {
         return bus.getIdEcole();
     }
 
+    public Integer findLikelyBusIdForChauffeur(int chauffeurId) throws SQLException {
+        BusService busService = new BusService();
+        Bus bus = busService.getByChauffeurId(chauffeurId);
+        return bus != null ? bus.getBusId() : null;
+    }
+
     public Reclamation mapResultSetToReclamation(ResultSet rs) throws SQLException {
         Reclamation r = new Reclamation();
         r.setId(rs.getInt("id"));

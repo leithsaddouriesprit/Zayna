@@ -5,22 +5,20 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
-import javafx.util.StringConverter;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import tn.esprit.workshop.controlleurs.leith.SceneNavigator;
 import tn.esprit.workshop.model.leith.CandidatureAgent;
 import tn.esprit.workshop.model.leith.CandidatureAgentStatut;
-import tn.esprit.workshop.model.tous.Ecole;
 import tn.esprit.workshop.services.leith.CandidatureAgentService;
-import tn.esprit.workshop.services.leith.EcoleService;
 import tn.esprit.workshop.utilis.AppSession;
 
 import java.net.URL;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.function.UnaryOperator;
+import javafx.scene.control.TextFormatter;
 
 public class AgentCandidatureEcolePendingController implements Initializable {
 
@@ -28,7 +26,6 @@ public class AgentCandidatureEcolePendingController implements Initializable {
     @FXML private Label lblMessage;
 
     private final CandidatureAgentService candidatureAgentService = new CandidatureAgentService();
-    private final EcoleService ecoleService = new EcoleService();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -83,40 +80,21 @@ public class AgentCandidatureEcolePendingController implements Initializable {
             return;
         }
 
-        List<Ecole> ecoles;
-        try {
-            ecoles = ecoleService.selectAll();
-        } catch (SQLException e) {
-            new Alert(Alert.AlertType.ERROR, e.getMessage()).showAndWait();
-            return;
-        }
-
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Modifier la candidature");
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
         TextField fNom = new TextField(c.getNom());
         TextField fPrenom = new TextField(c.getPrenom());
-        ComboBox<Ecole> comboEcole = new ComboBox<>();
-        comboEcole.getItems().setAll(ecoles);
-        comboEcole.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(Ecole e) {
-                return e == null ? "" : e.getNomEcole();
-            }
-
-            @Override
-            public Ecole fromString(String s) {
-                return null;
-            }
-        });
-        for (Ecole e : ecoles) {
-            if (e.getId() == c.getIdEcole()) {
-                comboEcole.getSelectionModel().select(e);
-                break;
-            }
-        }
-        SceneNavigator.applyAppCssToComboBoxPopup(comboEcole);
+        TextField fEcole = new TextField(c.getNomEcole() != null ? c.getNomEcole() : "");
+        fEcole.setPromptText("Nom de l'école");
+        UnaryOperator<TextFormatter.Change> ecoleFilter = change -> {
+            String text = change.getControlNewText();
+            if (text == null) return null;
+            if (text.length() > 150) return null;
+            return text.matches("^[\\p{L} ]*$") ? change : null;
+        };
+        fEcole.setTextFormatter(new TextFormatter<>(ecoleFilter));
         TextField fLat = new TextField(String.valueOf(c.getLatitude()));
         TextField fLon = new TextField(String.valueOf(c.getLongitude()));
 
@@ -127,7 +105,7 @@ public class AgentCandidatureEcolePendingController implements Initializable {
         int r = 0;
         grid.addRow(r++, new Label("Nom"), fNom);
         grid.addRow(r++, new Label("Prénom"), fPrenom);
-        grid.addRow(r++, new Label("École"), comboEcole);
+        grid.addRow(r++, new Label("École"), fEcole);
         grid.addRow(r++, new Label("Latitude"), fLat);
         grid.addRow(r++, new Label("Longitude"), fLon);
         dialog.getDialogPane().setContent(grid);
@@ -137,11 +115,16 @@ public class AgentCandidatureEcolePendingController implements Initializable {
             return;
         }
 
-        Ecole sel = comboEcole.getSelectionModel().getSelectedItem();
-        if (sel == null) {
-            new Alert(Alert.AlertType.WARNING, "Choisissez une école.").showAndWait();
+        String nomEcole = fEcole.getText() != null ? fEcole.getText().trim() : "";
+        if (nomEcole.isEmpty()) {
+            new Alert(Alert.AlertType.WARNING, "Le nom de l'école est obligatoire.").showAndWait();
             return;
         }
+        if (!nomEcole.matches("^[\\p{L} ]+$")) {
+            new Alert(Alert.AlertType.WARNING, "Nom d'école invalide : lettres et espaces uniquement.").showAndWait();
+            return;
+        }
+
         double lat;
         double lon;
         try {
@@ -154,7 +137,14 @@ public class AgentCandidatureEcolePendingController implements Initializable {
 
         new Thread(() -> {
             try {
-                candidatureAgentService.updateByUserId(uid, fNom.getText(), fPrenom.getText(), sel.getId(), lat, lon);
+                candidatureAgentService.updateByUserId(
+                        uid,
+                        fNom.getText(),
+                        fPrenom.getText(),
+                        c.getIdEcole(),
+                        lat,
+                        lon,
+                        nomEcole);
                 Platform.runLater(() -> {
                     lblMessage.setText("Candidature mise à jour.");
                     refreshStatut();

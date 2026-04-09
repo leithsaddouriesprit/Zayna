@@ -12,6 +12,7 @@ import tn.esprit.workshop.model.leith.Reclamation;
 import tn.esprit.workshop.services.leith.ReclamationHistoriqueService;
 import tn.esprit.workshop.services.leith.ReclamationService;
 import tn.esprit.workshop.services.leith.ReclamationService.ParentEcoleChoice;
+import tn.esprit.workshop.services.leith.MaitresseMetierService;
 import tn.esprit.workshop.utilis.AppSession;
 import tn.esprit.workshop.utilis.InputModerationUtil;
 
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 public class ReclamationFormController implements Initializable {
 
@@ -38,6 +40,8 @@ public class ReclamationFormController implements Initializable {
 
     private final ReclamationService reclamationService = new ReclamationService();
     private final ReclamationHistoriqueService historiqueService = new ReclamationHistoriqueService();
+    private final MaitresseMetierService maitresseMetierService = new MaitresseMetierService();
+    private static final Pattern OBJET_PATTERN = Pattern.compile("^[\\p{L}\\p{N} .,:;!?()'\"\\-_/]{3,120}$");
 
     /** Écoles proposées au parent connecté (vide si autre rôle ou erreur). */
     private List<ParentEcoleChoice> parentEcolesCharges = Collections.emptyList();
@@ -112,6 +116,10 @@ public class ReclamationFormController implements Initializable {
             showMsg("L’objet est obligatoire.", true);
             return;
         }
+        if (!OBJET_PATTERN.matcher(objet).matches()) {
+            showMsg("Objet invalide : utilisez lettres, chiffres, espaces et ponctuation simple (3 à 120 caractères).", true);
+            return;
+        }
         if (desc.isEmpty()) {
             showMsg("La description est obligatoire.", true);
             return;
@@ -176,9 +184,14 @@ public class ReclamationFormController implements Initializable {
                         showMsg("Profil chauffeur introuvable.", true);
                         return;
                     }
+                    if (!ReclamationUiHelper.canCreateReclamation()) {
+                        showMsg("Accès refusé : chauffeur non accepté.", true);
+                        return;
+                    }
                     r.setIdChauffeur(s.getChauffeurId());
                     // École du bus affecté à ce chauffeur (si présent en base) ; sinon id_ecole reste null.
                     r.setIdEcole(reclamationService.findLikelyEcoleIdForChauffeur(s.getChauffeurId()));
+                    r.setIdBus(reclamationService.findLikelyBusIdForChauffeur(s.getChauffeurId()));
                     break;
                 case "MAITRESSE":
                     if (s.getMaitresseId() == null) {
@@ -193,6 +206,13 @@ public class ReclamationFormController implements Initializable {
                     r.setIdMaitresse(s.getMaitresseId());
                     // Une maîtresse est rattachée à une école via la session (même source que les écrans agent).
                     r.setIdEcole(s.getEcoleId());
+                    try {
+                        Integer sessionUid = s.getConnectedUserId();
+                        Integer busId = sessionUid != null ? maitresseMetierService.getBusIdForMaitresseUser(sessionUid) : null;
+                        r.setIdBus((busId != null && busId > 0) ? busId : null);
+                    } catch (SQLException ex) {
+                        LOG.log(Level.FINE, "bus maitresse introuvable", ex);
+                    }
                     break;
                 case "AGENT_ECOLE":
                     if (s.getEcoleId() == null) {

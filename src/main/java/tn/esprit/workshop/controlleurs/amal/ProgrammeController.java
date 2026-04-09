@@ -116,14 +116,6 @@ public class ProgrammeController {
         tableProgramme.getSelectionModel().clearSelection();
     }
 
-    private boolean validateSessionEcole() {
-        if (AppSession.getInstance().getEcoleId() == null) {
-            showAlert("Session", "Aucune école n'est associée à votre compte agent.", AlertType.WARNING);
-            return false;
-        }
-        return true;
-    }
-
     private boolean validateFields() {
         if (tfNom.getText().trim().isEmpty()) {
             showAlert("Erreur", "Le nom du programme est obligatoire !", AlertType.WARNING);
@@ -151,26 +143,7 @@ public class ProgrammeController {
 
     @FXML
     private void ajouterProgramme() {
-        if (!validateSessionEcole() || !validateFields()) {
-            return;
-        }
-
-        try {
-            Programme p = new Programme();
-            p.setEcoleId(AppSession.getInstance().getEcoleId());
-            p.setNomProgramme(tfNom.getText().trim());
-            p.setNiveau(tfNiveau.getText().trim());
-            p.setDuree(tfDuree.getText().trim());
-            p.setDescriptionProgramme(tfDescription.getText() != null ? tfDescription.getText().trim() : "");
-
-            programmeService.insertProgramme(p);
-            loadTable();
-            clearFields();
-            showAlert("Succès", "Programme ajouté avec succès !", AlertType.INFORMATION);
-
-        } catch (SQLException e) {
-            showAlert("Erreur", "Erreur lors de l'ajout : " + e.getMessage(), AlertType.ERROR);
-        }
+        showAlert("Information", "L'ajout de nouveaux programmes est désactivé sur cet écran.", AlertType.INFORMATION);
     }
 
     @FXML

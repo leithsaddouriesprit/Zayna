@@ -1,6 +1,8 @@
 package tn.esprit.workshop.controlleurs.leith.reclamation;
 
 import tn.esprit.workshop.model.leith.Reclamation;
+import tn.esprit.workshop.model.leith.Candidature;
+import tn.esprit.workshop.services.leith.CandidatureService;
 import tn.esprit.workshop.utilis.AppSession;
 
 import java.util.Locale;
@@ -72,6 +74,26 @@ public final class ReclamationUiHelper {
 
     public static boolean canRespondOrChangeStatut() {
         return isAdmin() || isAgentEcole();
+    }
+
+    public static boolean canCreateReclamation() {
+        String role = filterRoleKey();
+        if (role == null) {
+            return false;
+        }
+        if (!"CHAUFFEUR".equals(role)) {
+            return true;
+        }
+        Integer chauffeurId = AppSession.getInstance().getChauffeurId();
+        if (chauffeurId == null) {
+            return false;
+        }
+        try {
+            Candidature c = new CandidatureService().findByChauffeurId(chauffeurId);
+            return c != null && "ACCEPTEE".equals(c.getStatut());
+        } catch (Exception ignored) {
+            return false;
+        }
     }
 
     /** Rôle enum DB pour une nouvelle réponse (agent ou admin uniquement à l’UI). */

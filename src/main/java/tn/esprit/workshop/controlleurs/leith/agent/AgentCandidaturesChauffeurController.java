@@ -7,6 +7,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import tn.esprit.workshop.model.leith.Candidature;
@@ -145,7 +146,10 @@ public class AgentCandidaturesChauffeurController implements Initializable {
         root.getChildren().add(fermer);
         Stage popup = new Stage();
         popup.setTitle("Détails candidature");
-        popup.setScene(new javafx.scene.Scene(root, 420, 580));
+        ScrollPane scrollPane = new ScrollPane(root);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        popup.setScene(new javafx.scene.Scene(scrollPane, 460, 600));
         popup.show();
     }
 

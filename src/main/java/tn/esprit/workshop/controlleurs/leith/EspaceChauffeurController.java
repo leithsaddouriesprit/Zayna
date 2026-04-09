@@ -21,7 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Espace Chauffeur: bus info, active trajet, list of arrets. Réclamer = placeholder.
+ * Espace Chauffeur: bus info, active trajet, list of arrets.
  */
 public class EspaceChauffeurController {
 
@@ -40,7 +40,6 @@ public class EspaceChauffeurController {
     @FXML private TableColumn<Arret, String> colHeure;
     @FXML private TableColumn<Arret, Double> colLat;
     @FXML private TableColumn<Arret, Double> colLng;
-    @FXML private javafx.scene.control.Button btnReclamer;
 
     private final BusService busService = new BusService();
     private final TrajetService trajetService = new TrajetService();
@@ -103,9 +102,4 @@ public class EspaceChauffeurController {
         }
     }
 
-    @FXML
-    void onReclamer() {
-        // Placeholder: no backend logic required
-        btnReclamer.getScene().getWindow();
-    }
 }

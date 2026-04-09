@@ -73,10 +73,19 @@ public class CandidatureEnfantService {
 
     /** Candidatures ENVOYEE pour l'école de l'agent. */
     public List<CandidatureEnfant> findEnVoyeeByEcoleId(int idEcole) throws SQLException {
-        String sql = "SELECT id, parent_id, id_ecole, nom_enfant, prenom_enfant, age, latitude, longitude, statut, trajet_id, date_demande FROM candidature_enfant WHERE id_ecole = ? AND statut = 'ENVOYEE' ORDER BY date_demande DESC";
+        String sql = """
+                SELECT ce.id, ce.parent_id, ce.id_ecole, ce.nom_enfant, ce.prenom_enfant, ce.age,
+                       ce.latitude, ce.longitude, ce.statut, ce.trajet_id, ce.date_demande
+                FROM candidature_enfant ce
+                LEFT JOIN trajet t ON t.id = ce.trajet_id
+                WHERE ce.statut = 'ENVOYEE'
+                  AND (t.id_ecole = ? OR (ce.trajet_id IS NULL AND ce.id_ecole = ?))
+                ORDER BY ce.date_demande DESC
+                """;
         List<CandidatureEnfant> list = new ArrayList<>();
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, idEcole);
+            ps.setInt(2, idEcole);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     list.add(mapRow(rs));

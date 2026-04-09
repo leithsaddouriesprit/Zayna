@@ -123,6 +123,41 @@ public class EnfantService implements CRUD<Enfant> {
         return list;
     }
 
+    public List<Enfant> findEnfantsByBusAndEcoleId(int busId, int ecoleId, String search) throws SQLException {
+        List<Enfant> list = new ArrayList<>();
+        String term = search == null ? "" : search.trim();
+        String like = "%" + term + "%";
+        String sql = """
+                SELECT e.id, e.nom, e.prenom, e.parent_id, e.trajet_id, e.actif, e.on_board
+                FROM enfant e
+                INNER JOIN trajet t ON e.trajet_id = t.id
+                WHERE t.id_bus = ? AND t.id_ecole = ? AND e.actif = 1
+                AND (e.nom LIKE ? OR e.prenom LIKE ? OR ? = '')
+                ORDER BY e.nom, e.prenom
+                """;
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setInt(1, busId);
+            ps.setInt(2, ecoleId);
+            ps.setString(3, like);
+            ps.setString(4, like);
+            ps.setString(5, term);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Enfant e = new Enfant();
+                    e.setEnfantId(rs.getInt("id"));
+                    e.setNom(rs.getString("nom"));
+                    e.setPrenom(rs.getString("prenom"));
+                    e.setParentId(rs.getInt("parent_id"));
+                    e.setTrajetId(rs.getInt("trajet_id"));
+                    e.setActif(rs.getBoolean("actif"));
+                    e.setOnBoard(rs.getBoolean("on_board"));
+                    list.add(e);
+                }
+            }
+        }
+        return list;
+    }
+
     public void updateOnBoardIfEnfantOnBus(int enfantId, int busId, boolean onBoard) throws SQLException {
         String sql = """
                 UPDATE enfant e

@@ -17,8 +17,11 @@ import tn.esprit.workshop.utilis.Talel.CodeGenerator;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class OublierController implements Initializable {
+    private static final Logger LOG = Logger.getLogger(OublierController.class.getName());
 
     // ==================== ÉLÉMENTS FXML ====================
     @FXML private VBox emailStep;
@@ -230,11 +233,24 @@ public class OublierController implements Initializable {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/Talel/ConnecterUser.fxml"));
             Parent root = loader.load();
-
-            Stage stage = (Stage) emailField.getScene().getWindow();
+            Scene currentSceneRef = (emailField != null) ? emailField.getScene() : null;
+            if (currentSceneRef == null && messageLabel != null) {
+                currentSceneRef = messageLabel.getScene();
+            }
+            if (currentSceneRef == null || !(currentSceneRef.getWindow() instanceof Stage)) {
+                LOG.log(Level.WARNING, "Retour login impossible: scène ou fenêtre absente.");
+                showError("Navigation indisponible. Veuillez rouvrir l'écran de connexion.");
+                return;
+            }
+            Stage stage = (Stage) currentSceneRef.getWindow();
 
             // Animation de transition
             Scene currentScene = stage.getScene();
+            if (currentScene == null) {
+                LOG.log(Level.WARNING, "Retour login impossible: stage sans scène.");
+                showError("Navigation indisponible. Veuillez réessayer.");
+                return;
+            }
             root.setOpacity(0);
             currentScene.setRoot(root);
 
@@ -244,7 +260,7 @@ public class OublierController implements Initializable {
             fade.play();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.log(Level.SEVERE, "Erreur de navigation vers login", e);
             showError("Erreur de navigation");
         }
     }

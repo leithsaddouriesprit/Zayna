@@ -389,8 +389,11 @@ public class ReclamationDetailController implements Initializable {
         }
         String num = b.getNumeroBus() != null ? b.getNumeroBus() : "";
         String mat = b.getMatricule() != null ? b.getMatricule() : "";
+        if (!mat.isEmpty()) {
+            return mat + (!num.isEmpty() ? " · " + num : "") + " (id " + id + ")";
+        }
         if (!num.isEmpty()) {
-            return num + (!mat.isEmpty() ? " · " + mat : "") + " (id " + id + ")";
+            return num + " (id " + id + ")";
         }
         return "Bus n° " + id;
     }

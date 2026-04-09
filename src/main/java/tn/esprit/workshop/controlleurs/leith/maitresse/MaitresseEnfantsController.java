@@ -39,18 +39,20 @@ public class MaitresseEnfantsController implements Initializable {
     private final MaitresseMetierService maitresseMetierService = new MaitresseMetierService();
 
     private Integer busId;
+    private Integer ecoleId;
     private final Map<Integer, String> trajetNames = new HashMap<>();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Integer uid = AppSession.getInstance().getConnectedUserId();
+        ecoleId = AppSession.getInstance().getEcoleId();
         try {
             busId = uid != null ? maitresseMetierService.getBusIdForMaitresseUser(uid) : null;
         } catch (SQLException e) {
             busId = null;
         }
 
-        if (busId == null || busId <= 0) {
+        if (busId == null || busId <= 0 || ecoleId == null || ecoleId <= 0) {
             lblEmpty.setText("Aucun bus ne vous est actuellement affecté.");
             lblEmpty.setVisible(true);
             lblEmpty.setManaged(true);
@@ -125,7 +127,7 @@ public class MaitresseEnfantsController implements Initializable {
         new Thread(() -> {
             try {
                 String q = fieldSearch != null ? fieldSearch.getText() : "";
-                List<Enfant> list = enfantService.findEnfantsByBusId(busId, q);
+                List<Enfant> list = enfantService.findEnfantsByBusAndEcoleId(busId, ecoleId, q);
                 trajetNames.clear();
                 for (Enfant e : list) {
                     int tid = e.getTrajetId();

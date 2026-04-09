@@ -70,6 +70,10 @@ public class CandidatureAgentService {
     }
 
     public void updateByUserId(int userId, String nom, String prenom, int idEcole, double latitude, double longitude) throws SQLException {
+        updateByUserId(userId, nom, prenom, idEcole, latitude, longitude, null);
+    }
+
+    public void updateByUserId(int userId, String nom, String prenom, int idEcole, double latitude, double longitude, String nomEcole) throws SQLException {
         String sql = """
                 UPDATE candidature_agent SET nom = ?, prenom = ?, id_ecole = ?, latitude = ?, longitude = ?,
                 statut = CASE WHEN statut = 'REFUSEE' THEN 'EN_ATTENTE' ELSE statut END
@@ -95,6 +99,14 @@ public class CandidatureAgentService {
                 psA.setString(3, prenom != null ? prenom.trim() : "");
                 psA.setInt(4, userId);
                 psA.executeUpdate();
+            }
+            if (nomEcole != null) {
+                String sqlEcole = "UPDATE ecole SET nom = ? WHERE id = ?";
+                try (PreparedStatement psE = conn.prepareStatement(sqlEcole)) {
+                    psE.setString(1, nomEcole.trim());
+                    psE.setInt(2, idEcole);
+                    psE.executeUpdate();
+                }
             }
             conn.commit();
         } catch (SQLException e) {
