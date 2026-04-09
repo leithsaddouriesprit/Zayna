@@ -29,6 +29,7 @@ public class ProgrammeController {
     @FXML private TableColumn<Programme, String> colDuree;
 
     @FXML private Label lblTotalProgrammes;
+    @FXML private Button btnAjouter;
 
     private final ProgrammeService programmeService = new ProgrammeService();
     private final EcoleService ecoleService = new EcoleService();
@@ -76,7 +77,17 @@ public class ProgrammeController {
             if (newSelection != null) {
                 remplirChamps(newSelection);
             }
+            updateAjouterButtonState();
         });
+    }
+
+    /** Actif seulement sans ligne sélectionnée (mode ajout) ; désactivé en modification / suppression. */
+    private void updateAjouterButtonState() {
+        if (btnAjouter == null) {
+            return;
+        }
+        boolean hasSelection = tableProgramme.getSelectionModel().getSelectedItem() != null;
+        btnAjouter.setDisable(hasSelection);
     }
 
     private void loadTable() {
@@ -86,11 +97,13 @@ public class ProgrammeController {
                 programmeList.clear();
                 tableProgramme.setItems(programmeList);
                 updateStatistics();
+                updateAjouterButtonState();
                 return;
             }
             programmeList.setAll(programmeService.selectByEcoleId(idEcole));
             tableProgramme.setItems(programmeList);
             updateStatistics();
+            updateAjouterButtonState();
         } catch (SQLException e) {
             showAlert("Erreur", "Impossible de charger les programmes : " + e.getMessage(), AlertType.ERROR);
         }
@@ -114,6 +127,7 @@ public class ProgrammeController {
         tfDuree.clear();
         tfDescription.clear();
         tableProgramme.getSelectionModel().clearSelection();
+        updateAjouterButtonState();
     }
 
     private boolean validateFields() {
@@ -143,7 +157,32 @@ public class ProgrammeController {
 
     @FXML
     private void ajouterProgramme() {
-        showAlert("Information", "L'ajout de nouveaux programmes est désactivé sur cet écran.", AlertType.INFORMATION);
+        if (tableProgramme.getSelectionModel().getSelectedItem() != null) {
+            return;
+        }
+        Integer idEcole = AppSession.getInstance().getEcoleId();
+        if (idEcole == null) {
+            showAlert("Erreur", "Aucune école n'est associée à la session. Impossible d'ajouter un programme.",
+                    AlertType.WARNING);
+            return;
+        }
+        if (!validateFields()) {
+            return;
+        }
+        Programme p = new Programme();
+        p.setEcoleId(idEcole);
+        p.setNomProgramme(tfNom.getText().trim());
+        p.setNiveau(tfNiveau.getText().trim());
+        p.setDuree(tfDuree.getText().trim());
+        p.setDescriptionProgramme(tfDescription.getText() != null ? tfDescription.getText().trim() : "");
+        try {
+            programmeService.insertProgramme(p);
+            loadTable();
+            clearFields();
+            showAlert("Succès", "Programme ajouté avec succès !", AlertType.INFORMATION);
+        } catch (SQLException e) {
+            showAlert("Erreur", "Erreur lors de l'ajout : " + e.getMessage(), AlertType.ERROR);
+        }
     }
 
     @FXML

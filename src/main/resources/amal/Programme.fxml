@@ -46,7 +46,7 @@
         </GridPane>
 
         <HBox spacing="10" alignment="CENTER">
-            <Button text="Ajouter (désactivé)" disable="true" styleClass="btn-soft"/>
+            <Button fx:id="btnAjouter" text="Ajouter" onAction="#ajouterProgramme" styleClass="btn-soft"/>
             <Button text="Modifier" onAction="#modifierProgramme" styleClass="btn-secondary"/>
             <Button text="Supprimer" onAction="#supprimerProgramme" styleClass="btn-soft"/>
             <Button text="Effacer" onAction="#clearFields" styleClass="btn-soft"/>

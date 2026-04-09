@@ -1,7 +1,9 @@
 package tn.esprit.workshop.services.leith;
 
 import tn.esprit.workshop.model.leith.Bus;
+import tn.esprit.workshop.model.leith.Candidature;
 import tn.esprit.workshop.model.leith.Reclamation;
+import tn.esprit.workshop.model.leith.Trajet;
 import tn.esprit.workshop.utilis.MyBDConnexion;
 
 import java.sql.*;
@@ -93,6 +95,19 @@ public class ReclamationService {
         public String toString() {
             String n = nomEcole != null && !nomEcole.isBlank() ? nomEcole.trim() : "École";
             return n + " (#" + idEcole + ")";
+        }
+    }
+
+    /** Résolution école / bus / trajet pour une réclamation créée par un chauffeur. */
+    public static final class ChauffeurReclamationContext {
+        public final Integer idEcole;
+        public final Integer idBus;
+        public final Integer idTrajet;
+
+        public ChauffeurReclamationContext(Integer idEcole, Integer idBus, Integer idTrajet) {
+            this.idEcole = idEcole;
+            this.idBus = idBus;
+            this.idTrajet = idTrajet;
         }
     }
 
@@ -777,6 +792,49 @@ public class ReclamationService {
         BusService busService = new BusService();
         Bus bus = busService.getByChauffeurId(chauffeurId);
         return bus != null ? bus.getBusId() : null;
+    }
+
+    /**
+     * Résout {@code id_ecole}, {@code id_bus} et {@code id_trajet} pour un chauffeur :
+     * bus affecté puis trajet lié au bus ; si {@code id_ecole} manque sur le bus, repli sur
+     * l’école du trajet puis sur la candidature {@code ACCEPTEE} ({@code candidature.id_ecole}).
+     */
+    public ChauffeurReclamationContext resolveChauffeurReclamationContext(int chauffeurId) throws SQLException {
+        BusService busService = new BusService();
+        TrajetService trajetService = new TrajetService();
+        CandidatureService candidatureService = new CandidatureService();
+
+        Integer idEcole = null;
+        Integer idBus = null;
+        Integer idTrajet = null;
+
+        Bus bus = busService.getByChauffeurId(chauffeurId);
+        if (bus != null) {
+            idBus = bus.getBusId();
+            Integer be = bus.getIdEcole();
+            if (be != null && be > 0) {
+                idEcole = be;
+            }
+            Trajet t = trajetService.getByBusId(bus.getBusId());
+            if (t != null) {
+                idTrajet = t.getTrajetId();
+                if ((idEcole == null || idEcole <= 0) && t.getIdEcole() > 0) {
+                    idEcole = t.getIdEcole();
+                }
+            }
+        }
+
+        if (idEcole == null || idEcole <= 0) {
+            Candidature cand = candidatureService.findByChauffeurId(chauffeurId);
+            if (cand != null && CandidatureService.STATUT_ACCEPTEE.equals(cand.getStatut())) {
+                int ce = cand.getIdEcole();
+                if (ce > 0) {
+                    idEcole = ce;
+                }
+            }
+        }
+
+        return new ChauffeurReclamationContext(idEcole, idBus, idTrajet);
     }
 
     public Reclamation mapResultSetToReclamation(ResultSet rs) throws SQLException {

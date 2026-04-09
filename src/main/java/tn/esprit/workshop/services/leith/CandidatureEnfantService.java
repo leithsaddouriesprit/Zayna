@@ -1,6 +1,7 @@
 package tn.esprit.workshop.services.leith;
 
 import tn.esprit.workshop.model.leith.CandidatureEnfant;
+import tn.esprit.workshop.model.leith.Trajet;
 import tn.esprit.workshop.utilis.MyBDConnexion;
 
 import java.sql.*;
@@ -103,12 +104,88 @@ public class CandidatureEnfantService {
         }
     }
 
-    public void accepter(int candidatureEnfantId, int trajetId) throws SQLException {
-        String sql = "UPDATE candidature_enfant SET statut = 'ACCEPTEE', trajet_id = ? WHERE id = ?";
-        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
-            ps.setInt(1, trajetId);
-            ps.setInt(2, candidatureEnfantId);
-            ps.executeUpdate();
+    /**
+     * Accepte la candidature et crée ou met à jour l’enfant dans {@code enfant} (même transaction).
+     * Évite l’état incohérent « candidature ACCEPTEE sans ligne enfant » si l’insert échouait après l’UPDATE.
+     *
+     * @param idEcole école de l’agent (contrôle de périmètre ; le trajet doit appartenir à cette école)
+     */
+    public void accepter(int candidatureEnfantId, int trajetId, int idEcole) throws SQLException {
+        if (trajetId <= 0) {
+            throw new SQLException("Un trajet valide est obligatoire pour accepter la candidature.");
+        }
+        CandidatureEnfant ce = getById(candidatureEnfantId);
+        if (ce == null) {
+            throw new SQLException("Candidature introuvable.");
+        }
+        if (!STATUT_ENVOYEE.equals(ce.getStatut())) {
+            throw new SQLException("Cette candidature a déjà été traitée.");
+        }
+        if (ce.getIdEcole() != idEcole) {
+            throw new SQLException("Candidature hors périmètre de votre école.");
+        }
+        TrajetService trajetService = new TrajetService();
+        Trajet trajet = trajetService.getById(trajetId);
+        if (trajet == null || trajet.getIdEcole() != idEcole) {
+            throw new SQLException("Le trajet sélectionné est introuvable ou n’appartient pas à votre école.");
+        }
+
+        String nom = ce.getNomEnfant() != null ? ce.getNomEnfant().trim() : "";
+        String prenom = ce.getPrenomEnfant() != null ? ce.getPrenomEnfant().trim() : "";
+        if (nom.isEmpty() || prenom.isEmpty()) {
+            throw new SQLException("Le nom et le prénom de l’enfant sur la candidature sont obligatoires.");
+        }
+
+        Connection conn = getConnection();
+        boolean prevAuto = conn.getAutoCommit();
+        try {
+            conn.setAutoCommit(false);
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "UPDATE candidature_enfant SET statut = 'ACCEPTEE', trajet_id = ? WHERE id = ? AND statut = ?")) {
+                ps.setInt(1, trajetId);
+                ps.setInt(2, candidatureEnfantId);
+                ps.setString(3, STATUT_ENVOYEE);
+                if (ps.executeUpdate() != 1) {
+                    throw new SQLException("Impossible d’accepter cette candidature (déjà traitée ou introuvable).");
+                }
+            }
+            Integer existingEnfantId = null;
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "SELECT id FROM enfant WHERE parent_id = ? AND nom = ? AND prenom = ?")) {
+                ps.setInt(1, ce.getParentId());
+                ps.setString(2, nom);
+                ps.setString(3, prenom);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        existingEnfantId = rs.getInt("id");
+                    }
+                }
+            }
+            if (existingEnfantId != null) {
+                try (PreparedStatement ps = conn.prepareStatement(
+                        "UPDATE enfant SET trajet_id = ?, actif = 1, on_board = 0 WHERE id = ?")) {
+                    ps.setInt(1, trajetId);
+                    ps.setInt(2, existingEnfantId);
+                    if (ps.executeUpdate() != 1) {
+                        throw new SQLException("Mise à jour de l’enfant impossible.");
+                    }
+                }
+            } else {
+                try (PreparedStatement ps = conn.prepareStatement(
+                        "INSERT INTO enfant (nom, prenom, parent_id, trajet_id, actif, on_board) VALUES (?, ?, ?, ?, 1, 0)")) {
+                    ps.setString(1, nom);
+                    ps.setString(2, prenom);
+                    ps.setInt(3, ce.getParentId());
+                    ps.setInt(4, trajetId);
+                    ps.executeUpdate();
+                }
+            }
+            conn.commit();
+        } catch (SQLException e) {
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(prevAuto);
         }
     }
 

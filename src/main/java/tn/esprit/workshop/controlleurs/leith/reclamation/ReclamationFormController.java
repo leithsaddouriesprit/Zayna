@@ -6,11 +6,13 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.VBox;
 import tn.esprit.workshop.controlleurs.leith.SceneNavigator;
 import tn.esprit.workshop.model.leith.Reclamation;
 import tn.esprit.workshop.services.leith.ReclamationHistoriqueService;
 import tn.esprit.workshop.services.leith.ReclamationService;
+import tn.esprit.workshop.services.leith.ReclamationService.ChauffeurReclamationContext;
 import tn.esprit.workshop.services.leith.ReclamationService.ParentEcoleChoice;
 import tn.esprit.workshop.services.leith.MaitresseMetierService;
 import tn.esprit.workshop.utilis.AppSession;
@@ -41,7 +43,8 @@ public class ReclamationFormController implements Initializable {
     private final ReclamationService reclamationService = new ReclamationService();
     private final ReclamationHistoriqueService historiqueService = new ReclamationHistoriqueService();
     private final MaitresseMetierService maitresseMetierService = new MaitresseMetierService();
-    private static final Pattern OBJET_PATTERN = Pattern.compile("^[\\p{L}\\p{N} .,:;!?()'\"\\-_/]{3,120}$");
+    private static final Pattern OBJET_PATTERN = Pattern.compile("^[\\p{L}\\p{N} ]+$");
+    private static final int OBJET_MAX_LEN = 255;
 
     /** Écoles proposées au parent connecté (vide si autre rôle ou erreur). */
     private List<ParentEcoleChoice> parentEcolesCharges = Collections.emptyList();
@@ -55,6 +58,17 @@ public class ReclamationFormController implements Initializable {
         cbPriorite.getSelectionModel().selectFirst();
         SceneNavigator.applyAppCssToComboBoxPopup(cbCategorie);
         SceneNavigator.applyAppCssToComboBoxPopup(cbPriorite);
+
+        tfObjet.setTextFormatter(new TextFormatter<>(change -> {
+            String t = change.getControlNewText();
+            if (t == null) {
+                return null;
+            }
+            if (t.length() > OBJET_MAX_LEN) {
+                return null;
+            }
+            return t.matches("^[\\p{L}\\p{N} ]*$") ? change : null;
+        }));
 
         if ("PARENT".equals(ReclamationUiHelper.filterRoleKey())) {
             AppSession s = AppSession.getInstance();
@@ -116,8 +130,12 @@ public class ReclamationFormController implements Initializable {
             showMsg("L’objet est obligatoire.", true);
             return;
         }
+        if (objet.length() > OBJET_MAX_LEN) {
+            showMsg("Objet invalide : lettres, chiffres et espaces uniquement.", true);
+            return;
+        }
         if (!OBJET_PATTERN.matcher(objet).matches()) {
-            showMsg("Objet invalide : utilisez lettres, chiffres, espaces et ponctuation simple (3 à 120 caractères).", true);
+            showMsg("Objet invalide : lettres, chiffres et espaces uniquement.", true);
             return;
         }
         if (desc.isEmpty()) {
@@ -189,9 +207,18 @@ public class ReclamationFormController implements Initializable {
                         return;
                     }
                     r.setIdChauffeur(s.getChauffeurId());
-                    // École du bus affecté à ce chauffeur (si présent en base) ; sinon id_ecole reste null.
-                    r.setIdEcole(reclamationService.findLikelyEcoleIdForChauffeur(s.getChauffeurId()));
-                    r.setIdBus(reclamationService.findLikelyBusIdForChauffeur(s.getChauffeurId()));
+                    ChauffeurReclamationContext ctx =
+                            reclamationService.resolveChauffeurReclamationContext(s.getChauffeurId());
+                    if (ctx.idEcole == null || ctx.idEcole <= 0) {
+                        showMsg(
+                                "Impossible d'enregistrer : aucune école n'a pu être déterminée pour votre compte chauffeur. "
+                                        + "Vérifiez votre affectation bus/trajet ou votre candidature acceptée, ou contactez l'agent.",
+                                true);
+                        return;
+                    }
+                    r.setIdEcole(ctx.idEcole);
+                    r.setIdBus(ctx.idBus);
+                    r.setIdTrajet(ctx.idTrajet);
                     break;
                 case "MAITRESSE":
                     if (s.getMaitresseId() == null) {

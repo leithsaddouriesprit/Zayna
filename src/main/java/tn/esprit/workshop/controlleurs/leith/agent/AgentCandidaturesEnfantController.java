@@ -7,7 +7,6 @@ import javafx.scene.control.*;
 import tn.esprit.workshop.model.leith.CandidatureEnfant;
 import tn.esprit.workshop.model.leith.Trajet;
 import tn.esprit.workshop.services.leith.CandidatureEnfantService;
-import tn.esprit.workshop.services.leith.EnfantService;
 import tn.esprit.workshop.services.leith.TrajetService;
 import tn.esprit.workshop.utilis.AppSession;
 
@@ -32,7 +31,6 @@ public class AgentCandidaturesEnfantController implements Initializable {
 
     private final CandidatureEnfantService candidatureEnfantService = new CandidatureEnfantService();
     private final TrajetService trajetService = new TrajetService();
-    private final EnfantService enfantService = new EnfantService();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -95,21 +93,41 @@ public class AgentCandidaturesEnfantController implements Initializable {
 
     private void accepter(CandidatureEnfant ce) {
         Integer idEcole = AppSession.getInstance().getEcoleId();
-        if (idEcole == null) return;
+        if (idEcole == null) {
+            return;
+        }
         try {
+            Integer candTrajetId = ce.getTrajetId();
+            if (candTrajetId != null && candTrajetId > 0) {
+                Trajet ref = trajetService.getById(candTrajetId);
+                if (ref == null || ref.getIdEcole() != idEcole) {
+                    new Alert(Alert.AlertType.ERROR,
+                            "Cette candidature indique un trajet inexistant ou qui n’appartient pas à votre école. "
+                                    + "Le parent doit corriger la demande avant acceptation.").showAndWait();
+                    return;
+                }
+            }
             java.util.List<Trajet> trajets = trajetService.selectByEcoleId(idEcole);
             if (trajets.isEmpty()) {
                 new Alert(Alert.AlertType.WARNING, "Aucun trajet disponible pour cette école.").showAndWait();
                 return;
             }
-            ChoiceDialog<Trajet> d = new ChoiceDialog<>(trajets.get(0), trajets);
+            Trajet defaultTrajet = trajets.get(0);
+            if (candTrajetId != null && candTrajetId > 0) {
+                for (Trajet t : trajets) {
+                    if (t.getTrajetId() == candTrajetId) {
+                        defaultTrajet = t;
+                        break;
+                    }
+                }
+            }
+            ChoiceDialog<Trajet> d = new ChoiceDialog<>(defaultTrajet, trajets);
             d.setTitle("Choisir le trajet");
             d.setHeaderText("Sélectionnez le trajet pour cet enfant");
             d.showAndWait().ifPresent(trajet -> {
                 try {
-                    candidatureEnfantService.accepter(ce.getId(), trajet.getTrajetId());
-                    enfantService.insertFromCandidature(ce.getNomEnfant(), ce.getPrenomEnfant(), ce.getParentId(), trajet.getTrajetId());
-                    new Alert(Alert.AlertType.INFORMATION, "✅ Candidature acceptée, enfant créé.").showAndWait();
+                    candidatureEnfantService.accepter(ce.getId(), trajet.getTrajetId(), idEcole);
+                    new Alert(Alert.AlertType.INFORMATION, "✅ Candidature acceptée, enfant enregistré.").showAndWait();
                     load();
                 } catch (SQLException ex) {
                     LOG.log(Level.SEVERE, "accepter", ex);

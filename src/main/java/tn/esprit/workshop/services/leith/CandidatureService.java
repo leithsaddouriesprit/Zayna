@@ -30,7 +30,7 @@ public class CandidatureService {
      */
     public Candidature findByChauffeurId(int chauffeurId) throws SQLException {
         String sql =
-                "SELECT c.id, c.chauffeur_id, c.statut, c.date_envoi, c.maladie, " +
+                "SELECT c.id, c.chauffeur_id, c.id_ecole, c.statut, c.date_envoi, c.maladie, " +
                         "ch.nom, ch.prenom, c.permis_recto " +
                         "FROM candidature c " +
                         "JOIN chauffeur ch ON c.chauffeur_id = ch.id " +
@@ -42,6 +42,10 @@ public class CandidatureService {
                     Candidature c = new Candidature();
                     c.setId(rs.getInt("id"));
                     c.setChauffeurId(rs.getInt("chauffeur_id"));
+                    int idEcole = rs.getInt("id_ecole");
+                    if (!rs.wasNull()) {
+                        c.setIdEcole(idEcole);
+                    }
                     c.setStatut(rs.getString("statut"));
                     Timestamp ts = rs.getTimestamp("date_envoi");
                     if (ts != null) c.setDateEnvoi(ts.toLocalDateTime());
